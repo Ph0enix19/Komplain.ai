@@ -30,7 +30,21 @@ function ConfidenceMeter({ value }) {
   );
 }
 
-function ResolutionCard({ running, resolution, onApprove, tone, onOpenDetail, scenarioKey }) {
+function ResolutionCard({
+  running,
+  resolution,
+  onApprove,
+  tone,
+  onOpenDetail,
+  isEditing,
+  draft,
+  onDraftChange,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onCopyReply,
+  scenarioKey,
+}) {
   if (!resolution && !running) {
     return (
       <aside className="panel resolution-panel">
@@ -118,36 +132,76 @@ function ResolutionCard({ running, resolution, onApprove, tone, onOpenDetail, sc
       </div>
 
       <div className="res-replies">
-        <ReplyBlock lang="EN" flag="🇬🇧" text={resolution.response_en} tone={tone} />
-        <ReplyBlock lang="BM" flag="🇲🇾" text={resolution.response_bm} tone={tone} primary />
+        <ReplyBlock
+          lang="EN"
+          flag="🇬🇧"
+          text={isEditing ? draft.response_en : resolution.response_en}
+          tone={tone}
+          editable={isEditing}
+          onChange={(value) => onDraftChange({ ...draft, response_en: value })}
+          onCopy={onCopyReply}
+        />
+        <ReplyBlock
+          lang="BM"
+          flag="🇲🇾"
+          text={isEditing ? draft.response_bm : resolution.response_bm}
+          tone={tone}
+          primary
+          editable={isEditing}
+          onChange={(value) => onDraftChange({ ...draft, response_bm: value })}
+          onCopy={onCopyReply}
+        />
       </div>
 
       <div className="res-actions">
-        <button className="btn btn-ghost">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit
-        </button>
-        <button className="btn btn-primary" onClick={onApprove}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
-          Approve & close case
-        </button>
+        {!isEditing && (
+          <button className="btn btn-ghost" type="button" onClick={onStartEdit}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit replies
+          </button>
+        )}
+        {isEditing && (
+          <button className="btn btn-ghost" type="button" onClick={onCancelEdit}>
+            Cancel
+          </button>
+        )}
+        {isEditing && (
+          <button className="btn btn-primary" type="button" onClick={onSaveEdit}>
+            Save draft
+          </button>
+        )}
+        {!isEditing && (
+          <button className="btn btn-primary" type="button" onClick={onApprove}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
+            Approve & close case
+          </button>
+        )}
       </div>
     </aside>
   );
 }
 
-function ReplyBlock({ lang, flag, text, tone, primary }) {
+function ReplyBlock({ lang, flag, text, tone, primary, editable, onChange, onCopy }) {
   return (
     <div className={'reply ' + (primary ? 'reply-primary' : '')}>
       <div className="reply-head">
         <span className="reply-flag">{flag}</span>
         <span className="reply-lang mono">{lang === 'EN' ? 'English reply' : 'Bahasa Malaysia · reply'}</span>
         <span className="reply-meta mono">{text.length} chars · tone: {tone}</span>
-        <button className="reply-copy" title="Copy">
+        <button className="reply-copy" type="button" title="Copy" onClick={() => onCopy(text)}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         </button>
       </div>
-      <pre className="reply-body">{text}</pre>
+      {editable ? (
+        <textarea
+          className="textarea reply-editor"
+          rows={6}
+          value={text}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <pre className="reply-body">{text}</pre>
+      )}
     </div>
   );
 }

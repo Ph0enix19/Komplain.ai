@@ -1,1 +1,186 @@
-[]
+[
+  {
+    "id": "6c0925aa-f002-4407-abbb-071d6f0aad81",
+    "complaint_text": "Hi, my order ORD-1887 arrived damaged and I need help.",
+    "created_at": "2026-04-22T10:14:52.908802+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.82,
+      "rationale": "Damaged product reported, refund is the quickest resolution.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: REFUND. Damaged product reported, refund is the quickest resolution.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: REFUND. Sebab: Damaged product reported, refund is the quickest resolution."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "c67709d6-6d73-40a7-b77e-64e1d552f13c",
+    "complaint_text": "Saya nak refund. Barang rosak.",
+    "created_at": "2026-04-22T10:20:27.799164+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Missing order ID. Ask user to provide an order ID."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.35,
+      "rationale": "Cannot process without order ID.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your message. Please share your order ID so we can verify and resolve this quickly.",
+      "bahasa_malaysia": "Terima kasih atas mesej anda. Sila kongsikan ID pesanan anda supaya kami boleh semak dan selesaikan dengan cepat."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "08e79cf8-f7b1-4172-8dbe-f623e06dcaf2",
+    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
+    "created_at": "2026-04-22T10:24:07.772851+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.82,
+      "rationale": "Damaged product reported, refund is the quickest resolution.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: REFUND. Damaged product reported, refund is the quickest resolution.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: REFUND. Sebab: Damaged product reported, refund is the quickest resolution."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "20ffeaa7-002e-4108-b56d-9196525ec11d",
+    "complaint_text": "HELLO",
+    "created_at": "2026-04-22T10:24:54.817177+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Missing order ID. Ask user to provide an order ID."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.35,
+      "rationale": "Cannot process without order ID.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your message. Please share your order ID so we can verify and resolve this quickly.",
+      "bahasa_malaysia": "Terima kasih atas mesej anda. Sila kongsikan ID pesanan anda supaya kami boleh semak dan selesaikan dengan cepat."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "2adeedae-8f12-4b66-b4fd-8e786c727a7a",
+    "complaint_text": "Brader, barang saya tak sampai lagi la. Dah 2 minggu tracking still processing je. Mana pergi barang saya ni? Order ORD-2041. Kalau tak settle hari ni, I nak refund balik.",
+    "created_at": "2026-04-22T11:45:32.562729+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.55,
+      "rationale": "Needs manual review due to unclear issue context.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: ESCALATE. Needs manual review due to unclear issue context.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: ESCALATE. Sebab: Needs manual review due to unclear issue context."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  }
+]

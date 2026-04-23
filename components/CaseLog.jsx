@@ -1,22 +1,28 @@
 // CaseLog — bottom strip + CaseDetail modal
 
 function CaseLog({ cases, onOpen, activeId }) {
+  const [filter, setFilter] = React.useState('all');
+  const filteredCases = cases.filter((c) => {
+    if (filter === 'all') return true;
+    return c.status === filter;
+  });
+
   return (
     <section className="panel case-log">
       <div className="panel-head">
         <div className="panel-title">
           <span className="panel-ix mono">04</span>
           <h2>Case log</h2>
-          <span className="mono subhead">{cases.length} cases · last 24 h</span>
+          <span className="mono subhead">{filteredCases.length} cases · last 24 h</span>
         </div>
         <div style={{display:'flex', gap:8, alignItems:'center'}}>
           <div className="seg seg-sm">
-            <button className="seg-btn seg-active">All</button>
-            <button className="seg-btn">Resolved</button>
-            <button className="seg-btn">Review</button>
-            <button className="seg-btn">Pending</button>
+            <button className={'seg-btn ' + (filter === 'all' ? 'seg-active' : '')} type="button" onClick={() => setFilter('all')}>All</button>
+            <button className={'seg-btn ' + (filter === 'resolved' ? 'seg-active' : '')} type="button" onClick={() => setFilter('resolved')}>Resolved</button>
+            <button className={'seg-btn ' + (filter === 'review' ? 'seg-active' : '')} type="button" onClick={() => setFilter('review')}>Review</button>
+            <button className={'seg-btn ' + (filter === 'pending' ? 'seg-active' : '')} type="button" onClick={() => setFilter('pending')}>Pending</button>
           </div>
-          <button className="btn btn-ghost btn-sm">
+          <button className="btn btn-ghost btn-sm" type="button">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             Export
           </button>
@@ -33,12 +39,12 @@ function CaseLog({ cases, onOpen, activeId }) {
           <div>Status</div>
           <div style={{textAlign:'right'}}>Updated</div>
         </div>
-        {cases.map(c => {
+        {filteredCases.map(c => {
           const meta = RESOLUTION_META[c.resolution] || RESOLUTION_META.REFUND;
           const isActive = c.id === activeId;
           return (
-            <button key={c.id} className={'case-row ' + (isActive ? 'case-row-active' : '')} onClick={() => onOpen(c)}>
-              <div className="mono case-id">{c.id}{isActive && <span className="case-live mono">live</span>}</div>
+            <button key={c.id} type="button" className={'case-row ' + (isActive ? 'case-row-active' : '')} onClick={() => onOpen(c)}>
+              <div className="mono case-id" title={c.id}>{c.displayId || c.id}{isActive && <span className="case-live mono">live</span>}</div>
               <div className="case-preview">{c.preview}</div>
               <div className="mono" style={{color:'var(--fg-muted)'}}>{c.order}</div>
               <div className="mono" style={{color:'var(--fg-muted)', fontSize:11}}>{c.lang}</div>
@@ -80,23 +86,34 @@ function StatusPill({ status }) {
 
 // ---------------- Case Detail Modal ----------------
 
-function CaseDetailModal({ caseData, events, resolution, onClose, scenarioComplaint }) {
+function CaseDetailModal({ caseData, events, resolution, onClose, scenarioComplaint, orderData }) {
   if (!caseData) return null;
   const meta = RESOLUTION_META[caseData.resolution] || RESOLUTION_META.REFUND;
-  const order = window.MOCK_ORDERS[caseData.order];
+  const caseLabel = caseData.displayId || caseData.id;
+  const order = orderData || window.MOCK_ORDERS[caseData.order];
+  const orderView = order ? {
+    id: order.id || order.order_id || '—',
+    product: order.product_name || order.item || '—',
+    orderDate: order.order_date || order.delivery_date || '—',
+    courier: order.courier || '—',
+    tracking: order.tracking || '—',
+    status: order.delivery_status || order.status || '—',
+    daysSince: order.days_since_order || '—',
+    refundWindow: order.seller_policy_refund_days || '—',
+  } : null;
 
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <header className="modal-head">
           <div>
-            <div className="mono" style={{color:'var(--fg-subtle)', fontSize:11}}>CASE · {caseData.id}</div>
+            <div className="mono" style={{color:'var(--fg-subtle)', fontSize:11}} title={caseData.id}>CASE · {caseLabel}</div>
             <h2 className="modal-title">Complaint detail <span style={{color:'var(--fg-muted)', fontWeight:400, fontSize:14}}>· debug view</span></h2>
           </div>
           <div style={{display:'flex', gap:8, alignItems:'center'}}>
             <span className="res-pill mono" style={{background: meta.bg, color: meta.fg, fontSize:12, padding:'4px 10px'}}>{caseData.resolution}</span>
             <StatusPill status={caseData.status} />
-            <button className="btn btn-ghost" onClick={onClose} aria-label="Close">
+            <button className="btn btn-ghost" type="button" onClick={onClose} aria-label="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
@@ -202,18 +219,18 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
               </ol>
             </div>
 
-            {order && (
+            {orderView && (
               <div className="side-block">
                 <div className="section-label mono">ORDER CONTEXT</div>
                 <div className="kv-grid mono">
-                  <div><span className="kv-k">id</span><span>{order.id}</span></div>
-                  <div><span className="kv-k">product</span><span>{order.product_name}</span></div>
-                  <div><span className="kv-k">order_date</span><span>{order.order_date}</span></div>
-                  <div><span className="kv-k">courier</span><span>{order.courier}</span></div>
-                  <div><span className="kv-k">tracking</span><span>{order.tracking}</span></div>
-                  <div><span className="kv-k">status</span><span style={{color:'var(--warn-fg)'}}>{order.delivery_status}</span></div>
-                  <div><span className="kv-k">days_since</span><span>{order.days_since_order}</span></div>
-                  <div><span className="kv-k">refund_window</span><span>{order.seller_policy_refund_days}d</span></div>
+                  <div><span className="kv-k">id</span><span>{orderView.id}</span></div>
+                  <div><span className="kv-k">product</span><span>{orderView.product}</span></div>
+                  <div><span className="kv-k">order_date</span><span>{orderView.orderDate}</span></div>
+                  <div><span className="kv-k">courier</span><span>{orderView.courier}</span></div>
+                  <div><span className="kv-k">tracking</span><span>{orderView.tracking}</span></div>
+                  <div><span className="kv-k">status</span><span style={{color:'var(--warn-fg)'}}>{orderView.status}</span></div>
+                  <div><span className="kv-k">days_since</span><span>{orderView.daysSince}</span></div>
+                  <div><span className="kv-k">refund_window</span><span>{orderView.refundWindow === '—' ? '—' : `${orderView.refundWindow}d`}</span></div>
                 </div>
               </div>
             )}
