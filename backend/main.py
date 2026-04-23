@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from backend.agents import (
@@ -21,6 +22,14 @@ from backend.models import ComplaintCreate, TestLLMRequest, TestLLMResponse
 from backend.storage import DataManager
 
 app = FastAPI(title="Komplain.ai Backend", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:3000", "http://localhost:3000"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 data_manager = DataManager(data_dir="data")
 ollama_client = OllamaClient()
@@ -49,8 +58,11 @@ async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
 @app.post("/api/complaints")
 def create_complaint(payload: ComplaintCreate) -> dict:
     complaint_id = str(uuid4())
+    complaint_text = payload.complaint_text.strip()
+    if payload.order_id and payload.order_id not in complaint_text:
+        complaint_text = f"{complaint_text}\n\nOrder ID: {payload.order_id}"
 
-    intake = intake_agent(payload.complaint_text)
+    intake = intake_agent(complaint_text)
     data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake.model_dump()))
 
     context = context_agent(data_manager, intake)
@@ -73,7 +85,7 @@ def create_complaint(payload: ComplaintCreate) -> dict:
 
     complaint = {
         "id": complaint_id,
-        "complaint_text": payload.complaint_text,
+        "complaint_text": complaint_text,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "COMPLETED",
         "intake": intake.model_dump(),
@@ -97,6 +109,13 @@ def get_complaint(complaint_id: str) -> dict:
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found")
     return complaint
+
+
+@app.get("/api/complaints/{complaint_id}/events")
+def get_complaint_events(complaint_id: str) -> list[dict]:
+    if not data_manager.get_complaint(complaint_id):
+        raise HTTPException(status_code=404, detail="Complaint not found")
+    return [e for e in data_manager.agent_events if e["complaint_id"] == complaint_id]
 
 
 @app.get("/api/complaints/{complaint_id}/stream")

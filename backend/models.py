@@ -16,6 +16,7 @@ class Decision(str, Enum):
 
 class ComplaintCreate(BaseModel):
     complaint_text: str = Field(..., min_length=5)
+    order_id: Optional[str] = None
 
 
 class IntakeResult(BaseModel):

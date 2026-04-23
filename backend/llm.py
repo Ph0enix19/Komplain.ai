@@ -13,7 +13,7 @@ class OllamaClient:
         timeout: float = 30.0,
     ) -> None:
         self.base_url = base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-        self.model = model or os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+        self.model = model or os.getenv("OLLAMA_MODEL", "llama3.2:3b")
         self.timeout = timeout
 
     async def chat(self, prompt: str, system: str = "You are a helpful assistant.") -> str:

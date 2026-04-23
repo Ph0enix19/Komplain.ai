@@ -540,6 +540,12 @@
   max-height: 180px;
   overflow-y: auto;
 }
+.reply-editor {
+  border: none;
+  background: transparent;
+  min-height: 140px;
+  border-radius: 0;
+}
 
 .res-actions { display: flex; gap: 8px; margin-top: 4px; }
 .res-actions .btn-primary { flex: 1; justify-content: center; }
@@ -573,7 +579,16 @@
 .case-row-active:hover { background: var(--accent-soft); }
 .case-head { color: var(--fg-subtle); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; cursor: default; border-top: none; font-weight: 600; padding-top: 0; }
 .case-head:hover { background: transparent; }
-.case-id { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.case-id {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .case-live { font-size: 9px; padding: 1px 5px; background: var(--accent); color: var(--bg-elev); border-radius: 3px; letter-spacing: 0.08em; }
 .case-preview {
   color: var(--fg-muted);
