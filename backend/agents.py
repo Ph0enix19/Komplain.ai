@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-import re
+import os
 from uuid import uuid4
 
-import httpx
 from pydantic import ValidationError
 
 from backend.llm import ILMUClient
@@ -57,147 +56,25 @@ Return only valid JSON with exactly these keys:
 - priority: one of "normal", "high"
 - supervisor_note: short string"""
 
-AGENT_LLM_TIMEOUT_SECONDS = 12
+AGENT_LLM_TIMEOUT_SECONDS = float(os.getenv("AGENT_LLM_TIMEOUT_SECONDS", "180"))
 
 
-def _validated(model_cls, payload: dict, fallback_message: str):
+def _validated(model_cls, payload: dict, error_message: str):
     try:
         return model_cls(**payload)
     except ValidationError as exc:
-        raise RuntimeError(fallback_message) from exc
-
-
-def _extract_order_id(text: str) -> str | None:
-    match = re.search(r"\b([A-Z]{2,5}-\d{3,6})\b", text.upper())
-    return match.group(1) if match else None
-
-
-def _fallback_intake(complaint_text: str) -> dict:
-    lowered = complaint_text.lower()
-    if any(word in lowered for word in ("damage", "damaged", "broken", "crack", "rosak", "pecah", "torn")):
-        issue_type = "damaged_item"
-    elif any(word in lowered for word in ("wrong item", "incorrect item", "salah barang", "missing item")):
-        issue_type = "wrong_item"
-    elif any(word in lowered for word in ("late", "delay", "tak sampai", "not arrive", "still processing")):
-        issue_type = "delivery_delay"
-    elif any(word in lowered for word in ("refund", "money back", "bayaran balik")):
-        issue_type = "refund_request"
-    elif any(word in lowered for word in ("bill", "charged", "payment", "billing")):
-        issue_type = "billing"
-    else:
-        issue_type = "unknown"
-
-    if any(word in lowered for word in ("angry", "terrible", "bad", "refund", "rosak", "broken", "late")):
-        sentiment = "negative"
-    elif any(word in lowered for word in ("thanks", "thank you", "please")):
-        sentiment = "positive"
-    else:
-        sentiment = "neutral"
-
-    return {
-        "customer_name": None,
-        "order_id": _extract_order_id(complaint_text),
-        "issue_type": issue_type,
-        "sentiment": sentiment,
-    }
-
-
-def _fallback_context(order: dict | None, intake: IntakeResult) -> dict:
-    if order:
-        notes = f"Order found for {order.get('status', 'unknown').lower()} item."
-    elif intake.order_id:
-        notes = "Order ID provided but no matching order was found."
-    else:
-        notes = "Missing order ID. Ask user to provide an order ID."
-    return {
-        "order_found": bool(order),
-        "order_data": order,
-        "notes": notes,
-    }
-
-
-def _fallback_reasoning(intake: IntakeResult, context: ContextResult) -> dict:
-    if not context.order_found:
-        return {
-            "decision": "ESCALATE",
-            "confidence": 0.35,
-            "rationale": "We could not verify the order details automatically.",
-            "requires_human_review": True,
-        }
-    if intake.issue_type == "damaged_item":
-        return {
-            "decision": "REFUND",
-            "confidence": 0.86,
-            "rationale": "The complaint indicates the delivered item arrived damaged.",
-            "requires_human_review": False,
-        }
-    if intake.issue_type in {"wrong_item", "delivery_delay"}:
-        return {
-            "decision": "RESHIP",
-            "confidence": 0.78,
-            "rationale": "A replacement is the fastest resolution for this delivery issue.",
-            "requires_human_review": False,
-        }
-    if intake.issue_type in {"billing", "refund_request"}:
-        return {
-            "decision": "ESCALATE",
-            "confidence": 0.6,
-            "rationale": "Billing and refund requests need manual verification before action.",
-            "requires_human_review": True,
-        }
-    return {
-        "decision": "ESCALATE",
-        "confidence": 0.5,
-        "rationale": "The case needs manual review because the issue is still unclear.",
-        "requires_human_review": True,
-    }
-
-
-def _fallback_response(reasoning: ReasoningResult, context: ContextResult) -> dict:
-    item = context.order_data.get("item") if context.order_data else "your order"
-    if reasoning.decision == "REFUND":
-        english = f"Thanks for reaching out. We are sorry that {item} arrived damaged. We will proceed with a refund for you."
-        bahasa_malaysia = f"Terima kasih kerana menghubungi kami. Kami mohon maaf kerana {item} tiba dalam keadaan rosak. Kami akan teruskan proses bayaran balik untuk anda."
-    elif reasoning.decision == "RESHIP":
-        english = f"Thanks for reaching out. We will arrange a replacement for {item} and keep you updated."
-        bahasa_malaysia = f"Terima kasih kerana menghubungi kami. Kami akan aturkan penggantian untuk {item} dan memaklumkan perkembangan kepada anda."
-    elif reasoning.decision == "DISMISS":
-        english = "Thanks for reaching out. Based on the current order details, we could not confirm an issue that needs action."
-        bahasa_malaysia = "Terima kasih kerana menghubungi kami. Berdasarkan butiran pesanan semasa, kami tidak dapat mengesahkan isu yang memerlukan tindakan."
-    else:
-        english = "Thanks for reaching out. We need a support specialist to review this case before we take action."
-        bahasa_malaysia = "Terima kasih kerana menghubungi kami. Kami memerlukan pegawai sokongan untuk menyemak kes ini sebelum tindakan diambil."
-    return {
-        "english": english,
-        "bahasa_malaysia": bahasa_malaysia,
-    }
-
-
-def _fallback_supervisor(reasoning: ReasoningResult, context: ContextResult) -> dict:
-    needs_review = reasoning.requires_human_review or not context.order_found
-    return {
-        "requires_human_review": needs_review,
-        "priority": "high" if needs_review else "normal",
-        "supervisor_note": (
-            "Escalate to human support for manual handling."
-            if needs_review
-            else "Auto-resolution is acceptable."
-        ),
-    }
+        raise RuntimeError(error_message) from exc
 
 
 async def intake_agent(llm_client: ILMUClient, complaint_text: str) -> IntakeResult:
-    try:
-        payload = await asyncio.wait_for(
-            llm_client.chat_json(
+    payload = await asyncio.wait_for(
+        llm_client.chat_json(
             prompt=f"Complaint:\n{complaint_text}",
             system=INTAKE_SYSTEM,
-            max_tokens=220,
-            ),
-            timeout=AGENT_LLM_TIMEOUT_SECONDS,
-        )
-    except (RuntimeError, httpx.HTTPError, TimeoutError):
-        payload = _fallback_intake(complaint_text)
+            max_tokens=1024,
+        ),
+        timeout=AGENT_LLM_TIMEOUT_SECONDS,
+    )
     if isinstance(payload.get("customer_name"), str):
         payload["customer_name"] = payload["customer_name"].strip() or None
     if isinstance(payload.get("order_id"), str):
@@ -215,20 +92,17 @@ async def context_agent(
     intake: IntakeResult,
 ) -> ContextResult:
     order = data_manager.get_order(intake.order_id) if intake.order_id else None
-    try:
-        payload = await asyncio.wait_for(
-            llm_client.chat_json(
+    payload = await asyncio.wait_for(
+        llm_client.chat_json(
             prompt=(
                 f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
                 f"Order lookup result:\n{order if order is not None else 'null'}"
             ),
             system=CONTEXT_SYSTEM,
-            max_tokens=180,
-            ),
-            timeout=AGENT_LLM_TIMEOUT_SECONDS,
-        )
-    except (RuntimeError, httpx.HTTPError, TimeoutError):
-        payload = _fallback_context(order, intake)
+            max_tokens=1024,
+        ),
+        timeout=AGENT_LLM_TIMEOUT_SECONDS,
+    )
     payload["order_found"] = bool(order)
     payload["order_data"] = order
     return _validated(ContextResult, payload, "Context agent returned invalid data.")
@@ -240,21 +114,18 @@ async def reasoning_agent(
     intake: IntakeResult,
     context: ContextResult,
 ) -> ReasoningResult:
-    try:
-        payload = await asyncio.wait_for(
-            llm_client.chat_json(
+    payload = await asyncio.wait_for(
+        llm_client.chat_json(
             prompt=(
                 f"Complaint:\n{complaint_text}\n\n"
                 f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
                 f"Context:\n{context.model_dump_json(indent=2)}"
             ),
             system=REASONING_SYSTEM,
-            max_tokens=260,
-            ),
-            timeout=AGENT_LLM_TIMEOUT_SECONDS,
-        )
-    except (RuntimeError, httpx.HTTPError, TimeoutError):
-        payload = _fallback_reasoning(intake, context)
+            max_tokens=1024,
+        ),
+        timeout=AGENT_LLM_TIMEOUT_SECONDS,
+    )
     if isinstance(payload.get("decision"), str):
         payload["decision"] = payload["decision"].strip().upper()
     try:
@@ -273,21 +144,18 @@ async def response_agent(
     reasoning: ReasoningResult,
     context: ContextResult,
 ) -> ResponseResult:
-    try:
-        payload = await asyncio.wait_for(
-            llm_client.chat_json(
+    payload = await asyncio.wait_for(
+        llm_client.chat_json(
             prompt=(
                 f"Complaint:\n{complaint_text}\n\n"
                 f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
                 f"Context:\n{context.model_dump_json(indent=2)}"
             ),
             system=RESPONSE_SYSTEM,
-            max_tokens=320,
-            ),
-            timeout=AGENT_LLM_TIMEOUT_SECONDS,
-        )
-    except (RuntimeError, httpx.HTTPError, TimeoutError):
-        payload = _fallback_response(reasoning, context)
+            max_tokens=1536,
+        ),
+        timeout=AGENT_LLM_TIMEOUT_SECONDS,
+    )
     if isinstance(payload.get("english"), str):
         payload["english"] = payload["english"].strip()
     if isinstance(payload.get("bahasa_malaysia"), str):
@@ -300,20 +168,17 @@ async def supervisor_logic(
     reasoning: ReasoningResult,
     context: ContextResult,
 ) -> dict:
-    try:
-        payload = await asyncio.wait_for(
-            llm_client.chat_json(
+    payload = await asyncio.wait_for(
+        llm_client.chat_json(
             prompt=(
                 f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
                 f"Context:\n{context.model_dump_json(indent=2)}"
             ),
             system=SUPERVISOR_SYSTEM,
-            max_tokens=180,
-            ),
-            timeout=AGENT_LLM_TIMEOUT_SECONDS,
-        )
-    except (RuntimeError, httpx.HTTPError, TimeoutError):
-        payload = _fallback_supervisor(reasoning, context)
+            max_tokens=1024,
+        ),
+        timeout=AGENT_LLM_TIMEOUT_SECONDS,
+    )
     required_keys = {"requires_human_review", "priority", "supervisor_note"}
     if not required_keys.issubset(payload):
         raise RuntimeError("Supervisor agent returned invalid data.")

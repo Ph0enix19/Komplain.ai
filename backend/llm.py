@@ -20,7 +20,8 @@ class ILMUClient:
         self.base_url = (base_url or os.getenv("ILMU_BASE_URL", "https://api.ilmu.ai/v1")).rstrip("/")
         self.model = model or os.getenv("ILMU_MODEL", "ilmu-glm-5.1")
         self.api_key = os.getenv("ILMU_API_KEY")
-        self.timeout = timeout or float(os.getenv("ILMU_TIMEOUT", "60"))
+        self.timeout = timeout or float(os.getenv("ILMU_TIMEOUT", "180"))
+        self.reasoning_effort = os.getenv("ILMU_REASONING_EFFORT", "low")
 
     async def chat(
         self,
@@ -39,6 +40,8 @@ class ILMUClient:
             ],
             "max_tokens": max_tokens or self.MAX_TOKENS,
         }
+        if self.reasoning_effort:
+            payload["reasoning_effort"] = self.reasoning_effort
         data = await self._create_chat_completion(payload)
 
         try:
@@ -66,7 +69,28 @@ class ILMUClient:
         *,
         max_tokens: int | None = None,
     ) -> dict[str, Any]:
-        raw_text = await self.chat(prompt, system=system, max_tokens=max_tokens)
+        if not self.api_key:
+            raise RuntimeError("ILMU_API_KEY is not configured.")
+
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens or self.MAX_TOKENS,
+            "response_format": {"type": "json_object"},
+        }
+        if self.reasoning_effort:
+            payload["reasoning_effort"] = self.reasoning_effort
+
+        data = await self._create_chat_completion(payload)
+        try:
+            raw_text = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise RuntimeError("Unexpected response format from ILMU API.") from exc
+        if not isinstance(raw_text, str):
+            raise RuntimeError("ILMU API returned no JSON message content.")
         return self._extract_json_object(raw_text)
 
     async def _create_chat_completion(self, payload: dict[str, Any]) -> dict[str, Any]:

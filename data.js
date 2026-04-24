@@ -213,7 +213,7 @@ window.PIPELINES = {
       type: 'CLARIFY',
       confidence: 0.62,
       reason: 'Complaint asserts damage and requests refund but contains no order reference. Intake Agent could not extract an order ID; Context Agent cannot enrich without one. Supervisor intercepted and generated a bilingual clarification request rather than forcing a low-confidence resolution.',
-      policy: 'Supervisor fallback · missing_context handler',
+      policy: 'Supervisor review · missing_context handler',
       response_en: "Hi,\n\nThanks for getting in touch. I can see you'd like a refund because the item arrived damaged — I'm sorry about that.\n\nTo pull up your order and process this quickly, could you share your order number (starts with ORD-)? You can find it in your confirmation email or your account under 'My Orders'.\n\nOnce I have that, I'll sort this out straight away.\n\n— Nadia, Sambal & Silk",
       response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami. Saya faham anda ingin refund kerana barang yang diterima rosak — kami mohon maaf atas keadaan ini.\n\nUntuk membantu kami menyemak pesanan anda dengan cepat, boleh kongsikan nombor pesanan anda (bermula dengan ORD-)? Anda boleh temuinya dalam email pengesahan atau di akaun anda di bawah 'My Orders'.\n\nSetelah kami terima nombor tersebut, kami akan uruskan dengan segera.\n\n— Nadia, Sambal & Silk",
       amount: '—',

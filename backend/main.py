@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 from uuid import uuid4
@@ -162,6 +161,8 @@ async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
         ) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
+    except TimeoutError as exc:
+        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -185,6 +186,8 @@ async def create_complaint(payload: ComplaintCreate) -> dict:
         ) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
+    except TimeoutError as exc:
+        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

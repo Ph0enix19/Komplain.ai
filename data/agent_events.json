@@ -1510,5 +1510,330 @@
       "supervisor_note": "Escalate to human support for manual handling."
     },
     "created_at": "2026-04-24T18:59:15.971082+00:00"
+  },
+  {
+    "id": "997e612e-ea53-4f0a-af38-3bd22a086ac6",
+    "complaint_id": "61b96c80-05b4-494d-98a7-b9c5daa0358d",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "refund_request",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:16:41.888506+00:00"
+  },
+  {
+    "id": "e7b7bc1b-6615-4aa6-afe9-0ffb831ffdaf",
+    "complaint_id": "61b96c80-05b4-494d-98a7-b9c5daa0358d",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina. Status: SHIPPED. Issue: refund request with negative sentiment."
+    },
+    "created_at": "2026-04-24T19:16:46.773479+00:00"
+  },
+  {
+    "id": "abf57a02-0bf4-4368-9a0e-b53455647ee4",
+    "complaint_id": "61b96c80-05b4-494d-98a7-b9c5daa0358d",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "REFUND",
+      "confidence": 0.9,
+      "rationale": "Order shipped two weeks ago with no delivery date, indicating likely lost in transit. Customer explicitly requested refund.",
+      "requires_human_review": false
+    },
+    "created_at": "2026-04-24T19:16:51.596613+00:00"
+  },
+  {
+    "id": "f0890f1c-6601-4897-8637-9179399592c2",
+    "complaint_id": "61b96c80-05b4-494d-98a7-b9c5daa0358d",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Dear Aina, We sincerely apologize for the delay with your order ORD-2041. Since your Baju Kurung Moden - Maroon XL has not arrived after two weeks, we have processed a full refund of RM 89.00 to your original payment method. Please allow a few business days for the amount to reflect. We truly regret the inconvenience caused.",
+      "bahasa_malaysia": "Kepada Aina, kami memohon maaf atas kelewatan pesanan ORD-2041 anda. Oleh kerana Baju Kurung Moden - Maroon XL anda belum tiba selepas dua minggu, kami telah memproses bayaran balik penuh sebanyak RM 89.00. Sila berikan masa beberapa hari bekerja untuk ia diproses. Kami amat menyesali ketidakselesaan yang dialami."
+    },
+    "created_at": "2026-04-24T19:17:01.708980+00:00"
+  },
+  {
+    "id": "1e287742-89c3-4d85-82df-4693594a38bc",
+    "complaint_id": "0738c7e9-c213-4866-a2ff-3bf44693d11a",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "refund_request",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:22:08.236446+00:00"
+  },
+  {
+    "id": "196cf174-1a76-4c89-9f53-9404e145d593",
+    "complaint_id": "0738c7e9-c213-4866-a2ff-3bf44693d11a",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order ORD-2041 found for Aina. Status: SHIPPED. Issue: refund request. Sentiment: negative."
+    },
+    "created_at": "2026-04-24T19:22:13.264972+00:00"
+  },
+  {
+    "id": "87532530-5f33-41ef-8c79-a6011d24de47",
+    "complaint_id": "0738c7e9-c213-4866-a2ff-3bf44693d11a",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "ESCALATE",
+      "confidence": 0.85,
+      "rationale": "Order is marked as SHIPPED but has no delivery date and has been delayed for two weeks, effectively making it a missing order. This requires manual review to confirm the lost shipment status and reconcile the customer's refund request with the standard reship policy for delays.",
+      "requires_human_review": true
+    },
+    "created_at": "2026-04-24T19:22:21.507348+00:00"
+  },
+  {
+    "id": "e3571e13-2586-4beb-8c4e-75d0faf99534",
+    "complaint_id": "0738c7e9-c213-4866-a2ff-3bf44693d11a",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Dear Aina, I am truly sorry that your Baju Kurung Moden - Maroon XL has not arrived after two weeks. I understand you are requesting a refund. As your order is marked as shipped but appears lost in transit, I have escalated your case to our specialized team for manual review. They will investigate the shipment and assist you with your refund request as soon as possible. Thank you for your patience.",
+      "bahasa_malaysia": "Kepada Aina, saya amat minta maaf kerana Baju Kurung Moden - Maroon XL anda belum tiba selepas dua minggu. Saya faham anda memohon bayaran balik. Memandangkan pesanan anda berstatus dihantar tetapi kelihatan hilang dalam pengangkutan, saya telah merujuk kes anda kepada pasukan khas kami untuk semakan manual. Mereka akan menyiasat penghantaran dan membantu permohonan bayaran balik anda secepat mungkin. Terima kasih atas kesabaran anda."
+    },
+    "created_at": "2026-04-24T19:22:30.932837+00:00"
+  },
+  {
+    "id": "1ffa72de-d3e2-4c8b-b2d8-bf2758357498",
+    "complaint_id": "0738c7e9-c213-4866-a2ff-3bf44693d11a",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order shipped but delayed 2 weeks with no delivery date. Customer requests refund, which requires manual reconciliation with the standard reship policy for lost shipments."
+    },
+    "created_at": "2026-04-24T19:22:36.329922+00:00"
+  },
+  {
+    "id": "010cacdd-9ede-48f5-af8e-130342ff638e",
+    "complaint_id": "a336818c-f0e6-4c02-96c4-ced25ba27991",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:23:30.179525+00:00"
+  },
+  {
+    "id": "b9235a68-eabe-4a60-b867-2f14d739280c",
+    "complaint_id": "a336818c-f0e6-4c02-96c4-ced25ba27991",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina. Status is SHIPPED with no delivery date, matching the delivery_delay issue. Sentiment is negative."
+    },
+    "created_at": "2026-04-24T19:23:35.908019+00:00"
+  },
+  {
+    "id": "225aa5da-5a54-4826-9285-2512a41719e6",
+    "complaint_id": "a336818c-f0e6-4c02-96c4-ced25ba27991",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "REFUND",
+      "confidence": 0.92,
+      "rationale": "Order has been stuck in shipping for 2 weeks with no delivery date, effectively lost in transit, and the customer explicitly requested a refund if the issue is not resolved today.",
+      "requires_human_review": false
+    },
+    "created_at": "2026-04-24T19:23:43.065999+00:00"
+  },
+  {
+    "id": "50a3dffc-d249-463c-9011-27133bf419ed",
+    "complaint_id": "a336818c-f0e6-4c02-96c4-ced25ba27991",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Dear Aina, I sincerely apologize for the delay with your order ORD-2041. I understand how frustrating it is to wait two weeks without any updates. Since the item appears to be lost in transit, I have processed a full refund of RM 89.00 to your original payment method as requested. Please allow a few business days for the amount to reflect. We are truly sorry for this experience.",
+      "bahasa_malaysia": "Kepada Aina, saya amat minta maaf atas kelewatan pesanan ORD-2041 anda. Saya faham betapa kecewanya menunggu selama dua minggu tanpa sebarang kemas kini. Oleh kerana barang kelihatan hilang dalam penghantaran, saya telah memproses bayaran balik penuh sebanyak RM 89.00 mengikut permintaan anda. Sila berikan masa beberapa hari bekerja untuk proses pemulangan. Sekali lagi, kami minta maaf atas kesulitan ini."
+    },
+    "created_at": "2026-04-24T19:23:53.239698+00:00"
+  },
+  {
+    "id": "a3157600-881d-47a6-a7e0-331a6d3bc93b",
+    "complaint_id": "a336818c-f0e6-4c02-96c4-ced25ba27991",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": false,
+      "priority": "high",
+      "supervisor_note": "High confidence refund for lost-in-transit order. Customer explicitly requested refund; prioritize to resolve negative sentiment promptly."
+    },
+    "created_at": "2026-04-24T19:23:59.370000+00:00"
+  },
+  {
+    "id": "ec102b1a-d72d-463c-9f33-00712c56a182",
+    "complaint_id": "c9e5ec25-6d13-4385-9627-d2d7c5e4bd55",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "unknown",
+      "sentiment": "neutral"
+    },
+    "created_at": "2026-04-24T19:26:18.606937+00:00"
+  },
+  {
+    "id": "8858e117-39b9-437e-92c5-bf1d7e18852d",
+    "complaint_id": "c9e5ec25-6d13-4385-9627-d2d7c5e4bd55",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order ID provided and order lookup returned null."
+    },
+    "created_at": "2026-04-24T19:26:22.330348+00:00"
+  },
+  {
+    "id": "7ef21995-b1e8-4b63-83d0-5869315aea09",
+    "complaint_id": "c9e5ec25-6d13-4385-9627-d2d7c5e4bd55",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "DISMISS",
+      "confidence": 0.95,
+      "rationale": "No valid complaint, order, or customer issue identified; message is a general greeting/question.",
+      "requires_human_review": false
+    },
+    "created_at": "2026-04-24T19:26:26.070839+00:00"
+  },
+  {
+    "id": "be371dfd-ab3d-40bd-af28-6c05dd659554",
+    "complaint_id": "c9e5ec25-6d13-4385-9627-d2d7c5e4bd55",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Hello! I'm doing well, thank you. I am an AI assistant designed to help with customer complaints. Since your message did not include a specific order issue or order ID, I am unable to take any action. If you need assistance with an order, please provide your order details and I will be happy to help.",
+      "bahasa_malaysia": "Helo! Saya sihat, terima kasih. Saya adalah pembantu AI yang direka untuk membantu dengan aduan pelanggan. Oleh kerana mesej anda tidak menyertakan isu pesanan atau ID pesanan tertentu, saya tidak dapat mengambil sebarang tindakan. Jika anda memerlukan bantuan mengenai pesanan, sila berikan butiran pesanan anda dan saya sedia membantu."
+    },
+    "created_at": "2026-04-24T19:26:36.475796+00:00"
+  },
+  {
+    "id": "48237d96-8136-4df6-a18b-656f1c942fc8",
+    "complaint_id": "c9e5ec25-6d13-4385-9627-d2d7c5e4bd55",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "No valid complaint or order identified; dismissing as general inquiry."
+    },
+    "created_at": "2026-04-24T19:26:40.429626+00:00"
+  },
+  {
+    "id": "6663262a-572b-4c70-94e2-b82f9d9d2a1c",
+    "complaint_id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:32:47.837899+00:00"
+  },
+  {
+    "id": "efdd9ef1-76d6-4160-a77e-fb65029600fc",
+    "complaint_id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order ORD-1887 found for Hannah. Delivered on 2026-04-19. Issue: damaged item. Sentiment: negative."
+    },
+    "created_at": "2026-04-24T19:32:52.999836+00:00"
+  },
+  {
+    "id": "a55bea34-04d4-496b-ba03-5183821372bc",
+    "complaint_id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "REFUND",
+      "confidence": 0.95,
+      "rationale": "Item was delivered and is clearly damaged (torn seam); policy prefers refund for clearly damaged delivered items.",
+      "requires_human_review": false
+    },
+    "created_at": "2026-04-24T19:32:57.957119+00:00"
+  },
+  {
+    "id": "14e6fc04-74f4-41c3-8721-7330297e1e74",
+    "complaint_id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Dear Hannah, I am so sorry to hear that your Linen Midi Dress arrived with a torn seam. We understand how disappointing this is. We have processed a full refund of MYR 129.00 to your original payment method for order ORD-1887. You may keep or dispose of the damaged item. Please allow a few business days for the refund to reflect. Thank you for your patience.",
+      "bahasa_malaysia": "Hannah yang dihormati, kami amat minta maaf kerana Linen Midi Dress anda tiba dengan jahitan yang koyak. Kami faham betapa mengecewakannya keadaan ini. Kami telah memproses bayaran balik penuh sebanyak MYR 129.00 ke kaedah pembayaran asal anda untuk pesanan ORD-1887. Anda boleh menyimpan atau melupuskan barang yang rosak tersebut. Harap tunggu beberapa hari bekerja untuk bayaran balik diproses. Terima kasih atas kesabaran anda."
+    },
+    "created_at": "2026-04-24T19:33:06.006185+00:00"
+  },
+  {
+    "id": "11459fe2-9504-4677-b505-47c278fabd83",
+    "complaint_id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "High confidence refund for clearly damaged delivered item. Policy aligned, no escalation needed."
+    },
+    "created_at": "2026-04-24T19:33:10.906325+00:00"
   }
 ]
