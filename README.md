@@ -83,13 +83,25 @@ Create a Render Web Service from this repository with these settings:
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
 
-The repository includes `.python-version` and `runtime.txt` to pin Render to Python 3.13.2. This avoids Python 3.14 dependency builds for packages such as `pydantic-core`. If Render still logs Python 3.14 during deploy, add this environment variable in the Render dashboard:
+Set this environment variable in the Render dashboard to avoid Python 3.14 dependency builds for packages such as `pydantic-core`:
 
 ```env
 PYTHON_VERSION=3.13.2
 ```
 
 Add the same ILMU values from your local `.env` as Render environment variables. Do not upload `.env` to Render or commit it to Git.
+
+## Deploy Frontend on Netlify
+
+Netlify hosts only the static frontend from this repository. The included `netlify.toml` publishes the repository root and runs no build command.
+
+Use these settings if you configure the site manually:
+
+- Base directory: leave empty
+- Build command: leave empty
+- Publish directory: `.`
+
+The frontend is already configured to call the Render backend at `https://komplain-ai.onrender.com/api`.
 
 ## API Overview
 
