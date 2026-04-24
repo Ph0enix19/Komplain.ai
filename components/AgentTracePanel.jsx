@@ -181,7 +181,7 @@ function AgentTracePanel({ events, running, scenario, traceStyle, totalDuration 
         <div className="panel-title">
           <span className="panel-ix mono">02</span>
           <h2>Agent trace</h2>
-          <span className="mono subhead">4-agent CrewAI pipeline · GLM Supervisor</span>
+          <span className="mono subhead">4-agent pipeline · GLM-5.1 supervisor</span>
         </div>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
           {running && <span className="live-dot"><span className="live-dot-inner"></span>live</span>}
@@ -205,7 +205,7 @@ function AgentTracePanel({ events, running, scenario, traceStyle, totalDuration 
         <div className="trace-empty">
           <EmptyIllustration />
           <div className="empty-title">Pipeline idle</div>
-          <div className="empty-sub">Submit a complaint or pick a scenario to watch all 4 agents fire in sequence.</div>
+          <div className="empty-sub">Submit a complaint or choose a scenario to run the full agent workflow.</div>
         </div>
       )}
 

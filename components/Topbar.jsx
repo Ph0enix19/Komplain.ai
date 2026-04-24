@@ -22,9 +22,9 @@ function Topbar({ theme, setTheme, density, setDensity, tone, setTone, traceStyl
       <div className="topbar-center">
         <div className="pipeline-status">
           <span className="status-dot" style={{background:'var(--accent)'}}></span>
-          <span className="mono" style={{fontSize:11}}>GLM-4 · ap-southeast-2 · 47 ms</span>
+          <span className="mono" style={{fontSize:11}}>GLM-5.1 · live API</span>
           <span className="divider-v"></span>
-          <span className="mono" style={{fontSize:11, color:'var(--fg-muted)'}}>sambal&silk · seller_id 2047</span>
+          <span className="mono" style={{fontSize:11, color:'var(--fg-muted)'}}>complaint resolution workspace</span>
         </div>
       </div>
       <div className="topbar-right">
@@ -33,11 +33,11 @@ function Topbar({ theme, setTheme, density, setDensity, tone, setTone, traceStyl
             <SegmentedControl value={theme} onChange={setTheme} options={[['light','Light'],['dark','Dark']]} />
           </div>
         )}
-        <button className="btn btn-ghost" title="Docs">
+        <a className="btn btn-ghost" href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer" title="Open API docs">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg>
-          Docs
-        </button>
-        <div className="avatar mono" title="Nadia · Sambal & Silk">N</div>
+          API docs
+        </a>
+        <div className="avatar mono" title="Komplain.ai workspace">K</div>
       </div>
     </header>
   );

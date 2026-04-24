@@ -6,6 +6,29 @@ function CaseLog({ cases, onOpen, activeId }) {
     if (filter === 'all') return true;
     return c.status === filter;
   });
+  const exportCases = () => {
+    const columns = ['case_id', 'complaint', 'order', 'language', 'resolution', 'confidence', 'status', 'updated'];
+    const escapeCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+    const rows = filteredCases.map((c) => [
+      c.displayId || c.id,
+      c.preview,
+      c.order,
+      c.lang,
+      c.resolution,
+      Math.round(c.confidence * 100) + '%',
+      c.status,
+      c.timestamp,
+    ].map(escapeCell).join(','));
+    const csv = [columns.join(','), ...rows].join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'komplain-cases.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <section className="panel case-log">
@@ -22,7 +45,7 @@ function CaseLog({ cases, onOpen, activeId }) {
             <button className={'seg-btn ' + (filter === 'review' ? 'seg-active' : '')} type="button" onClick={() => setFilter('review')}>Review</button>
             <button className={'seg-btn ' + (filter === 'pending' ? 'seg-active' : '')} type="button" onClick={() => setFilter('pending')}>Pending</button>
           </div>
-          <button className="btn btn-ghost btn-sm" type="button">
+          <button className="btn btn-ghost btn-sm" type="button" onClick={exportCases}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             Export
           </button>
@@ -108,7 +131,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
         <header className="modal-head">
           <div>
             <div className="mono" style={{color:'var(--fg-subtle)', fontSize:11}} title={caseData.id}>CASE · {caseLabel}</div>
-            <h2 className="modal-title">Complaint detail <span style={{color:'var(--fg-muted)', fontWeight:400, fontSize:14}}>· debug view</span></h2>
+            <h2 className="modal-title">Complaint detail <span style={{color:'var(--fg-muted)', fontWeight:400, fontSize:14}}>· review view</span></h2>
           </div>
           <div style={{display:'flex', gap:8, alignItems:'center'}}>
             <span className="res-pill mono" style={{background: meta.bg, color: meta.fg, fontSize:12, padding:'4px 10px'}}>{caseData.resolution}</span>
@@ -124,7 +147,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
             <section className="modal-section">
               <div className="section-label mono">COMPLAINT · raw input</div>
               <blockquote className="complaint-quote">
-                {scenarioComplaint || "Brader, barang saya tak sampai lagi la. Dah 2 minggu tracking still processing je. Mana pergi barang saya ni? Order ORD-2041. Kalau tak settle hari ni, I nak refund balik."}
+                {scenarioComplaint || "My order ORD-2041 has not arrived after two weeks. Please help me get a refund."}
               </blockquote>
               <div className="complaint-meta mono">
                 <span>· {caseData.lang}</span>
@@ -199,21 +222,21 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                   <span className="t-dot"></span>
                   <div>
                     <div className="t-title">Pipeline completed</div>
-                    <div className="t-meta mono">4 agents · 5.34s</div>
+                    <div className="t-meta mono">4 agents · GLM-5.1</div>
                   </div>
                 </li>
                 <li className={'timeline-item ' + (caseData.status === 'resolved' ? 'done' : 'active')}>
                   <span className="t-dot"></span>
                   <div>
-                    <div className="t-title">{caseData.status === 'resolved' ? 'Seller approved' : 'Awaiting seller review'}</div>
-                    <div className="t-meta mono">{caseData.status === 'resolved' ? 'auto-sent · EN + BM' : 'flagged · conf < 0.80'}</div>
+                    <div className="t-title">{caseData.status === 'resolved' ? 'Resolution approved' : 'Awaiting review'}</div>
+                    <div className="t-meta mono">{caseData.status === 'resolved' ? 'approved · EN + BM' : 'flagged · conf < 0.80'}</div>
                   </div>
                 </li>
                 <li className="timeline-item">
                   <span className="t-dot"></span>
                   <div>
                     <div className="t-title">Reply sent to customer</div>
-                    <div className="t-meta mono">via email + wa</div>
+                    <div className="t-meta mono">via email + WhatsApp</div>
                   </div>
                 </li>
               </ol>
@@ -234,18 +257,6 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                 </div>
               </div>
             )}
-
-            <div className="side-block">
-              <div className="section-label mono">LANGSMITH TRACE</div>
-              <div className="ls-trace mono">
-                <div className="ls-row"><span>trace_id</span><span>trc_2047ab</span></div>
-                <div className="ls-row"><span>model</span><span>glm-4-{caseData.id.slice(-4)}</span></div>
-                <div className="ls-row"><span>prompt_tokens</span><span>2,481</span></div>
-                <div className="ls-row"><span>completion_tokens</span><span>1,092</span></div>
-                <div className="ls-row"><span>cost</span><span>$0.014</span></div>
-              </div>
-              <a className="ls-link mono">open in LangSmith →</a>
-            </div>
           </aside>
         </div>
       </div>
