@@ -74,6 +74,19 @@ API docs are available at:
 http://127.0.0.1:8000/docs
 ```
 
+## Deploy Backend on Render
+
+Create a Render Web Service from this repository with these settings:
+
+- Runtime: Python 3
+- Root Directory: leave empty
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+
+The repository includes `runtime.txt` to pin Render to Python 3.13.2. This avoids Python 3.14 dependency builds for packages such as `pydantic-core`.
+
+Add the same ILMU values from your local `.env` as Render environment variables. Do not upload `.env` to Render or commit it to Git.
+
 ## API Overview
 
 - `GET /api/health`: checks backend status and complaint count.
