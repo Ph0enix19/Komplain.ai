@@ -2,7 +2,7 @@
 
 const { useState, useEffect, useRef } = React;
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = 'https://komplain-ai.onrender.com/api';
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",

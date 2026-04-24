@@ -159,7 +159,7 @@ Keep `.env` private. If an API key was ever committed to a public repository, ro
 
 ## Current Demo Behavior
 
-- The frontend expects the backend at `http://127.0.0.1:8000/api`.
-- The backend allows frontend origins on `127.0.0.1:3000`, `localhost:3000`, `127.0.0.1:8080`, and `localhost:8080`.
+- The frontend expects the backend at `https://komplain-ai.onrender.com/api`.
+- The backend allows browser requests from static frontend hosts such as Netlify.
 - The case log is intentionally limited to the latest five complaints.
 - Complaint and event data are stored locally as JSON for simple hackathon deployment.
