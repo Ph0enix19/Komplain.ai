@@ -14,7 +14,7 @@ data/
   orders.json
   complaints.json
   agent_events.json
-requirements.txt
+backend/requirements.txt
 ```
 
 ## Run locally
@@ -23,7 +23,7 @@ requirements.txt
    ```bash
    python -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt
+   pip install -r backend/requirements.txt
    ```
 2. Start Ollama and ensure model exists:
    ```bash

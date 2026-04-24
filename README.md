@@ -36,7 +36,7 @@ python -m venv .venv
 2. Install dependencies.
 
 ```powershell
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 3. Create `.env` with your ILMU settings.
@@ -80,7 +80,7 @@ Create a Render Web Service from this repository with these settings:
 
 - Runtime: Python 3
 - Root Directory: leave empty
-- Build Command: `pip install -r requirements.txt`
+- Build Command: `pip install -r backend/requirements.txt`
 - Start Command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
 
 Set this environment variable in the Render dashboard to avoid Python 3.14 dependency builds for packages such as `pydantic-core`:
@@ -128,7 +128,7 @@ The frontend is already configured to call the Render backend at `https://kompla
 - `data.js`: frontend demo constants, quick-load scenarios, mock orders, seed cases, agent definitions, and offline pipeline examples.
 - `styles.css`: global layout, theme variables, app shell, panels, typography, and responsive styling.
 - `components.css`: shared component styling for controls, cards, traces, modals, badges, and case log UI.
-- `requirements.txt`: Python dependencies for the FastAPI backend.
+- `backend/requirements.txt`: Python dependencies for the FastAPI backend.
 - `README_BACKEND.md`: earlier backend-focused setup notes.
 - `README.md`: this professional project overview and operating guide.
 - `backend.log`: runtime stdout log for the backend server.
