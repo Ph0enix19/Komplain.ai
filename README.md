@@ -83,7 +83,11 @@ Create a Render Web Service from this repository with these settings:
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
 
-The repository includes `runtime.txt` to pin Render to Python 3.13.2. This avoids Python 3.14 dependency builds for packages such as `pydantic-core`.
+The repository includes `.python-version` and `runtime.txt` to pin Render to Python 3.13.2. This avoids Python 3.14 dependency builds for packages such as `pydantic-core`. If Render still logs Python 3.14 during deploy, add this environment variable in the Render dashboard:
+
+```env
+PYTHON_VERSION=3.13.2
+```
 
 Add the same ILMU values from your local `.env` as Render environment variables. Do not upload `.env` to Render or commit it to Git.
 
