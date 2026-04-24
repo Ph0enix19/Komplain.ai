@@ -8,6 +8,8 @@ from typing import Any
 class DataManager:
     """Simple in-memory + JSON file storage for hackathon MVP."""
 
+    MAX_COMPLAINTS = 5
+
     def __init__(self, data_dir: str = "data") -> None:
         self.data_dir = Path(data_dir)
         self.complaints_path = self.data_dir / "complaints.json"
@@ -32,7 +34,13 @@ class DataManager:
 
     def add_complaint(self, complaint: dict[str, Any]) -> None:
         self.complaints.append(complaint)
+        self.complaints = self.complaints[-self.MAX_COMPLAINTS :]
+        active_ids = {c["id"] for c in self.complaints}
+        self.agent_events = [
+            event for event in self.agent_events if event["complaint_id"] in active_ids
+        ]
         self.save_complaints()
+        self.save_agent_events()
 
     def add_event(self, event: dict[str, Any]) -> None:
         self.agent_events.append(event)

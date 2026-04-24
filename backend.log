@@ -1,3 +1,8 @@
-INFO:     127.0.0.1:7159 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:7177 - "GET /api/complaints HTTP/1.1" 200 OK
-INFO:     127.0.0.1:7177 - "GET /api/complaints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10075 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10076 - "GET /api/complaints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7916 - "GET /api/complaints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7916 - "GET /api/complaints/f1807692-9760-4905-87f4-7a99dbac9fdc/events HTTP/1.1" 200 OK
+INFO:     127.0.0.1:7916 - "GET /api/complaints/6f73d30f-30e5-4bc9-9e26-9d406e53cc07/events HTTP/1.1" 200 OK
+INFO:     127.0.0.1:2777 - "GET /api/complaints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13287 - "POST /api/complaints HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13287 - "GET /api/complaints/3d830ba6-31f4-4925-aa2f-aba92a5c7332/events HTTP/1.1" 200 OK

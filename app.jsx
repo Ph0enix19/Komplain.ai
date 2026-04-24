@@ -174,7 +174,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const timers = useRef([]);
 
-  const [cases, setCases] = useState(window.SEED_CASES);
+  const [cases, setCases] = useState([]);
   const [caseRecords, setCaseRecords] = useState({});
   const [caseEvents, setCaseEvents] = useState({});
   const [modalCase, setModalCase] = useState(null);
@@ -217,7 +217,7 @@ function App() {
           return acc;
         }, {});
         setCaseRecords(recordMap);
-        setCases([...mapped, ...window.SEED_CASES]);
+        setCases(mapped.slice(0, 5));
       } catch (error) {
         console.error(error);
         if (!cancelled) setErrorMessage('Backend not reachable. Make sure the API is running on port 8000.');
@@ -298,7 +298,7 @@ function App() {
       setScenarioKey(orderId ? 'clean' : scenarioKey);
       setCaseRecords((prev) => ({ ...prev, [created.id]: created }));
       setCaseEvents((prev) => ({ ...prev, [created.id]: timelineEvents }));
-      setCases((prev) => [nextCase, ...prev.filter((item) => item.id !== created.id)]);
+      setCases((prev) => [nextCase, ...prev.filter((item) => item.id !== created.id)].slice(0, 5));
       setResolutionDraft({
         response_en: nextResolution.response_en,
         response_bm: nextResolution.response_bm,
