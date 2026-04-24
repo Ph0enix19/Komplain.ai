@@ -13,10 +13,10 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 function adjustTone(text, tone) {
   if (tone === 'formal') {
-    return text.replace(/^Hi there,/, 'Dear Customer,').replace(/^Hi,/, 'Dear Customer,').replace(/— Nadia, Sambal & Silk/, 'Sincerely,\nSambal & Silk Customer Care');
+    return text.replace(/^Hi there,/, 'Dear Customer,').replace(/^Hi,/, 'Dear Customer,').replace(/— Komplain.ai Support/, 'Sincerely,\nCustomer Support');
   }
   if (tone === 'technical') {
-    return text.replace(/^Hi there,\n\n/, '[AUTO-DRAFT · GLM-4]\n\n').replace(/^Hi,\n\n/, '[AUTO-DRAFT · GLM-4]\n\n');
+    return text.replace(/^Hi there,\n\n/, '[AUTO-DRAFT · GLM-5.1]\n\n').replace(/^Hi,\n\n/, '[AUTO-DRAFT · GLM-5.1]\n\n');
   }
   return text;
 }

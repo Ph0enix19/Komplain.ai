@@ -1835,5 +1835,135 @@
       "supervisor_note": "High confidence refund for clearly damaged delivered item. Policy aligned, no escalation needed."
     },
     "created_at": "2026-04-24T19:33:10.906325+00:00"
+  },
+  {
+    "id": "0d633831-557f-4d2d-9843-b812adfeadaa",
+    "complaint_id": "628c509d-e9ff-47b4-9296-2c251489b487",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "delivery_delay",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:45:24.293259+00:00"
+  },
+  {
+    "id": "247a0864-4e29-4b97-b172-0ec8f3238096",
+    "complaint_id": "628c509d-e9ff-47b4-9296-2c251489b487",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order ID provided and order lookup returned null. Issue is delivery_delay with negative sentiment."
+    },
+    "created_at": "2026-04-24T19:45:28.303221+00:00"
+  },
+  {
+    "id": "0b50f024-66c7-472e-b7cd-b6a8dc9f6d1c",
+    "complaint_id": "628c509d-e9ff-47b4-9296-2c251489b487",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "ESCALATE",
+      "confidence": 1.0,
+      "rationale": "No order ID provided and order lookup failed; cannot process request without locating the order first.",
+      "requires_human_review": true
+    },
+    "created_at": "2026-04-24T19:45:32.770890+00:00"
+  },
+  {
+    "id": "91213192-274b-41ea-9c1e-1e85a4d3a677",
+    "complaint_id": "628c509d-e9ff-47b4-9296-2c251489b487",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Hello! I understand you are waiting for your order, and I apologize for the delay. Unfortunately, we were unable to locate your order details without an order ID. I have escalated your request to our support team, who will reach out to you shortly to help locate your order.",
+      "bahasa_malaysia": "Helo! Saya faham anda sedang menunggu pesanan anda, dan saya memohon maaf atas kelewatan ini. Malangnya, kami tidak dapat mengesan butiran pesanan anda tanpa ID pesanan. Saya telah menyerahkan permintaan anda kepada pasukan sokongan kami, yang akan menghubungi anda sebentar lagi untuk membantu mengesan pesanan anda."
+    },
+    "created_at": "2026-04-24T19:45:43.129843+00:00"
+  },
+  {
+    "id": "1ed31968-d888-4279-b33f-925f7179a0b5",
+    "complaint_id": "628c509d-e9ff-47b4-9296-2c251489b487",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order lookup failed with no ID provided. Escalating to human agent to locate order and address negative sentiment on delivery delay."
+    },
+    "created_at": "2026-04-24T19:45:49.066759+00:00"
+  },
+  {
+    "id": "34b4c151-23f8-4e03-a5a1-a732a8376a16",
+    "complaint_id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "negative"
+    },
+    "created_at": "2026-04-24T19:47:20.939660+00:00"
+  },
+  {
+    "id": "d0744ad3-fd01-4b85-9046-d251ae73d3fd",
+    "complaint_id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order ORD-1887 found for Hannah. Item: Linen Midi Dress - Sage M, Status: DELIVERED. Issue: damaged_item. Sentiment: negative."
+    },
+    "created_at": "2026-04-24T19:47:26.085072+00:00"
+  },
+  {
+    "id": "863bf9f3-852d-4c48-abf0-682fb012bc7d",
+    "complaint_id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "REFUND",
+      "confidence": 1.0,
+      "rationale": "Order was delivered and item is clearly damaged (torn seam), preferring refund per policy.",
+      "requires_human_review": false
+    },
+    "created_at": "2026-04-24T19:47:30.240774+00:00"
+  },
+  {
+    "id": "850c7dc2-a40f-45cb-a044-c1baf352fe43",
+    "complaint_id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Dear Hannah, I am so sorry to hear that your Linen Midi Dress - Sage M arrived with a torn seam. We understand how disappointing this is. We have processed a full refund of MYR 129.00 to your original payment method. Please allow a few business days for the transaction to reflect. We hope to provide you with a better experience in the future.",
+      "bahasa_malaysia": "Hai Hannah, saya amat kesal mengetahui bahawa Linen Midi Dress - Sage M anda tiba dengan jahitan yang koyak. Kami faham betapa mengecewakannya situasi ini. Kami telah memproses bayaran balik penuh sebanyak MYR 129.00 ke kaedah pembayaran asal anda. Sila berikan beberapa hari bekerja untuk transaksi ini dipaparkan. Kami berharap dapat memberikan pengalaman yang lebih baik pada masa akan datang."
+    },
+    "created_at": "2026-04-24T19:47:38.723070+00:00"
+  },
+  {
+    "id": "a65c327b-d485-4f4f-833d-19871d29a292",
+    "complaint_id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Automated refund approved for damaged delivered item. High confidence, aligns with policy."
+    },
+    "created_at": "2026-04-24T19:47:43.613960+00:00"
   }
 ]
