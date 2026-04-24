@@ -58,7 +58,7 @@ function ResolutionCard({
         <div className="res-empty">
           <ResIllustration />
           <div className="empty-title">No resolution yet</div>
-          <div className="empty-sub">When the pipeline completes, the structured decision and bilingual reply land here — ready to approve.</div>
+          <div className="empty-sub">When the pipeline completes, the decision and bilingual reply appear here for review.</div>
         </div>
       </aside>
     );

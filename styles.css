@@ -94,6 +94,7 @@ input, textarea { font-family: inherit; }
   color: var(--fg);
   font-size: 13px;
   font-weight: 500;
+  text-decoration: none;
   transition: background .15s, border-color .15s, transform .05s;
 }
 .btn:hover { background: var(--bg-hover); }

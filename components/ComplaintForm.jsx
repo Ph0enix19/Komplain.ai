@@ -28,7 +28,7 @@ function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve
         <textarea
           className="textarea"
           rows={8}
-          placeholder="Paste or type the customer's complaint in any language — BM, EN, Manglish, mixed..."
+          placeholder="Paste or type the customer's complaint in any language."
           value={complaint}
           onChange={e => setComplaint(e.target.value)}
           disabled={running}
@@ -50,7 +50,7 @@ function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve
           disabled={running}
         />
         <div className="field-foot mono">
-          <span style={{color:'var(--fg-subtle)'}}>Leave blank — Intake Agent will try to extract from text</span>
+          <span style={{color:'var(--fg-subtle)'}}>Leave blank if the order ID appears in the complaint.</span>
         </div>
       </div>
 
@@ -68,7 +68,7 @@ function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve
             </>
           )}
         </button>
-        <div className="form-foot-hint mono">↵ 4 agents · GLM-4 · ~5s</div>
+        <div className="form-foot-hint mono">↵ 4 agents · GLM-5.1 · live run</div>
       </div>
     </aside>
   );
