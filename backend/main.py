@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 from uuid import uuid4
 
+import httpx
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -17,22 +20,119 @@ from backend.agents import (
     response_agent,
     supervisor_logic,
 )
-from backend.llm import OllamaClient
-from backend.models import ComplaintCreate, TestLLMRequest, TestLLMResponse
+from backend.llm import ILMUClient
+from backend.models import (
+    ComplaintCreate,
+    ContextResult,
+    IntakeResult,
+    ReasoningResult,
+    ResponseResult,
+    TestLLMRequest,
+    TestLLMResponse,
+)
 from backend.storage import DataManager
+
+load_dotenv()
 
 app = FastAPI(title="Komplain.ai Backend", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:3000", "http://localhost:3000"],
+    allow_origins=[
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        "http://127.0.0.1:8080",
+        "http://localhost:8080",
+        "null",
+    ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 data_manager = DataManager(data_dir="data")
-ollama_client = OllamaClient()
+ilmu_client = ILMUClient()
+
+
+async def run_intake_agent(complaint_text: str) -> dict:
+    return (await intake_agent(ilmu_client, complaint_text)).model_dump()
+
+
+async def run_context_agent(intake: dict) -> dict:
+    return (
+        await context_agent(ilmu_client, data_manager, IntakeResult(**intake))
+    ).model_dump()
+
+
+async def run_reasoning_agent(complaint_text: str, intake: dict, context: dict) -> dict:
+    return (
+        await reasoning_agent(
+            ilmu_client,
+            complaint_text,
+            IntakeResult(**intake),
+            ContextResult(**context),
+        )
+    ).model_dump()
+
+
+async def run_response_agent(complaint_text: str, reasoning: dict, context: dict) -> dict:
+    return (
+        await response_agent(
+            ilmu_client,
+            complaint_text,
+            ReasoningResult(**reasoning),
+            ContextResult(**context),
+        )
+    ).model_dump()
+
+
+async def run_supervisor_logic(reasoning: dict, context: dict) -> dict:
+    return await supervisor_logic(
+        ilmu_client,
+        ReasoningResult(**reasoning),
+        ContextResult(**context),
+    )
+
+
+async def run_complaint_pipeline(complaint_id: str, complaint_text: str) -> dict:
+    intake_payload = await run_intake_agent(complaint_text)
+    intake = IntakeResult(**intake_payload)
+    data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake_payload))
+
+    context_payload = await run_context_agent(intake_payload)
+    context = ContextResult(**context_payload)
+    data_manager.add_event(build_event(complaint_id, "context", "Context loaded", context_payload))
+
+    reasoning_payload = await run_reasoning_agent(complaint_text, intake_payload, context_payload)
+    reasoning = ReasoningResult(**reasoning_payload)
+    data_manager.add_event(
+        build_event(complaint_id, "reasoning", "Reasoning completed", reasoning_payload)
+    )
+
+    response_payload = await run_response_agent(complaint_text, reasoning_payload, context_payload)
+    response = ResponseResult(**response_payload)
+    data_manager.add_event(
+        build_event(complaint_id, "response", "Response generated", response_payload)
+    )
+
+    supervisor = await run_supervisor_logic(reasoning_payload, context_payload)
+    data_manager.add_event(
+        build_event(complaint_id, "supervisor", "Supervisor decision", supervisor)
+    )
+
+    complaint = {
+        "id": complaint_id,
+        "complaint_text": complaint_text,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "COMPLETED",
+        "intake": intake.model_dump(),
+        "context": context.model_dump(),
+        "reasoning": reasoning.model_dump(),
+        "response": response.model_dump(),
+        "supervisor": supervisor,
+    }
+    data_manager.add_complaint(complaint)
+    return complaint
 
 
 @app.on_event("startup")
@@ -51,51 +151,42 @@ def health() -> dict:
 
 @app.post("/api/test-llm", response_model=TestLLMResponse)
 async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
-    output = await ollama_client.chat(req.prompt, system="You are Komplain.ai assistant.")
-    return TestLLMResponse(model=ollama_client.model, output=output)
+    try:
+        output = await ilmu_client.chat(req.prompt, system="You are Komplain.ai assistant.")
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail="ILMU API request timed out.") from exc
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"ILMU API returned HTTP {exc.response.status_code}.",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return TestLLMResponse(model=ilmu_client.model, output=output)
 
 
 @app.post("/api/complaints")
-def create_complaint(payload: ComplaintCreate) -> dict:
+async def create_complaint(payload: ComplaintCreate) -> dict:
     complaint_id = str(uuid4())
     complaint_text = payload.complaint_text.strip()
     if payload.order_id and payload.order_id not in complaint_text:
         complaint_text = f"{complaint_text}\n\nOrder ID: {payload.order_id}"
-
-    intake = intake_agent(complaint_text)
-    data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake.model_dump()))
-
-    context = context_agent(data_manager, intake)
-    data_manager.add_event(build_event(complaint_id, "context", "Context loaded", context.model_dump()))
-
-    reasoning = reasoning_agent(intake, context)
-    data_manager.add_event(
-        build_event(complaint_id, "reasoning", "Reasoning completed", reasoning.model_dump())
-    )
-
-    response = response_agent(reasoning, context)
-    data_manager.add_event(
-        build_event(complaint_id, "response", "Response generated", response.model_dump())
-    )
-
-    supervisor = supervisor_logic(reasoning)
-    data_manager.add_event(
-        build_event(complaint_id, "supervisor", "Supervisor decision", supervisor)
-    )
-
-    complaint = {
-        "id": complaint_id,
-        "complaint_text": complaint_text,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "status": "COMPLETED",
-        "intake": intake.model_dump(),
-        "context": context.model_dump(),
-        "reasoning": reasoning.model_dump(),
-        "response": response.model_dump(),
-        "supervisor": supervisor,
-    }
-    data_manager.add_complaint(complaint)
-    return complaint
+    try:
+        return await run_complaint_pipeline(complaint_id, complaint_text)
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"ILMU API returned HTTP {exc.response.status_code}.",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.get("/api/complaints")

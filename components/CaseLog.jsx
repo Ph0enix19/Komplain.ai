@@ -234,18 +234,6 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                 </div>
               </div>
             )}
-
-            <div className="side-block">
-              <div className="section-label mono">LANGSMITH TRACE</div>
-              <div className="ls-trace mono">
-                <div className="ls-row"><span>trace_id</span><span>trc_2047ab</span></div>
-                <div className="ls-row"><span>model</span><span>glm-4-{caseData.id.slice(-4)}</span></div>
-                <div className="ls-row"><span>prompt_tokens</span><span>2,481</span></div>
-                <div className="ls-row"><span>completion_tokens</span><span>1,092</span></div>
-                <div className="ls-row"><span>cost</span><span>$0.014</span></div>
-              </div>
-              <a className="ls-link mono">open in LangSmith →</a>
-            </div>
           </aside>
         </div>
       </div>

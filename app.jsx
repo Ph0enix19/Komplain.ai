@@ -308,7 +308,7 @@ function App() {
     } catch (error) {
       console.error(error);
       setRunning(false);
-      setErrorMessage('Could not resolve complaint. Check the backend server and Ollama setup.');
+      setErrorMessage('Could not resolve complaint. Check the backend server and ILMU setup.');
       setEditingResolution(false);
       setEvents([
         { at: 120, agent: 'supervisor', status: 'started', message: 'Pipeline started' },

@@ -182,5 +182,621 @@
       "priority": "high",
       "supervisor_note": "Escalate to human support."
     }
+  },
+  {
+    "id": "cd2f204d-0677-44a2-ae49-d865049b7565",
+    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
+    "created_at": "2026-04-23T15:14:54.746949+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.82,
+      "rationale": "Damaged product reported, refund is the quickest resolution.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: REFUND. Damaged product reported, refund is the quickest resolution.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: REFUND. Sebab: Damaged product reported, refund is the quickest resolution."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "6d291f96-a948-436f-85d1-cbc0fc4d2210",
+    "complaint_text": "Brader, barang saya tak sampai lagi la. Dah 2 minggu tracking still processing je. Mana pergi barang saya ni? Order ORD-2041. Kalau tak settle hari ni, I nak refund balik.",
+    "created_at": "2026-04-23T15:16:52.030500+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.55,
+      "rationale": "Needs manual review due to unclear issue context.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: ESCALATE. Needs manual review due to unclear issue context.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: ESCALATE. Sebab: Needs manual review due to unclear issue context."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "28b34285-9c8d-49d9-b445-07462c62f842",
+    "complaint_text": "Brader, barang saya tak sampai lagi la. Dah 2 minggu tracking still processing je. Mana pergi barang saya ni? Order ORD-2041. Kalau tak settle hari ni, I nak refund balik.",
+    "created_at": "2026-04-23T15:18:49.281125+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.55,
+      "rationale": "Needs manual review due to unclear issue context.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: ESCALATE. Needs manual review due to unclear issue context.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: ESCALATE. Sebab: Needs manual review due to unclear issue context."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "228f1d2d-9cea-4d18-bb6f-1bca0dde3206",
+    "complaint_text": "My order arrived damaged\n\nOrder ID: KM-777",
+    "created_at": "2026-04-23T15:32:04.005721+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Missing order ID. Ask user to provide an order ID."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.35,
+      "rationale": "Cannot process without order ID.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your message. Please share your order ID so we can verify and resolve this quickly.",
+      "bahasa_malaysia": "Terima kasih atas mesej anda. Sila kongsikan ID pesanan anda supaya kami boleh semak dan selesaikan dengan cepat."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "b34eefe4-83f8-426f-be92-2c756ad7d5a6",
+    "complaint_text": "Package missing items\n\nOrder ID: KM-555",
+    "created_at": "2026-04-23T15:39:31.131608+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Missing order ID. Ask user to provide an order ID."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.35,
+      "rationale": "Cannot process without order ID.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for your message. Please share your order ID so we can verify and resolve this quickly.",
+      "bahasa_malaysia": "Terima kasih atas mesej anda. Sila kongsikan ID pesanan anda supaya kami boleh semak dan selesaikan dengan cepat."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support."
+    }
+  },
+  {
+    "id": "bf25a762-f9bf-48a9-8f2e-479c53eddc44",
+    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
+    "created_at": "2026-04-23T15:45:13.916535+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.82,
+      "rationale": "Damaged product reported, refund is the quickest resolution.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: REFUND. Damaged product reported, refund is the quickest resolution.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: REFUND. Sebab: Damaged product reported, refund is the quickest resolution."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "beaa23b8-a045-4d86-ad72-b8e53ddb4b5c",
+    "complaint_text": "I WLOVEWARA\n\nOrder ID: ORD-1887",
+    "created_at": "2026-04-23T15:47:06.981312+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "delivery",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "DISMISS",
+      "confidence": 0.7,
+      "rationale": "Order shows delivered and no strong fault signal from complaint.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: DISMISS. Order shows delivered and no strong fault signal from complaint.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: DISMISS. Sebab: Order shows delivered and no strong fault signal from complaint."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "747339fa-f430-4e5a-8b87-f8ea0f04a2f8",
+    "complaint_text": "Wrong item received for order KM-1001",
+    "created_at": "2026-04-23T20:09:14.037559+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.76,
+      "rationale": "Reship provides faster fix for delivery/wrong item problems.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: RESHIP. Reship provides faster fix for delivery/wrong item problems.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: RESHIP. Sebab: Reship provides faster fix for delivery/wrong item problems."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "6a1d0d06-9542-4c02-a49e-fc5822441080",
+    "complaint_text": "I received the wrong item for order KM-1001 and I need help quickly.",
+    "created_at": "2026-04-23T20:26:38.202321+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.76,
+      "rationale": "Reship provides faster fix for delivery or wrong item problems.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: RESHIP. Reship provides faster fix for delivery or wrong item problems.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: RESHIP. Sebab: Reship provides faster fix for delivery or wrong item problems."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "27c2b9e8-b547-46e7-ad6a-6bae87d0c207",
+    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
+    "created_at": "2026-04-23T20:30:17.709063+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order found."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.82,
+      "rationale": "Damaged product reported, refund is the quickest resolution.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for your complaint. Our decision is: REFUND. Damaged product reported, refund is the quickest resolution.",
+      "bahasa_malaysia": "Terima kasih atas aduan anda. Keputusan kami ialah: REFUND. Sebab: Damaged product reported, refund is the quickest resolution."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "b241f549-ef5a-4d4b-8243-35fc551482fd",
+    "complaint_text": "My order KM-1001 arrived damaged and I want a refund.",
+    "created_at": "2026-04-24T12:08:46.627712+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "damaged_item",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found for delivered item."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.86,
+      "rationale": "The complaint indicates the delivered item arrived damaged.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for reaching out. We are sorry that Bluetooth Speaker arrived damaged. We will proceed with a refund for you.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami mohon maaf kerana Bluetooth Speaker tiba dalam keadaan rosak. Kami akan teruskan proses bayaran balik untuk anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "9a92e737-a702-411d-8752-b2443794b2c6",
+    "complaint_text": "Wrong item received for order KM-1001 and I need a replacement.",
+    "created_at": "2026-04-24T13:02:33.559420+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found for delivered item."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.78,
+      "rationale": "A replacement is the fastest resolution for this delivery issue.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for reaching out. We will arrange a replacement for Bluetooth Speaker and keep you updated.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami akan aturkan penggantian untuk Bluetooth Speaker dan memaklumkan perkembangan kepada anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "edc1ea51-2c9b-4cac-87ea-3fc6038310fc",
+    "complaint_text": "My order KM-1001 arrived damaged and I need help.",
+    "created_at": "2026-04-24T14:05:52.610203+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "damaged_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found for delivered item."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.86,
+      "rationale": "The complaint indicates the delivered item arrived damaged.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for reaching out. We are sorry that Bluetooth Speaker arrived damaged. We will proceed with a refund for you.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami mohon maaf kerana Bluetooth Speaker tiba dalam keadaan rosak. Kami akan teruskan proses bayaran balik untuk anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "d21ec54c-68dd-4b4b-be8f-c13af20e4fb8",
+    "complaint_text": "Wrong item received for order KM-1001 and I need a replacement.",
+    "created_at": "2026-04-24T14:12:32.346955+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "KM-1001",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1001",
+        "customer_name": "Aisyah",
+        "item": "Bluetooth Speaker",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-20"
+      },
+      "notes": "Order found for delivered item."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.78,
+      "rationale": "A replacement is the fastest resolution for this delivery issue.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for reaching out. We will arrange a replacement for Bluetooth Speaker and keep you updated.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami akan aturkan penggantian untuk Bluetooth Speaker dan memaklumkan perkembangan kepada anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "a7be8fb9-ab75-4017-befd-9026f10f4dba",
+    "complaint_text": "Brader, barang saya tak sampai lagi la. Dah 2 minggu tracking still processing je. Mana pergi barang saya ni? Order ORD-2041. Kalau tak settle hari ni, I nak refund balik.",
+    "created_at": "2026-04-24T18:57:37.984302+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for shipped item."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.78,
+      "rationale": "A replacement is the fastest resolution for this delivery issue.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Thanks for reaching out. We will arrange a replacement for Baju Kurung Moden - Maroon XL and keep you updated.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami akan aturkan penggantian untuk Baju Kurung Moden - Maroon XL dan memaklumkan perkembangan kepada anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Auto-resolution is acceptable."
+    }
+  },
+  {
+    "id": "481b2183-19ee-4a1a-b935-8e720053e45f",
+    "complaint_text": "hello how are you doing",
+    "created_at": "2026-04-24T18:59:15.973551+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "unknown",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Missing order ID. Ask user to provide an order ID."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.35,
+      "rationale": "We could not verify the order details automatically.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thanks for reaching out. We need a support specialist to review this case before we take action.",
+      "bahasa_malaysia": "Terima kasih kerana menghubungi kami. Kami memerlukan pegawai sokongan untuk menyemak kes ini sebelum tindakan diambil."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate to human support for manual handling."
+    }
   }
 ]
