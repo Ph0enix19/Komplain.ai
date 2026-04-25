@@ -12,7 +12,7 @@
 
 > _Replace the link above with your shared Google Drive URL before submitting. Make sure sharing is set to **"Anyone with the link → Viewer"**._
 
-**Mirror / backup link (optional):** _add YouTube unlisted link here_
+
 
 ---
 
