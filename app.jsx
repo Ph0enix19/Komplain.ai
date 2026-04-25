@@ -2,7 +2,14 @@
 
 const { useState, useEffect, useRef } = React;
 
-const API_BASE = 'https://komplain-ai.onrender.com/api';
+const API_BASE = (() => {
+  if (window.KOMPLAIN_API_BASE) return window.KOMPLAIN_API_BASE;
+
+  const isLocalFrontend = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+  return isLocalFrontend
+    ? 'http://127.0.0.1:8000/api'
+    : 'https://komplain-ai.onrender.com/api';
+})();
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
@@ -275,7 +282,10 @@ function App() {
 
     setRunning(true);
     setErrorMessage('');
-    setEvents([]);
+    setEvents([
+      { at: 0, agent: 'intake', status: 'started', message: 'GLM agent pipeline started' },
+      { at: 120, agent: 'intake', status: 'running', message: 'Waiting for GLM-5.1 response' },
+    ]);
     setResolution(null);
     setTotalDuration(0);
 

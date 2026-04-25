@@ -1,194 +1,202 @@
 [
   {
-    "id": "61fb54ed-cad2-46cf-8e2b-78c59ae80799",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-25T03:33:10.90882+08:00",
+    "id": "75e0af96-fde2-4102-b6ca-f4ea1a94b402",
+    "complaint_text": "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
+    "created_at": "2026-04-25T20:08:06.007981+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order ORD-1887 found for Hannah. Delivered on 2026-04-19. Issue: damaged item. Sentiment: negative."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.95,
-      "rationale": "Item was delivered and is clearly damaged (torn seam); policy prefers refund for clearly damaged delivered items.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Hannah, I am so sorry to hear that your Linen Midi Dress arrived with a torn seam. We understand how disappointing this is. We have processed a full refund of MYR 129.00 to your original payment method for order ORD-1887. You may keep or dispose of the damaged item. Please allow a few business days for the refund to reflect. Thank you for your patience.",
-      "bahasa_malaysia": "Hannah yang dihormati, kami amat minta maaf kerana Linen Midi Dress anda tiba dengan jahitan yang koyak. Kami faham betapa mengecewakannya keadaan ini. Kami telah memproses bayaran balik penuh sebanyak MYR 129.00 ke kaedah pembayaran asal anda untuk pesanan ORD-1887. Anda boleh menyimpan atau melupuskan barang yang rosak tersebut. Harap tunggu beberapa hari bekerja untuk bayaran balik diproses. Terima kasih atas kesabaran anda."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "High confidence refund for clearly damaged delivered item. Policy aligned, no escalation needed."
-    }
-  },
-  {
-    "id": "628c509d-e9ff-47b4-9296-2c251489b487",
-    "complaint_text": "Hello where is my order?",
-    "created_at": "2026-04-25T03:45:49.069255+08:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": null,
+      "order_id": "ORD-2041",
       "issue_type": "delivery_delay",
       "sentiment": "negative"
     },
     "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order ID provided and order lookup returned null. Issue is delivery_delay with negative sentiment."
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina. Status: SHIPPED. Issue: delivery_delay."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.82,
+      "rationale": "The issue can likely be resolved by arranging a replacement or delivery follow-up.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Hi Aina, we are sorry for the issue with Baju Kurung Moden - Maroon XL. We will arrange a replacement or delivery follow-up and update you shortly.",
+      "bahasa_malaysia": "Hai Aina, kami mohon maaf atas isu berkaitan Baju Kurung Moden - Maroon XL. Kami akan mengatur penggantian atau semakan penghantaran dan mengemas kini anda tidak lama lagi."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
+    }
+  },
+  {
+    "id": "f351a54a-ef0a-4c4d-88c8-8ed2156ddc0d",
+    "complaint_text": "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
+    "created_at": "2026-04-25T20:10:18.971246+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina. Status: SHIPPED. Issue: delivery_delay."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.82,
+      "rationale": "The issue can likely be resolved by arranging a replacement or delivery follow-up.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Hi Aina, we are sorry for the issue with Baju Kurung Moden - Maroon XL. We will arrange a replacement or delivery follow-up and update you shortly.",
+      "bahasa_malaysia": "Hai Aina, kami mohon maaf atas isu berkaitan Baju Kurung Moden - Maroon XL. Kami akan mengatur penggantian atau semakan penghantaran dan mengemas kini anda tidak lama lagi."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
+    }
+  },
+  {
+    "id": "951fdb39-3c02-4a9a-861d-2942516d8bd4",
+    "complaint_text": "GLM agent test: order ORD-1887 arrived damaged and I want a refund.",
+    "created_at": "2026-04-25T20:29:52.449609+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-1887",
+      "issue_type": "damaged_item",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-1887",
+        "customer_name": "Hannah",
+        "item": "Linen Midi Dress - Sage M",
+        "status": "DELIVERED",
+        "total": 129.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order ORD-1887 found for Hannah. Delivered item (Linen Midi Dress - Sage M) reported as damaged. Negative sentiment."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.95,
+      "rationale": "Delivered item reported as damaged and customer explicitly requested a refund, which aligns with policy for damaged delivered items.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Dear Hannah, we are truly sorry to hear that your Linen Midi Dress - Sage M from order ORD-1887 arrived damaged. We understand how disappointing this is. As requested, we have approved a full refund of RM 129.00, which will be processed to your original payment method within a few business days. Thank you for your patience.",
+      "bahasa_malaysia": "Kehadapan Hannah, kami sangat dukacita mendengar bahawa Linen Midi Dress - Sage M dari pesanan ORD-1887 anda tiba dalam keadaan rosak. Kami faham pasti anda kecewa. Seperti yang diminta, kami telah meluluskan bayaran balik penuh sebanyak RM 129.00, yang akan diproses ke kaedah pembayaran asal anda dalam beberapa hari bekerja. Terima kasih atas kesabaran anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Automated refund for damaged item aligns with policy. High confidence, no escalation needed."
+    }
+  },
+  {
+    "id": "47bbae67-6d0d-4f2d-bbf2-e26602b15811",
+    "complaint_text": "Hello how are you\n\nOrder ID: ORD-2041",
+    "created_at": "2026-04-25T20:34:58.129189+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "unknown",
+      "sentiment": "neutral"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina; status SHIPPED, delivery date pending. Intake had missing customer name and unknown issue type."
     },
     "reasoning": {
       "decision": "ESCALATE",
-      "confidence": 1.0,
-      "rationale": "No order ID provided and order lookup failed; cannot process request without locating the order first.",
+      "confidence": 0.95,
+      "rationale": "Complaint contains no specific issue or complaint, only a greeting. Issue type is unknown and requires manual review to determine the customer's needs.",
       "requires_human_review": true
     },
     "response": {
-      "english": "Hello! I understand you are waiting for your order, and I apologize for the delay. Unfortunately, we were unable to locate your order details without an order ID. I have escalated your request to our support team, who will reach out to you shortly to help locate your order.",
-      "bahasa_malaysia": "Helo! Saya faham anda sedang menunggu pesanan anda, dan saya memohon maaf atas kelewatan ini. Malangnya, kami tidak dapat mengesan butiran pesanan anda tanpa ID pesanan. Saya telah menyerahkan permintaan anda kepada pasukan sokongan kami, yang akan menghubungi anda sebentar lagi untuk membantu mengesan pesanan anda."
+      "english": "Hi there, we could not confidently resolve this automatically. We have escalated your case to our support team for review.",
+      "bahasa_malaysia": "Hai, kami tidak dapat menyelesaikan isu ini secara automatik dengan yakin. Kes anda telah diserahkan kepada pasukan sokongan untuk semakan."
     },
     "supervisor": {
       "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Order lookup failed with no ID provided. Escalating to human agent to locate order and address negative sentiment on delivery delay."
-    }
-  },
-  {
-    "id": "6f73d30f-30e5-4bc9-9e26-9d406e53cc07",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-25T03:47:43.616403+08:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order ORD-1887 found for Hannah. Item: Linen Midi Dress - Sage M, Status: DELIVERED. Issue: damaged_item. Sentiment: negative."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 1.0,
-      "rationale": "Order was delivered and item is clearly damaged (torn seam), preferring refund per policy.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Hannah, I am so sorry to hear that your Linen Midi Dress - Sage M arrived with a torn seam. We understand how disappointing this is. We have processed a full refund of MYR 129.00 to your original payment method. Please allow a few business days for the transaction to reflect. We hope to provide you with a better experience in the future.",
-      "bahasa_malaysia": "Hai Hannah, saya amat kesal mengetahui bahawa Linen Midi Dress - Sage M anda tiba dengan jahitan yang koyak. Kami faham betapa mengecewakannya situasi ini. Kami telah memproses bayaran balik penuh sebanyak MYR 129.00 ke kaedah pembayaran asal anda. Sila berikan beberapa hari bekerja untuk transaksi ini dipaparkan. Kami berharap dapat memberikan pengalaman yang lebih baik pada masa akan datang."
-    },
-    "supervisor": {
-      "requires_human_review": false,
       "priority": "normal",
-      "supervisor_note": "Automated refund approved for damaged delivered item. High confidence, aligns with policy."
+      "supervisor_note": "Customer message contained only a greeting with no specific issue. Manual review needed to clarify the customer's needs."
     }
   },
   {
-    "id": "f1807692-9760-4905-87f4-7a99dbac9fdc",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-25T06:37:13.723816+08:00",
+    "id": "6919fab8-6033-4861-8490-7ae30d7ef966",
+    "complaint_text": "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
+    "created_at": "2026-04-25T20:48:58.150227+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
       "sentiment": "negative"
     },
     "context": {
       "order_found": true,
       "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
         "currency": "MYR",
-        "delivery_date": "2026-04-19"
+        "delivery_date": null
       },
-      "notes": "Order found for Hannah. Delivered item (Linen Midi Dress - Sage M) reported as damaged. Negative sentiment."
+      "notes": "Order found for Aina. Status: SHIPPED with no delivery date. Customer complaining of delivery delay with negative sentiment."
     },
     "reasoning": {
       "decision": "REFUND",
       "confidence": 0.95,
-      "rationale": "Item was delivered and reported as clearly damaged (torn seam). Policy prefers refund for damaged delivered items.",
+      "rationale": "Order has been shipped for two weeks with no tracking movement and no delivery date, indicating it is lost in transit. Customer explicitly requested a refund if not resolved today.",
       "requires_human_review": false
     },
     "response": {
-      "english": "Hi Hannah, we are so sorry to hear that your Linen Midi Dress arrived with a torn seam. We understand how disappointing this must be. In line with our policy for damaged items, we have processed a full refund of RM 129.00 to your original payment method. Please allow a few business days for the transaction to reflect. Thank you for your patience.",
-      "bahasa_malaysia": "Salam Hannah, kami amat minta maaf mendengar bahawa Linen Midi Dress anda tiba dengan jahitan yang koyak. Kami faham betapa mengecewakannya keadaan ini. Selaras dengan polisi kami untuk item yang rosak, kami telah memproses bayaran balik penuh sebanyak RM 129.00 ke kaedah pembayaran asal anda. Harap maklum bahawa ia akan mengambil beberapa hari bekerja untuk diproses. Terima kasih atas kesabaran anda."
+      "english": "Hi Aina, we are sorry that Baju Kurung Moden - Maroon XL arrived damaged. We have approved a refund MYR 89.00 to your original payment method. Please allow a few business days for it to appear.",
+      "bahasa_malaysia": "Hai Aina, kami mohon maaf kerana Baju Kurung Moden - Maroon XL tiba dalam keadaan rosak. Kami telah meluluskan bayaran balik MYR 89.00 ke kaedah pembayaran asal anda. Sila berikan beberapa hari bekerja untuk ia dipaparkan."
     },
     "supervisor": {
       "requires_human_review": false,
       "priority": "normal",
-      "supervisor_note": "High confidence refund decision aligns with policy for damaged delivered items."
-    }
-  },
-  {
-    "id": "3d830ba6-31f4-4925-aa2f-aba92a5c7332",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-24T22:45:56.383723+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order found for Hannah. Delivered item: Linen Midi Dress - Sage M. Issue: damaged_item. Sentiment: negative."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.95,
-      "rationale": "Order was delivered and the item has clear physical damage (torn seam); policy dictates a refund for clearly damaged delivered items.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Hannah, we are truly sorry to hear that your Linen Midi Dress - Sage M from order ORD-1887 arrived with a torn seam. We understand how disappointing it is to receive a damaged item. In accordance with our policy, we have processed a full refund of RM 129.00 to your original payment method. Please allow a few business days for the transaction to reflect. Thank you for your patience.",
-      "bahasa_malaysia": "Salam Hannah, kami amat kesal mendapati Linen Midi Dress - Sage M anda dari pesanan ORD-1887 tiba dengan jahitan yang koyak. Kami faham betapa kecewanya menerima barangan yang rosak. Selaras dengan polisi kami, kami telah memproses bayaran balik penuh sebanyak RM 129.00 ke kaedah pembayaran asal anda. Sila berikan beberapa hari bekerja untuk transaksi tersebut dipaparkan. Terima kasih atas kesabaran anda."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "High confidence refund for clearly damaged item; aligns with policy."
+      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
     }
   }
 ]

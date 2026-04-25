@@ -31,7 +31,7 @@ from backend.models import (
 )
 from backend.storage import DataManager
 
-load_dotenv()
+load_dotenv(override=True)
 
 app = FastAPI(title="Komplain.ai Backend", version="0.1.0")
 
