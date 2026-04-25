@@ -36,7 +36,7 @@ You have **two ways** to experience Komplain.ai. Pick whichever you prefer.
 
 The frontend is already deployed on Netlify and the backend on Render. Just open the link:
 
-> ### **[komplain-ai.netlify.app]([https://komplain-ai.netlify.app](https://beamish-meringue-c0dd31.netlify.app/komplain.ai%20dashboard?v=20260425-frontend-refresh))**
+> ### **[komplain-ai.netlify.app](https://beamish-meringue-c0dd31.netlify.app/komplain.ai%20dashboard?v=20260425-frontend-refresh)**
 
 Drop in a complaint (or use a quick-load scenario) and watch the full 5-agent pipeline run in your browser.
 
