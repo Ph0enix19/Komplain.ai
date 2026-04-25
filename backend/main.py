@@ -87,7 +87,9 @@ async def run_supervisor_logic(reasoning: dict, context: dict) -> dict:
     )
 
 
-async def run_complaint_pipeline(complaint_id: str, complaint_text: str) -> dict:
+async def run_complaint_pipeline(
+    complaint_id: str, complaint_text: str, created_at: str
+) -> dict:
     intake_payload = await run_intake_agent(complaint_text)
     intake = IntakeResult(**intake_payload)
     data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake_payload))
@@ -102,13 +104,14 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str) -> dict
         build_event(complaint_id, "reasoning", "Reasoning completed", reasoning_payload)
     )
 
-    response_payload = await run_response_agent(complaint_text, reasoning_payload, context_payload)
+    response_payload, supervisor = await asyncio.gather(
+        run_response_agent(complaint_text, reasoning_payload, context_payload),
+        run_supervisor_logic(reasoning_payload, context_payload),
+    )
     response = ResponseResult(**response_payload)
     data_manager.add_event(
         build_event(complaint_id, "response", "Response generated", response_payload)
     )
-
-    supervisor = await run_supervisor_logic(reasoning_payload, context_payload)
     data_manager.add_event(
         build_event(complaint_id, "supervisor", "Supervisor decision", supervisor)
     )
@@ -116,7 +119,7 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str) -> dict
     complaint = {
         "id": complaint_id,
         "complaint_text": complaint_text,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": created_at,
         "status": "COMPLETED",
         "intake": intake.model_dump(),
         "context": context.model_dump(),
@@ -126,6 +129,23 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str) -> dict
     }
     data_manager.add_complaint(complaint)
     return complaint
+
+
+async def _run_pipeline_in_background(
+    complaint_id: str, complaint_text: str, created_at: str
+) -> None:
+    try:
+        await run_complaint_pipeline(complaint_id, complaint_text, created_at)
+    except Exception as exc:
+        data_manager.add_complaint(
+            {
+                "id": complaint_id,
+                "complaint_text": complaint_text,
+                "created_at": created_at,
+                "status": "FAILED",
+                "error": str(exc),
+            }
+        )
 
 
 @app.on_event("startup")
@@ -169,21 +189,19 @@ async def create_complaint(payload: ComplaintCreate) -> dict:
     complaint_text = payload.complaint_text.strip()
     if payload.order_id and payload.order_id not in complaint_text:
         complaint_text = f"{complaint_text}\n\nOrder ID: {payload.order_id}"
-    try:
-        return await run_complaint_pipeline(complaint_id, complaint_text)
-    except httpx.TimeoutException as exc:
-        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
-    except httpx.HTTPStatusError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"ILMU API returned HTTP {exc.response.status_code}.",
-        ) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
-    except TimeoutError as exc:
-        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    created_at = datetime.now(timezone.utc).isoformat()
+
+    placeholder = {
+        "id": complaint_id,
+        "complaint_text": complaint_text,
+        "created_at": created_at,
+        "status": "PROCESSING",
+    }
+    data_manager.add_complaint(placeholder)
+
+    asyncio.create_task(_run_pipeline_in_background(complaint_id, complaint_text, created_at))
+
+    return placeholder
 
 
 @app.get("/api/complaints")

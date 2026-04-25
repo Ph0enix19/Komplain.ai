@@ -33,6 +33,8 @@ class DataManager:
         self._save_json(self.agent_events_path, self.agent_events)
 
     def add_complaint(self, complaint: dict[str, Any]) -> None:
+        complaint_id = complaint.get("id")
+        self.complaints = [c for c in self.complaints if c.get("id") != complaint_id]
         self.complaints.append(complaint)
         self.complaints = self.complaints[-self.MAX_COMPLAINTS :]
         active_ids = {c["id"] for c in self.complaints}

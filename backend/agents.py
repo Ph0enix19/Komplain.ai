@@ -81,7 +81,8 @@ async def intake_agent(llm_client: ILMUClient, complaint_text: str) -> IntakeRes
             llm_client.chat_json(
                 prompt=f"Complaint:\n{complaint_text}",
                 system=INTAKE_SYSTEM,
-                max_tokens=1024,
+                max_tokens=256,
+                reasoning_effort=None,
             ),
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
@@ -125,7 +126,8 @@ async def context_agent(
                     f"Order lookup result:\n{order if order is not None else 'null'}"
                 ),
                 system=CONTEXT_SYSTEM,
-                max_tokens=1024,
+                max_tokens=256,
+                reasoning_effort=None,
             ),
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
@@ -198,7 +200,8 @@ async def response_agent(
                     f"Context:\n{context.model_dump_json(indent=2)}"
                 ),
                 system=RESPONSE_SYSTEM,
-                max_tokens=1536,
+                max_tokens=1024,
+                reasoning_effort=None,
             ),
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
@@ -227,7 +230,8 @@ async def supervisor_logic(
                     f"Context:\n{context.model_dump_json(indent=2)}"
                 ),
                 system=SUPERVISOR_SYSTEM,
-                max_tokens=1024,
+                max_tokens=256,
+                reasoning_effort=None,
             ),
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )

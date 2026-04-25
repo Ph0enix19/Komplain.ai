@@ -1,3 +1,9 @@
 [build]
-  publish = "."
+  publish = "frontend"
   command = ""
+
+# Friendly redirect from root → dashboard entry
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200

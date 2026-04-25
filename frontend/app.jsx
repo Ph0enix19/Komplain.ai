@@ -159,6 +159,34 @@ async function apiFetch(path, options) {
   return response.json();
 }
 
+async function pollForCompletion(complaintId, onEvents) {
+  const pollIntervalMs = 1500;
+  const maxWaitMs = 8 * 60 * 1000;
+  const startedAt = Date.now();
+  let record = { id: complaintId, status: 'PROCESSING' };
+
+  while (record.status === 'PROCESSING') {
+    if (Date.now() - startedAt > maxWaitMs) {
+      throw new Error('Timed out waiting for pipeline to complete.');
+    }
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+    try {
+      const [next, apiEvents] = await Promise.all([
+        apiFetch(`/complaints/${complaintId}`),
+        apiFetch(`/complaints/${complaintId}/events`),
+      ]);
+      record = next;
+      if (typeof onEvents === 'function') {
+        onEvents(buildTimelineEvents(apiEvents));
+      }
+    } catch (error) {
+      console.warn('Polling tick failed, retrying', error);
+    }
+  }
+
+  return record;
+}
+
 function App() {
   const [theme, setTheme] = useState(TWEAK_DEFAULTS.theme);
   const [density, setDensity] = useState(TWEAK_DEFAULTS.density);
@@ -179,7 +207,6 @@ function App() {
   const [resolutionDraft, setResolutionDraft] = useState({ response_en: '', response_bm: '' });
   const [totalDuration, setTotalDuration] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
-  const timers = useRef([]);
 
   const [cases, setCases] = useState([]);
   const [caseRecords, setCaseRecords] = useState({});
@@ -207,8 +234,6 @@ function App() {
   const persist = (edits) => window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
   const wrap = (setter, key) => (value) => { setter(value); persist({ [key]: value }); };
 
-  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -216,10 +241,11 @@ function App() {
       try {
         const records = await apiFetch('/complaints');
         if (cancelled) return;
-        const mapped = [...records]
+        const completed = records.filter((r) => r && r.intake && r.context && r.reasoning && r.response);
+        const mapped = [...completed]
           .sort((a, b) => parseTimestamp(b.created_at) - parseTimestamp(a.created_at))
           .map(buildCaseFromRecord);
-        const recordMap = records.reduce((acc, record) => {
+        const recordMap = completed.reduce((acc, record) => {
           acc[record.id] = record;
           return acc;
         }, {});
@@ -234,35 +260,6 @@ function App() {
     loadComplaints();
     return () => { cancelled = true; };
   }, []);
-
-  const scheduleTimeline = (timelineEvents, finalResolution, caseId) => {
-    timers.current.forEach(clearTimeout);
-    timers.current = [];
-    setEvents([]);
-    setResolution(null);
-    setEditingResolution(false);
-    setResolutionDraft({ response_en: '', response_bm: '' });
-
-    timelineEvents.forEach((event) => {
-      const timer = setTimeout(() => {
-        setEvents((prev) => [...prev, event]);
-      }, event.at);
-      timers.current.push(timer);
-    });
-
-    const finishAt = timelineEvents.length ? timelineEvents[timelineEvents.length - 1].at : 0;
-    const resolutionTimer = setTimeout(() => {
-      setResolution(finalResolution);
-    }, Math.max(0, finishAt - 240));
-    timers.current.push(resolutionTimer);
-
-    const doneTimer = setTimeout(() => {
-      setRunning(false);
-      setTotalDuration(finishAt);
-      setActiveCaseId(caseId);
-    }, finishAt + 120);
-    timers.current.push(doneTimer);
-  };
 
   const loadScenario = (scenario) => {
     if (running) return;
@@ -299,22 +296,37 @@ function App() {
         }),
       });
 
-      const apiEvents = await apiFetch(`/complaints/${created.id}/events`);
-      const timelineEvents = buildTimelineEvents(apiEvents);
-      const nextResolution = buildResolution(created);
-      const nextCase = buildCaseFromRecord(created);
-
       liveCaseId.current = created.id;
       setScenarioKey(orderId ? 'clean' : scenarioKey);
-      setCaseRecords((prev) => ({ ...prev, [created.id]: created }));
-      setCaseEvents((prev) => ({ ...prev, [created.id]: timelineEvents }));
-      setCases((prev) => [nextCase, ...prev.filter((item) => item.id !== created.id)].slice(0, 5));
+
+      const final = await pollForCompletion(created.id, (liveEvents) => {
+        setEvents(liveEvents);
+        setCaseEvents((prev) => ({ ...prev, [created.id]: liveEvents }));
+      });
+
+      if (final.status === 'FAILED') {
+        throw new Error(final.error || 'Pipeline failed');
+      }
+
+      const apiEvents = await apiFetch(`/complaints/${final.id}/events`);
+      const timelineEvents = buildTimelineEvents(apiEvents);
+      const nextResolution = buildResolution(final);
+      const nextCase = buildCaseFromRecord(final);
+      const finishAt = timelineEvents.length ? timelineEvents[timelineEvents.length - 1].at + 260 : 0;
+
+      setCaseRecords((prev) => ({ ...prev, [final.id]: final }));
+      setCaseEvents((prev) => ({ ...prev, [final.id]: timelineEvents }));
+      setCases((prev) => [nextCase, ...prev.filter((item) => item.id !== final.id)].slice(0, 5));
       setResolutionDraft({
         response_en: nextResolution.response_en,
         response_bm: nextResolution.response_bm,
       });
       setEditingResolution(false);
-      scheduleTimeline(timelineEvents, nextResolution, created.id);
+      setEvents(timelineEvents);
+      setResolution(nextResolution);
+      setTotalDuration(finishAt);
+      setActiveCaseId(final.id);
+      setRunning(false);
     } catch (error) {
       console.error(error);
       setRunning(false);

@@ -9,6 +9,9 @@ from typing import Any
 import httpx
 
 
+_REASONING_DEFAULT = object()
+
+
 class ILMUClient:
     MAX_TOKENS = 512
     MAX_NULL_CONTENT_RETRIES = 2
@@ -30,6 +33,7 @@ class ILMUClient:
         prompt: str,
         system: str = "You are a helpful assistant.",
         max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
     ) -> str:
         if not self.api_key:
             raise RuntimeError("ILMU_API_KEY is not configured.")
@@ -42,8 +46,9 @@ class ILMUClient:
             ],
             "max_tokens": max_tokens or self.MAX_TOKENS,
         }
-        if self.reasoning_effort:
-            payload["reasoning_effort"] = self.reasoning_effort
+        effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
+        if effort:
+            payload["reasoning_effort"] = effort
         message = await self._create_message_with_retries(payload)
 
         if isinstance(message, str):
@@ -65,6 +70,7 @@ class ILMUClient:
         system: str,
         *,
         max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
     ) -> dict[str, Any]:
         if not self.api_key:
             raise RuntimeError("ILMU_API_KEY is not configured.")
@@ -78,10 +84,15 @@ class ILMUClient:
             "max_tokens": max_tokens or self.MAX_TOKENS,
             "response_format": {"type": "json_object"},
         }
+        effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
+        if effort:
+            payload["reasoning_effort"] = effort
 
         raw_text = await self._create_message_with_retries(payload, expected_json=True)
         if not isinstance(raw_text, str):
-            raw_text = await self._chat_key_value(prompt, system, max_tokens=max_tokens)
+            raw_text = await self._chat_key_value(
+                prompt, system, max_tokens=max_tokens, reasoning_effort=reasoning_effort
+            )
         return self._extract_structured_object(raw_text)
 
     async def _create_chat_completion(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -170,6 +181,7 @@ class ILMUClient:
         system: str,
         *,
         max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
     ) -> str:
         safe_system = re.sub(r"\bJSON\b", "plain text", system, flags=re.IGNORECASE)
         safe_prompt = re.sub(r"\bJSON\b", "plain text fields", prompt, flags=re.IGNORECASE)
@@ -179,7 +191,12 @@ class ILMUClient:
             "Use exactly one field per line in this format: key: value. "
             "Do not use markdown, bullets, tables, or explanations."
         )
-        return await self.chat(safe_prompt, system=key_value_system, max_tokens=max_tokens)
+        return await self.chat(
+            safe_prompt,
+            system=key_value_system,
+            max_tokens=max_tokens,
+            reasoning_effort=reasoning_effort,
+        )
 
     @classmethod
     def _extract_structured_object(cls, text: str) -> dict[str, Any]:
