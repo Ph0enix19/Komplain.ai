@@ -37,6 +37,9 @@ All required documentation is included in this repository under [`/docs`](./docs
 
 ## About the Project
 
+<img width="2527" height="1521" alt="image" src="https://github.com/user-attachments/assets/f4c76208-0ec0-4474-8d3a-0b14edcf8c4d" />
+
+
 Komplain.ai is a hackathon MVP for agentic customer complaint resolution. It combines a browser-based operations dashboard with a FastAPI backend that runs a multi-agent workflow over customer complaints, order context, decision reasoning, bilingual response drafting, and supervisor review.
 
 The project is designed for ecommerce support teams that need to process common complaints quickly while keeping a visible audit trail. A support operator can submit a complaint, optionally include an order ID, watch each agent step run, review the final recommendation, edit the customer reply, and inspect recent cases in the case log.
