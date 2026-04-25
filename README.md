@@ -23,9 +23,8 @@
 
 > ### **[Watch the recorded pitch + product demo](REPLACE_WITH_YOUR_GOOGLE_DRIVE_LINK)**
 >
-> _Replace the link above with your Google Drive URL before submitting. Set sharing to "Anyone with the link, Viewer"._
 
-**Mirror (optional):** _add YouTube unlisted link here_
+
 
 ---
 
