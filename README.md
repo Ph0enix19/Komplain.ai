@@ -284,38 +284,6 @@ Komplain.ai/
 
 ---
 
-## Security Notes
-
-- `.env` is **gitignored** and must never be committed.
-- If a key was ever pushed accidentally, **rotate it immediately** and force-push the cleaning commit.
-- The backend has no authentication in MVP scope; production deployments require JWT auth (roadmapped in the SAD).
-- No customer PII is sent to the LLM in the MVP — the demo uses synthetic data only.
-
----
-
-## Results Snapshot (from QATD)
-
-- **All 66** QA test cases pass
-- End-to-end pipeline avg: **23 seconds** (target < 30s)
-- Decision confidence avg: **0.87** (target ≥ 0.75)
-- Manglish input processed natively — zero preprocessing
-- Both EN + BM replies generated in a single GLM call
-- Zero API keys present in the public repo
-
-Full test methodology and case-by-case results: **[docs/QATD.pdf](./docs/QATD.pdf)**.
-
----
-
-## Roadmap
-
-- PostgreSQL migration (path documented in SAD §6)
-- JWT-based supervisor authentication
-- Redis rate-limiting and short-circuit caching for repeat queries
-- Multi-tenant SaaS deployment model
-- E-commerce platform connectors (Shopify, Lazada, WooCommerce)
-
----
-
 ## License
 
 This project is a hackathon submission. All rights reserved by the authors.
