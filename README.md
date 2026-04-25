@@ -1,5 +1,42 @@
 # Komplain.ai
 
+> **Hackathon Domain:** AI Systems & Agentic Workflow Automation
+> **Submission:** Single repository containing all deliverables (code + documentation + pitch video).
+
+---
+
+## 🎥 Pitch Video & Live Demo (10 minutes)
+
+> **▶️ Watch the recorded pitch & product demonstration here:**
+> **[👉 Click to watch on Google Drive](REPLACE_WITH_YOUR_GOOGLE_DRIVE_LINK)**
+
+> _Replace the link above with your shared Google Drive URL before submitting. Make sure sharing is set to **"Anyone with the link → Viewer"**._
+
+**Mirror / backup link (optional):** _add YouTube unlisted link here_
+
+---
+
+## 📦 Deliverables Index
+
+All required documentation is included in this repository under [`/docs`](./docs) in **PDF format** as required by the submission rubric. Editable source files (`.docx`, `.pptx`) are committed alongside the PDFs for transparency.
+
+| # | Deliverable | PDF | Source |
+|---|---|---|---|
+| 1 | **PRD** — Product Requirements Document | [docs/PRD.pdf](./docs/PRD.pdf) | — |
+| 2 | **SAD** — System Architecture Document | [docs/SAD.pdf](./docs/SAD.pdf) | — |
+| 3 | **QATD** — Quality Assurance & Testing Document | [docs/QATD.pdf](./docs/QATD.pdf) | [docs/QATD.docx](./docs/QATD.docx) |
+| 4 | **Pitch Deck** | [docs/PitchDeck.pdf](./docs/PitchDeck.pdf) | [docs/PitchDeck.pptx](./docs/PitchDeck.pptx) |
+| 5 | **Pitch Video (10 min + demo)** | _see link above_ | — |
+| 6 | **Source Code** | _this repository_ | — |
+| 7 | **Pitch Script** (speaker notes for the video) | [docs/PitchScript.md](./docs/PitchScript.md) | — |
+
+🌐 **Live deployed app:** https://komplain-ai.netlify.app
+🔌 **Backend API:** https://komplain-ai.onrender.com/api
+
+---
+
+## About the Project
+
 Komplain.ai is a hackathon MVP for agentic customer complaint resolution. It combines a browser-based operations dashboard with a FastAPI backend that runs a multi-agent workflow over customer complaints, order context, decision reasoning, bilingual response drafting, and supervisor review.
 
 The project is designed for ecommerce support teams that need to process common complaints quickly while keeping a visible audit trail. A support operator can submit a complaint, optionally include an order ID, watch each agent step run, review the final recommendation, edit the customer reply, and inspect recent cases in the case log.
