@@ -21,7 +21,7 @@
 
 ## Pitch Video & Live Demonstration (10 minutes)
 
-> ### **[Watch the recorded pitch + product demo](REPLACE_WITH_YOUR_GOOGLE_DRIVE_LINK)**
+> ### **[Watch the recorded pitch + product demo](https://drive.google.com/file/d/1IJ3Xe-SRWEcsv7_5ecS_KsFvllmv88rM/view?usp=sharing)**
 >
 
 
