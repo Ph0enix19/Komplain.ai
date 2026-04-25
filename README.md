@@ -28,7 +28,7 @@ All required documentation is included in this repository under [`/docs`](./docs
 | 4 | **Pitch Deck** | [docs/PitchDeck.pdf](./docs/PitchDeck.pdf) | [docs/PitchDeck.pptx](./docs/PitchDeck.pptx) |
 | 5 | **Pitch Video (10 min + demo)** | _see link above_ | — |
 | 6 | **Source Code** | _this repository_ | — |
-| 7 | **Pitch Script** (speaker notes for the video) | [docs/PitchScript.md](./docs/PitchScript.md) | — |
+
 
 🌐 **Live deployed app:** https://komplain-ai.netlify.app
 🔌 **Backend API:** https://komplain-ai.onrender.com/api
