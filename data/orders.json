@@ -1,0 +1,47 @@
+[
+  {
+    "order_id": "KM-1001",
+    "customer_name": "Aisyah",
+    "item": "Bluetooth Speaker",
+    "status": "DELIVERED",
+    "total": 129.0,
+    "currency": "MYR",
+    "delivery_date": "2026-04-20"
+  },
+  {
+    "order_id": "KM-1002",
+    "customer_name": "Ravi",
+    "item": "Phone Case",
+    "status": "SHIPPED",
+    "total": 39.0,
+    "currency": "MYR",
+    "delivery_date": null
+  },
+  {
+    "order_id": "KM-1003",
+    "customer_name": "Nurul",
+    "item": "Gaming Mouse",
+    "status": "DELIVERED",
+    "total": 89.0,
+    "currency": "MYR",
+    "delivery_date": "2026-04-19"
+  },
+  {
+    "order_id": "ORD-2041",
+    "customer_name": "Aina",
+    "item": "Baju Kurung Moden - Maroon XL",
+    "status": "SHIPPED",
+    "total": 89.0,
+    "currency": "MYR",
+    "delivery_date": null
+  },
+  {
+    "order_id": "ORD-1887",
+    "customer_name": "Hannah",
+    "item": "Linen Midi Dress - Sage M",
+    "status": "DELIVERED",
+    "total": 129.0,
+    "currency": "MYR",
+    "delivery_date": "2026-04-19"
+  }
+]
