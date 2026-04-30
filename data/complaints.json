@@ -1,88 +1,8 @@
 [
   {
-    "id": "ca0a3744-f8f4-484c-a91b-c46a80bd38c0",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-25T23:27:38.447330+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order ORD-1887 found for Hannah. Item: Linen Midi Dress - Sage M, Status: Delivered. Issue reported: damaged_item with negative sentiment."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.95,
-      "rationale": "Item is clearly damaged (torn seam) and has been delivered; policy prefers refund for damaged delivered items.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Hi Hannah, we are truly sorry to hear that your Linen Midi Dress arrived with a torn seam. We understand how disappointing this must be. We have approved a full refund of RM 129.00 for your order ORD-1887. The refund will be processed to your original payment method shortly. Thank you for your patience, and please let us know if you need any further assistance.",
-      "bahasa_malaysia": "Salam Hannah, kami amat minta maaf kerana Linen Midi Dress anda tiba dengan jahitan yang koyak. Kami faham betapa kecewanya situasi ini. Kami telah meluluskan bayaran balik penuh sebanyak RM 129.00 untuk pesanan ORD-1887 anda. Bayaran balik akan diproses ke kaedah pembayaran asal anda tidak lama lagi. Terima kasih atas kesabaran anda, dan sila hubungi kami jika memerlukan bantuan lanjut."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "High confidence refund for damaged delivered item aligns with policy. No escalation needed."
-    }
-  },
-  {
-    "id": "b4a0c74c-2952-435f-8fb3-54b2a7fde5d5",
-    "complaint_text": "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
-    "created_at": "2026-04-29T21:16:27.896899+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-1887",
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-1887",
-        "customer_name": "Hannah",
-        "item": "Linen Midi Dress - Sage M",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order found for Hannah. Status: DELIVERED. Issue: damaged_item."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.9,
-      "rationale": "The customer reports a damaged item for an order that exists in the system.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Hi Hannah, we are sorry that Linen Midi Dress - Sage M arrived damaged. We have approved a refund MYR 129.00 to your original payment method. Please allow a few business days for it to appear.",
-      "bahasa_malaysia": "Hai Hannah, kami mohon maaf kerana Linen Midi Dress - Sage M tiba dalam keadaan rosak. Kami telah meluluskan bayaran balik MYR 129.00 ke kaedah pembayaran asal anda. Sila berikan beberapa hari bekerja untuk ia dipaparkan."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
-    }
-  },
-  {
-    "id": "a14812df-51ff-4820-8e83-707ead8ef0ab",
+    "id": "05b23347-bc0d-4f8e-a104-7d82c29e479e",
     "complaint_text": "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
-    "created_at": "2026-04-29T21:17:00.939670+00:00",
+    "created_at": "2026-04-30T03:27:32.161867+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
@@ -101,86 +21,158 @@
         "currency": "MYR",
         "delivery_date": null
       },
-      "notes": "Order found for Aina. Status: SHIPPED. Issue: delivery_delay."
+      "notes": "Order found with ID ORD-2041 but delivery date not provided"
     },
     "reasoning": {
-      "decision": "RESHIP",
-      "confidence": 0.82,
-      "rationale": "The issue can likely be resolved by arranging a replacement or delivery follow-up.",
+      "decision": "REFUND",
+      "confidence": 0.8,
+      "rationale": "Delivery has been delayed by two weeks, no movement in tracking, and customer is expecting a resolution today.",
       "requires_human_review": false
     },
     "response": {
-      "english": "Hi Aina, we are sorry for the issue with Baju Kurung Moden - Maroon XL. We will arrange a replacement or delivery follow-up and update you shortly.",
-      "bahasa_malaysia": "Hai Aina, kami mohon maaf atas isu berkaitan Baju Kurung Moden - Maroon XL. Kami akan mengatur penggantian atau semakan penghantaran dan mengemas kini anda tidak lama lagi."
+      "english": "Dear Aina, \nWe apologize for the inconvenience caused by the delayed delivery of your order ORD-2041. Unfortunately, we are unable to resolve this issue today, and a refund will be processed for the full amount of MYR 89.00 to the original payment method. Please allow 5-7 business days for the refund to be credited.",
+      "bahasa_malaysia": "YB Aina,\n Kami mohon maaf atas mengapa pihak kami gagal dalam menyelesaikan tempahan nombor ORD-2041. Sayangnya, kami tidak dapat menangani isu ini hari ini, dan kami akan mengeluarkan pengembalian penuh sebanyak RM 89.00 kepada kaedah pembayaran asal. Sila beritahu kami 5-7 hari kerja bagi tempoh pengembalian ini."
     },
     "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Escalate for resolution despite automated decision, as customer is expecting resolution today due to delivery delays"
     }
   },
   {
-    "id": "121726a9-9d5e-40ac-882e-8ed00517b2b6",
-    "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-04-29T21:17:13.309682+00:00",
+    "id": "cfc3a960-0c65-464e-b6e2-6aec860c3cb8",
+    "complaint_text": "i want to return my order\n\nOrder ID: ORD-1111",
+    "created_at": "2026-04-30T03:27:56.518520+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
-      "order_id": null,
-      "issue_type": "damaged_item",
+      "order_id": "ORD-1111",
+      "issue_type": "refund_request",
       "sentiment": "negative"
     },
     "context": {
       "order_found": false,
       "order_data": null,
-      "notes": "No order ID was provided, so the order could not be located."
+      "notes": ""
     },
     "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Order context is missing, so a support agent should verify the customer and order details.",
+      "decision": "DISMISS",
+      "confidence": 0.8,
+      "rationale": "Insufficient order information, cannot proceed with customer's request.",
       "requires_human_review": true
     },
     "response": {
-      "english": "Hi there, we could not confidently resolve this automatically. We have escalated your case to our support team for review.",
-      "bahasa_malaysia": "Hai, kami tidak dapat menyelesaikan isu ini secara automatik dengan yakin. Kes anda telah diserahkan kepada pasukan sokongan untuk semakan."
+      "english": "We are unable to locate your order, ORD-1111, and therefore cannot proceed with returning it. Our team will review this further.",
+      "bahasa_malaysia": "Kami tidak dapat menemukan pesanan anda, ORD-1111, dan oleh itu, kami tidak dapat memproses permintaan balik pesanan tersebut. Tim kami akan membantu memeriksa ini lebih lanjut."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
+      "supervisor_note": "Insufficient order information, requires manual review to verify customer claim."
     }
   },
   {
-    "id": "5606e47d-f96a-43a7-9e1a-b4d3fd78ee12",
-    "complaint_text": "hi what model are you who are you",
-    "created_at": "2026-04-29T21:18:06.455039+00:00",
+    "id": "ffbfb434-c81d-488c-8574-3bd82d077793",
+    "complaint_text": "I want money give me",
+    "created_at": "2026-04-30T03:28:20.817803+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
       "order_id": null,
-      "issue_type": "unknown",
-      "sentiment": "neutral"
+      "issue_type": "refund_request",
+      "sentiment": "negative"
     },
     "context": {
       "order_found": false,
       "order_data": null,
-      "notes": "No order ID was provided, so the order could not be located."
+      "notes": "No customer information available for this issue."
     },
     "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Order context is missing, so a support agent should verify the customer and order details.",
-      "requires_human_review": true
+      "decision": "DISMISS",
+      "confidence": 1.0,
+      "rationale": "Complaint lacks context and specific details.",
+      "requires_human_review": false
     },
     "response": {
-      "english": "Hi there, we could not confidently resolve this automatically. We have escalated your case to our support team for review.",
-      "bahasa_malaysia": "Hai, kami tidak dapat menyelesaikan isu ini secara automatik dengan yakin. Kes anda telah diserahkan kepada pasukan sokongan untuk semakan."
+      "english": "We appreciate your feedback, but we cannot fulfill your request as it lacks necessary context and details. If you have any further concerns, please feel free to reach out to us.",
+      "bahasa_malaysia": "Kami menghargai maklum balas anda, namun kami tidak dapat memenuhi permintaan anda kerana kurangnya konteks dan maklumat yang diperlukan. Jika anda mempunyai tindakan lanjut, sila hubungi kami."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Fallback supervisor logic used because structured LLM output was unavailable."
+      "supervisor_note": "Lack of context and specific details requires closer examination, no customer information available for this issue."
+    }
+  },
+  {
+    "id": "bc8e25d1-4ec3-469e-affa-f6cc9e2eb688",
+    "complaint_text": "i want to return my order",
+    "created_at": "2026-04-30T03:28:51.554602+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "refund_request",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "Order details not provided or available"
+    },
+    "reasoning": {
+      "decision": "DISMISS",
+      "confidence": 0.8,
+      "rationale": "Insufficient order information to proceed with the refund request",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Thank you for reaching out to us. Unfortunately, we are unable to process your cancellation request at this time due to insufficient information. We kindly request that you provide the necessary details so we can assist you further.",
+      "bahasa_malaysia": "Terima kasih atas kejadian tersebut. Sayangkan, kami tidak dapat mengeluarkan proses pembatalan permintaan anda pada masa ini disebabkan oleh informasi yang tak mencukupi. Kami berharap dapat mendapati maklumat yang diperlukan untuk menolong."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order details not provided or available, potential issue with refund request"
+    }
+  },
+  {
+    "id": "54c202c2-4db5-44f7-ae06-4240af6deea6",
+    "complaint_text": "i want to return my order\n\nOrder ID: ORD-2041",
+    "created_at": "2026-04-30T03:29:05.961332+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "refund_request",
+      "sentiment": "negative"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Refund request for ORDER ORD-2041, Baju Kurung Moden - Maroon XL"
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.8,
+      "rationale": "Clearly damaged delivered item and the customer has made a refund request",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "We sincerely apologize for the damaged item you received, Aina. We have processed a refund for your order ORD-2041. You will be informed once the refund has been successfully issued.",
+      "bahasa_malaysia": "Kami mengakui kesalahan atas penerimaan barang rosak, Aina. Kami telah menghantar pengembalian dana untuk pesanan ORD-2041. Anda akan dimaklumkan apabila pengembalian dana berjaya ditunaikan."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Review refund request for damaged item"
     }
   }
 ]

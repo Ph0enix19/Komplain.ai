@@ -168,6 +168,21 @@ async def reasoning_agent(
         payload = fallback_reasoning(complaint_text, intake, context)
     if isinstance(payload.get("decision"), str):
         payload["decision"] = payload["decision"].strip().upper()
+        decision_aliases = {
+            "REPLACE": "RESHIP",
+            "REPLACEMENT": "RESHIP",
+            "DELIVERY_FOLLOW_UP": "RESHIP",
+            "DELIVERY_FOLLOWUP": "RESHIP",
+            "FOLLOW_UP": "RESHIP",
+            "FOLLOWUP": "RESHIP",
+            "MANUAL_REVIEW": "ESCALATE",
+            "HUMAN_REVIEW": "ESCALATE",
+            "ESCALATION": "ESCALATE",
+            "REFUND_REQUEST": "REFUND",
+        }
+        payload["decision"] = decision_aliases.get(payload["decision"], payload["decision"])
+        if payload["decision"] not in {"REFUND", "RESHIP", "ESCALATE", "DISMISS"}:
+            payload = fallback_reasoning(complaint_text, intake, context)
     try:
         payload["confidence"] = max(0.0, min(1.0, float(payload.get("confidence", 0))))
     except (TypeError, ValueError):
@@ -175,7 +190,14 @@ async def reasoning_agent(
     payload["requires_human_review"] = bool(payload.get("requires_human_review"))
     if isinstance(payload.get("rationale"), str):
         payload["rationale"] = payload["rationale"].strip()
-    return _validated(ReasoningResult, payload, "Reasoning agent returned invalid data.")
+    try:
+        return _validated(ReasoningResult, payload, "Reasoning agent returned invalid data.")
+    except RuntimeError:
+        return _validated(
+            ReasoningResult,
+            fallback_reasoning(complaint_text, intake, context),
+            "Fallback reasoning returned invalid data.",
+        )
 
 
 async def response_agent(
@@ -239,7 +261,7 @@ async def supervisor_logic(
         payload = fallback_supervisor(reasoning, context)
     required_keys = {"requires_human_review", "priority", "supervisor_note"}
     if not required_keys.issubset(payload):
-        raise RuntimeError("Supervisor agent returned invalid data.")
+        payload = fallback_supervisor(reasoning, context)
 
     payload["requires_human_review"] = bool(payload["requires_human_review"])
     payload["priority"] = str(payload["priority"]).lower()

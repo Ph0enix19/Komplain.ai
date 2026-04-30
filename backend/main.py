@@ -167,16 +167,16 @@ async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
     try:
         output = await ilmu_client.chat(req.prompt, system="You are Komplain.ai assistant.")
     except httpx.TimeoutException as exc:
-        raise HTTPException(status_code=504, detail="ILMU API request timed out.") from exc
+        raise HTTPException(status_code=504, detail="LLM provider request timed out.") from exc
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=502,
-            detail=f"ILMU API returned HTTP {exc.response.status_code}.",
+            detail=f"LLM provider returned HTTP {exc.response.status_code}.",
         ) from exc
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail="Failed to reach ILMU API.") from exc
+        raise HTTPException(status_code=502, detail="Failed to reach LLM provider.") from exc
     except TimeoutError as exc:
-        raise HTTPException(status_code=504, detail="An agent request to ILMU timed out.") from exc
+        raise HTTPException(status_code=504, detail="An agent request to the LLM provider timed out.") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

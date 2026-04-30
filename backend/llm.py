@@ -15,6 +15,7 @@ _REASONING_DEFAULT = object()
 class ILMUClient:
     MAX_TOKENS = 512
     MAX_NULL_CONTENT_RETRIES = 2
+    PROVIDERS = {"ilmu", "gemini", "groq"}
 
     def __init__(
         self,
@@ -22,11 +23,36 @@ class ILMUClient:
         model: str | None = None,
         timeout: float | None = None,
     ) -> None:
-        self.base_url = (base_url or os.getenv("ILMU_BASE_URL", "https://api.ilmu.ai/v1")).rstrip("/")
-        self.model = model or os.getenv("ILMU_MODEL", "ilmu-glm-5.1")
-        self.api_key = os.getenv("ILMU_API_KEY")
+        self.provider = os.getenv("LLM_PROVIDER", "ilmu").strip().lower()
+        if self.provider not in self.PROVIDERS:
+            allowed = ", ".join(sorted(self.PROVIDERS))
+            raise RuntimeError(f"Unsupported LLM_PROVIDER '{self.provider}'. Expected one of: {allowed}.")
+
+        if self.provider == "gemini":
+            default_base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
+            self.base_url = (base_url or os.getenv("GEMINI_BASE_URL", default_base_url)).rstrip("/")
+            self.model = model or os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+            self.api_key = os.getenv("GEMINI_API_KEY")
+            self.api_key_env_var = "GEMINI_API_KEY"
+            self.reasoning_effort = None
+            self.supports_reasoning_effort = False
+        elif self.provider == "groq":
+            default_base_url = "https://api.groq.com/openai/v1"
+            self.base_url = (base_url or os.getenv("GROQ_BASE_URL", default_base_url)).rstrip("/")
+            self.model = model or os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+            self.api_key = os.getenv("GROQ_API_KEY")
+            self.api_key_env_var = "GROQ_API_KEY"
+            self.reasoning_effort = None
+            self.supports_reasoning_effort = False
+        else:
+            self.base_url = (base_url or os.getenv("ILMU_BASE_URL", "https://api.ilmu.ai/v1")).rstrip("/")
+            self.model = model or os.getenv("ILMU_MODEL", "ilmu-glm-5.1")
+            self.api_key = os.getenv("ILMU_API_KEY")
+            self.api_key_env_var = "ILMU_API_KEY"
+            self.reasoning_effort = os.getenv("ILMU_REASONING_EFFORT", "low")
+            self.supports_reasoning_effort = True
+
         self.timeout = timeout or float(os.getenv("ILMU_TIMEOUT", "180"))
-        self.reasoning_effort = os.getenv("ILMU_REASONING_EFFORT", "low")
 
     async def chat(
         self,
@@ -36,7 +62,7 @@ class ILMUClient:
         reasoning_effort: Any = _REASONING_DEFAULT,
     ) -> str:
         if not self.api_key:
-            raise RuntimeError("ILMU_API_KEY is not configured.")
+            raise RuntimeError(f"{self.api_key_env_var} is not configured.")
 
         payload = {
             "model": self.model,
@@ -47,7 +73,7 @@ class ILMUClient:
             "max_tokens": max_tokens or self.MAX_TOKENS,
         }
         effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
-        if effort:
+        if self.supports_reasoning_effort and effort:
             payload["reasoning_effort"] = effort
         message = await self._create_message_with_retries(payload)
 
@@ -62,7 +88,7 @@ class ILMUClient:
                     text_parts.append(item)
             return "".join(text_parts)
 
-        raise RuntimeError("Unexpected message content from ILMU API.")
+        raise RuntimeError(f"Unexpected message content from {self.provider.upper()} API.")
 
     async def chat_json(
         self,
@@ -73,7 +99,7 @@ class ILMUClient:
         reasoning_effort: Any = _REASONING_DEFAULT,
     ) -> dict[str, Any]:
         if not self.api_key:
-            raise RuntimeError("ILMU_API_KEY is not configured.")
+            raise RuntimeError(f"{self.api_key_env_var} is not configured.")
 
         payload = {
             "model": self.model,
@@ -85,7 +111,7 @@ class ILMUClient:
             "response_format": {"type": "json_object"},
         }
         effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
-        if effort:
+        if self.supports_reasoning_effort and effort:
             payload["reasoning_effort"] = effort
 
         raw_text = await self._create_message_with_retries(payload, expected_json=True)
@@ -144,9 +170,10 @@ class ILMUClient:
     @staticmethod
     def _message_content(data: dict[str, Any]) -> Any:
         try:
-            return data["choices"][0]["message"]["content"]
+            message = data["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
             raise RuntimeError("Unexpected response format from ILMU API.") from exc
+        return message.get("content")
 
     @staticmethod
     def _extract_json_object(text: str) -> dict[str, Any]:
