@@ -6,16 +6,16 @@
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-### Agentic Customer Complaint Resolution — powered by ILMU GLM-5.1
+### Agentic Customer Complaint Resolution — powered by Groq
 
 *From a raw, code-switched complaint to an approved bilingual resolution in under 45 seconds.*
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://komplain-ai.netlify.app)
 [![Backend](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://komplain-ai.onrender.com/api/health)
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.136-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![GLM-5.1](https://img.shields.io/badge/LLM-ILMU_GLM--5.1-7C3AED?style=for-the-badge)](https://api.ilmu.ai)
+[![Groq](https://img.shields.io/badge/LLM-Groq-FF6B00?style=for-the-badge)](https://groq.com/)
 
 **Hackathon Track:** AI Systems & Agentic Workflow Automation
 
@@ -56,7 +56,7 @@ cd Komplain.ai
 # then follow the local setup steps in the section below
 ```
 
-You will need: Python 3.13, an ILMU API key, and a browser.
+You will need: Python 3.13, a Groq API key, and a browser.
 
 ---
 
@@ -106,13 +106,13 @@ The backend persists only the latest five complaints and their event logs — fo
 
 | # | Agent | Role | Engine |
 |---|---|---|---|
-| 1 | **Intake** | Extracts order ID, complaint type, language, sentiment from raw text | GLM-5.1 |
-| 2 | **Context** | Looks up the order; GLM synthesises a contextual note | Rule + GLM |
-| 3 | **Reasoning** | Evaluates complaint + policy → REFUND / RESHIP / CLARIFY / REVIEW | GLM-5.1 |
-| 4 | **Response** | Drafts bilingual EN + BM customer reply aligned to the decision | GLM-5.1 |
-| 5 | **Supervisor** | Independent validation, confidence flag, escalation priority | GLM-5.1 |
+| 1 | **Intake** | Extracts order ID, complaint type, language, sentiment from raw text | Groq |
+| 2 | **Context** | Looks up the order; synthesises a contextual note | Rule + Groq |
+| 3 | **Reasoning** | Evaluates complaint + policy → REFUND / RESHIP / ESCALATE / DISMISS | Groq |
+| 4 | **Response** | Drafts bilingual EN + BM customer reply aligned to the decision | Groq |
+| 5 | **Supervisor** | Independent validation, confidence flag, escalation priority | Groq |
 
-> **Human-in-the-Loop:** Every GLM resolution requires explicit supervisor approval before any reply is dispatched.
+> **Human-in-the-Loop:** Every AI-generated resolution requires explicit supervisor approval before any reply is dispatched.
 
 For the full architectural rationale, agent prompts, validation strategy, and roadmap, see **[docs/SAD.pdf](./docs/SAD.pdf)**.
 
@@ -122,7 +122,7 @@ For the full architectural rationale, agent prompts, validation strategy, and ro
 
 - **Frontend:** React 18 (UMD + Babel Standalone, no build step), plain CSS, static site on Netlify
 - **Backend:** FastAPI, Uvicorn, Pydantic v2, Python 3.13, hosted on Render
-- **LLM Engine:** ILMU GLM-5.1 (OpenAI-compatible API, JSON mode, 3-layer output validation)
+- **LLM Engine:** Groq OpenAI-compatible API, JSON mode, key-value fallback, typed validation
 - **Storage:** JSON flat-file (MVP); PostgreSQL migration path documented in the SAD
 
 ---
@@ -132,7 +132,7 @@ For the full architectural rationale, agent prompts, validation strategy, and ro
 ### Prerequisites
 
 - Python 3.13+
-- An [ILMU](https://api.ilmu.ai) API key
+- A [Groq](https://console.groq.com/keys) API key
 - A modern browser
 
 ### 1. Clone and set up the virtual environment
@@ -153,6 +153,12 @@ source .venv/bin/activate
 
 ```bash
 pip install -r backend/requirements.txt
+```
+
+For local testing and CI parity, also install the dev tools:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ### 3. Create your .env file in the repo root
@@ -231,9 +237,52 @@ Set these environment variables in the Render dashboard:
 | `GET`  | `/api/complaints/{id}` | Get one complaint record |
 | `GET`  | `/api/complaints/{id}/events` | Agent trace for one complaint |
 | `GET`  | `/api/complaints/{id}/stream` | SSE stream of agent events |
-| `POST` | `/api/test-llm` | Smoke-test the configured ILMU model |
+| `POST` | `/api/test-llm` | Smoke-test the configured LLM provider |
 
 Full OpenAPI documentation is auto-generated at `/docs` on the running backend.
+
+---
+
+## Quality Gates & CI
+
+GitHub Actions runs on every push to `main`, every pull request targeting `main`, and manual `workflow_dispatch`.
+
+| Job | What it checks |
+|---|---|
+| `lint` | `ruff check backend/ tests/` and `ruff format --check backend/ tests/` |
+| `test` | `pytest tests/ -v --tb=short` on Python 3.13 |
+| `security` | `pip-audit -r requirements.txt --strict` and `detect-secrets scan --baseline .secrets.baseline` |
+
+The security job is currently `continue-on-error: true` so demo deploys are not blocked by advisory churn, but the warnings still appear in the Actions UI.
+
+Add this GitHub Actions secret before pushing:
+
+```text
+GROQ_API_KEY
+```
+
+## Tests
+
+The pytest suite is fully mocked by default and does not call external LLM APIs.
+
+```bash
+pytest -v
+```
+
+Current coverage focus:
+
+- API endpoints: health, LLM smoke endpoint, complaint creation, complaint retrieval, event traces
+- LLM client: JSON parsing, markdown JSON extraction, key-value fallback, provider switching
+- Agents: intake extraction, context lookup, reasoning enum validation, bilingual response output, supervisor flags
+- Storage: JSON save/load, order lookup, FIFO complaint cap, event pruning
+
+To run the optional real Groq smoke path locally:
+
+```powershell
+$env:LLM_PROVIDER = "groq"
+$env:GROQ_API_KEY = "your_real_key"
+pytest tests/ --llm -v
+```
 
 ---
 
@@ -243,8 +292,14 @@ Full OpenAPI documentation is auto-generated at `/docs` on the running backend.
 Komplain.ai/
 ├── README.md                  ← you are here
 ├── netlify.toml               ← Netlify config (publishes /frontend)
+├── requirements.txt           ← CI/runtime dependency mirror
+├── requirements-dev.txt       ← pytest, ruff, pip-audit, detect-secrets
+├── pytest.ini                 ← pytest markers, testpaths, pythonpath
+├── .ruff.toml                 ← lenient Python 3.13 Ruff config
+├── .secrets.baseline          ← detect-secrets baseline
 ├── .env                       ← LOCAL ONLY · never commit
 ├── .gitignore
+├── .github/workflows/ci.yml   ← lint/test/security GitHub Actions workflow
 │
 ├── docs/                      ← submission deliverables (PDFs)
 │   ├── PRD.pdf
@@ -272,7 +327,7 @@ Komplain.ai/
 ├── backend/                   ← FastAPI + 5-agent pipeline
 │   ├── main.py                ← FastAPI app, routes, orchestrator
 │   ├── agents.py              ← agent prompts and execution functions
-│   ├── llm.py                 ← ILMU client (JSON-mode, 3-layer validation)
+│   ├── llm.py                 ← OpenAI-compatible LLM client (JSON-mode + fallback parsing)
 │   ├── models.py              ← Pydantic v2 models for typed I/O
 │   ├── storage.py             ← JSON-backed DataManager (FIFO, cap 5)
 │   └── requirements.txt
@@ -283,7 +338,12 @@ Komplain.ai/
 │   └── agent_events.json
 │
 └── tests/
-    └── smoke_test_glm.py      ← end-to-end ILMU connectivity test
+    ├── conftest.py            ← pytest helpers and optional --llm flag
+    ├── test_api.py            ← FastAPI endpoint and pipeline tests
+    ├── test_llm.py            ← mocked LLM client tests
+    ├── test_agents.py         ← mocked agent logic tests
+    ├── test_storage.py        ← JSON storage/FIFO tests
+    └── smoke_test_glm.py      ← optional provider connectivity script
 ```
 
 ---
