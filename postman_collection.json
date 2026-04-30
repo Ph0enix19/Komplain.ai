@@ -1,0 +1,231 @@
+{
+  "info": {
+    "name": "FastAPI Backend Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /api/health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://komplaintest.onrender.com/api/health",
+          "protocol": "https",
+          "host": [
+            "komplaintest",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response contains status\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"status\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/test-llm",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"reply pong\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://komplaintest.onrender.com/api/test-llm",
+          "protocol": "https",
+          "host": [
+            "komplaintest",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "test-llm"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response contains text output\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"output\");",
+              "  pm.expect(json.output).to.be.a(\"string\").and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /api/complaints",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"complaint_text\": \"my order arrived damaged and late\",\n  \"order_id\": \"ORD-1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://komplaintest.onrender.com/api/complaints",
+          "protocol": "https",
+          "host": [
+            "komplaintest",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "complaints"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has complaint fields\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"id\");",
+              "  pm.expect(json).to.have.property(\"complaint_text\");",
+              "  pm.expect(json).to.have.property(\"status\");",
+              "});",
+              "",
+              "pm.test(\"Status is valid\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.status).to.be.oneOf([\"PROCESSING\", \"COMPLETED\", \"FAILED\"]);",
+              "});",
+              "",
+              "if (pm.response.code === 200) {",
+              "  const json = pm.response.json();",
+              "  pm.collectionVariables.set(\"complaintId\", json.id);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET /api/complaints/{{complaintId}}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://komplaintest.onrender.com/api/complaints/{{complaintId}}",
+          "protocol": "https",
+          "host": [
+            "komplaintest",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "complaints",
+            "{{complaintId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has complaint status\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"status\");",
+              "});",
+              "",
+              "pm.test(\"Completed complaint has decision, confidence, and response text\", function () {",
+              "  const json = pm.response.json();",
+              "  if (json.status === \"COMPLETED\") {",
+              "    pm.expect(json.reasoning).to.have.property(\"decision\");",
+              "    pm.expect(json.reasoning).to.have.property(\"confidence\");",
+              "    pm.expect(json.response).to.have.property(\"english\");",
+              "    pm.expect(json.response.english).to.be.a(\"string\").and.not.empty;",
+              "    pm.expect(json.reasoning.decision).to.be.oneOf([\"REFUND\", \"RESHIP\", \"ESCALATE\", \"DISMISS\"]);",
+              "  }",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
