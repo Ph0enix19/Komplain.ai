@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Decision(str, Enum):
@@ -37,6 +37,11 @@ class ReasoningResult(BaseModel):
     confidence: float = Field(..., ge=0, le=1)
     rationale: str
     requires_human_review: bool = False
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def clamp_confidence(cls, value: float) -> float:
+        return max(0, min(1, float(value)))
 
 
 class ResponseResult(BaseModel):

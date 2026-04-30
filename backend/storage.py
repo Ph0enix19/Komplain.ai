@@ -38,9 +38,7 @@ class DataManager:
         self.complaints.append(complaint)
         self.complaints = self.complaints[-self.MAX_COMPLAINTS :]
         active_ids = {c["id"] for c in self.complaints}
-        self.agent_events = [
-            event for event in self.agent_events if event["complaint_id"] in active_ids
-        ]
+        self.agent_events = [event for event in self.agent_events if event["complaint_id"] in active_ids]
         self.save_complaints()
         self.save_agent_events()
 

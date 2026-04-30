@@ -16,7 +16,6 @@ from backend.models import (
 )
 from backend.storage import DataManager
 
-
 INTAKE_SYSTEM = """You are the intake agent for a customer complaints workflow.
 Read the complaint and extract structured fields.
 Return only valid JSON with exactly these keys:
@@ -283,9 +282,12 @@ def fallback_intake(complaint_text: str) -> dict:
         issue_type = "delivery_delay"
     elif "refund" in lowered:
         issue_type = "refund_request"
-    sentiment = "negative" if issue_type != "unknown" or any(
-        word in lowered for word in ("angry", "bad", "upset", "disappointed", "frustrated")
-    ) else "neutral"
+    sentiment = (
+        "negative"
+        if issue_type != "unknown"
+        or any(word in lowered for word in ("angry", "bad", "upset", "disappointed", "frustrated"))
+        else "neutral"
+    )
     return {
         "customer_name": None,
         "order_id": order_match.group(0).upper() if order_match else None,

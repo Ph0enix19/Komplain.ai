@@ -52,9 +52,7 @@ async def run_intake_agent(complaint_text: str) -> dict:
 
 
 async def run_context_agent(intake: dict) -> dict:
-    return (
-        await context_agent(ilmu_client, data_manager, IntakeResult(**intake))
-    ).model_dump()
+    return (await context_agent(ilmu_client, data_manager, IntakeResult(**intake))).model_dump()
 
 
 async def run_reasoning_agent(complaint_text: str, intake: dict, context: dict) -> dict:
@@ -87,9 +85,7 @@ async def run_supervisor_logic(reasoning: dict, context: dict) -> dict:
     )
 
 
-async def run_complaint_pipeline(
-    complaint_id: str, complaint_text: str, created_at: str
-) -> dict:
+async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created_at: str) -> dict:
     intake_payload = await run_intake_agent(complaint_text)
     intake = IntakeResult(**intake_payload)
     data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake_payload))
@@ -100,21 +96,15 @@ async def run_complaint_pipeline(
 
     reasoning_payload = await run_reasoning_agent(complaint_text, intake_payload, context_payload)
     reasoning = ReasoningResult(**reasoning_payload)
-    data_manager.add_event(
-        build_event(complaint_id, "reasoning", "Reasoning completed", reasoning_payload)
-    )
+    data_manager.add_event(build_event(complaint_id, "reasoning", "Reasoning completed", reasoning_payload))
 
     response_payload, supervisor = await asyncio.gather(
         run_response_agent(complaint_text, reasoning_payload, context_payload),
         run_supervisor_logic(reasoning_payload, context_payload),
     )
     response = ResponseResult(**response_payload)
-    data_manager.add_event(
-        build_event(complaint_id, "response", "Response generated", response_payload)
-    )
-    data_manager.add_event(
-        build_event(complaint_id, "supervisor", "Supervisor decision", supervisor)
-    )
+    data_manager.add_event(build_event(complaint_id, "response", "Response generated", response_payload))
+    data_manager.add_event(build_event(complaint_id, "supervisor", "Supervisor decision", supervisor))
 
     complaint = {
         "id": complaint_id,
@@ -131,9 +121,7 @@ async def run_complaint_pipeline(
     return complaint
 
 
-async def _run_pipeline_in_background(
-    complaint_id: str, complaint_text: str, created_at: str
-) -> None:
+async def _run_pipeline_in_background(complaint_id: str, complaint_text: str, created_at: str) -> None:
     try:
         await run_complaint_pipeline(complaint_id, complaint_text, created_at)
     except Exception as exc:
@@ -248,6 +236,6 @@ async def stream_complaint_events(complaint_id: str) -> StreamingResponse:
             await asyncio.sleep(0.5)
 
         yield "event: done\n"
-        yield "data: {\"status\": \"complete\"}\n\n"
+        yield 'data: {"status": "complete"}\n\n'
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

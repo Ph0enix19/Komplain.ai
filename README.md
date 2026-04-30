@@ -2,6 +2,10 @@
 
 # Komplain.ai
 
+[![CI](https://github.com/Mohmed/KomplainTest/actions/workflows/ci.yml/badge.svg)](https://github.com/Mohmed/KomplainTest/actions/workflows/ci.yml)
+![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+
 ### Agentic Customer Complaint Resolution — powered by ILMU GLM-5.1
 
 *From a raw, code-switched complaint to an approved bilingual resolution in under 45 seconds.*
@@ -154,11 +158,11 @@ pip install -r backend/requirements.txt
 ### 3. Create your .env file in the repo root
 
 ```env
-ILMU_API_KEY=your_api_key_here
-ILMU_BASE_URL=https://api.ilmu.ai/v1
-ILMU_MODEL=ilmu-glm-5.1
-ILMU_TIMEOUT=180
-ILMU_REASONING_EFFORT=low
+LLM_PROVIDER=groq
+GROQ_API_KEY=your_api_key_here
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+GROQ_MODEL=llama-3.1-8b-instant
+GROQ_TIMEOUT=180
 AGENT_LLM_TIMEOUT_SECONDS=180
 ```
 
@@ -211,7 +215,7 @@ http://127.0.0.1:3000/
 Set these environment variables in the Render dashboard:
 
 - `PYTHON_VERSION=3.13.2` (prevents Python 3.14 dependency build issues)
-- `ILMU_API_KEY`, `ILMU_BASE_URL`, `ILMU_MODEL`, `ILMU_TIMEOUT`, `ILMU_REASONING_EFFORT`, `AGENT_LLM_TIMEOUT_SECONDS`
+- `LLM_PROVIDER=groq`, `GROQ_API_KEY`, `GROQ_BASE_URL`, `GROQ_MODEL`, `GROQ_TIMEOUT`, `AGENT_LLM_TIMEOUT_SECONDS`
 
 > **Never commit `.env` to Git or upload it to your hosting provider.** Use the dashboard's environment-variable UI instead.
 

@@ -15,12 +15,12 @@ async def main() -> int:
     load_dotenv(override=True)
 
     client = ILMUClient()
-    print("Komplain.ai GLM-5.1 smoke test")
+    print("Komplain.ai LLM provider smoke test")
     print(f"Base URL: {client.base_url}")
     print(f"Model: {client.model}")
     print(f"Timeout: {client.timeout}s")
     print(f"Reasoning effort: {client.reasoning_effort or '(not set)'}")
-    print(f"API key configured: {'yes' if os.getenv('ILMU_API_KEY') else 'no'}")
+    print(f"API key configured: {'yes' if os.getenv(client.api_key_env_var) else 'no'}")
     print()
 
     start = time.perf_counter()
@@ -46,10 +46,7 @@ async def main() -> int:
 
     start = time.perf_counter()
     json_prompt = "Return JSON for a damaged item complaint with order_id ORD-1887."
-    json_system = (
-        "Return only valid JSON with exactly these keys: "
-        "order_id, issue_type, sentiment."
-    )
+    json_system = "Return only valid JSON with exactly these keys: order_id, issue_type, sentiment."
     try:
         payload = await client.chat_json(json_prompt, system=json_system, max_tokens=128)
         elapsed = time.perf_counter() - start
@@ -63,12 +60,12 @@ async def main() -> int:
         print(f"{type(exc).__name__}: {exc}")
         await print_json_diagnostic(client, json_prompt, json_system)
         print()
-        print("Summary: GLM plain chat is working, but ILMU structured JSON mode is not returning message content.")
-        print("Komplain.ai is configured with USE_LLM_AGENTS=true; backend agent calls retry GLM with safer request shapes.")
+        print("Summary: Plain chat is working, but structured JSON mode is not returning message content.")
+        print("Komplain.ai backend agent calls retry the configured provider with safer request shapes.")
         return 0
 
     print()
-    print("Summary: GLM plain chat and structured JSON mode are both working.")
+    print("Summary: Plain chat and structured JSON mode are both working.")
     return 0
 
 

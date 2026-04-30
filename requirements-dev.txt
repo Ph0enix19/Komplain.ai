@@ -1,2 +1,6 @@
 pytest
 pytest-asyncio
+ruff
+httpx
+pip-audit
+detect-secrets

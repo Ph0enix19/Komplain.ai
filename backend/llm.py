@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
-import asyncio
 from typing import Any
 
 import httpx
-
 
 _REASONING_DEFAULT = object()
 
@@ -15,7 +14,7 @@ _REASONING_DEFAULT = object()
 class ILMUClient:
     MAX_TOKENS = 512
     MAX_NULL_CONTENT_RETRIES = 2
-    PROVIDERS = {"ilmu", "gemini", "groq"}
+    PROVIDERS = {"groq", "ilmu"}
 
     def __init__(
         self,
@@ -23,20 +22,12 @@ class ILMUClient:
         model: str | None = None,
         timeout: float | None = None,
     ) -> None:
-        self.provider = os.getenv("LLM_PROVIDER", "ilmu").strip().lower()
+        self.provider = os.getenv("LLM_PROVIDER", "groq").strip().lower()
         if self.provider not in self.PROVIDERS:
             allowed = ", ".join(sorted(self.PROVIDERS))
             raise RuntimeError(f"Unsupported LLM_PROVIDER '{self.provider}'. Expected one of: {allowed}.")
 
-        if self.provider == "gemini":
-            default_base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
-            self.base_url = (base_url or os.getenv("GEMINI_BASE_URL", default_base_url)).rstrip("/")
-            self.model = model or os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
-            self.api_key = os.getenv("GEMINI_API_KEY")
-            self.api_key_env_var = "GEMINI_API_KEY"
-            self.reasoning_effort = None
-            self.supports_reasoning_effort = False
-        elif self.provider == "groq":
+        if self.provider == "groq":
             default_base_url = "https://api.groq.com/openai/v1"
             self.base_url = (base_url or os.getenv("GROQ_BASE_URL", default_base_url)).rstrip("/")
             self.model = model or os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
@@ -52,7 +43,8 @@ class ILMUClient:
             self.reasoning_effort = os.getenv("ILMU_REASONING_EFFORT", "low")
             self.supports_reasoning_effort = True
 
-        self.timeout = timeout or float(os.getenv("ILMU_TIMEOUT", "180"))
+        timeout_env_var = "GROQ_TIMEOUT" if self.provider == "groq" else "ILMU_TIMEOUT"
+        self.timeout = timeout or float(os.getenv(timeout_env_var, os.getenv("ILMU_TIMEOUT", "180")))
 
     async def chat(
         self,
