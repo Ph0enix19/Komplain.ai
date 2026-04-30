@@ -1,15 +1,20 @@
-// Main App — wires everything
+// Main App: wires the static React dashboard to the FastAPI backend.
 
 const { useState, useEffect, useRef } = React;
 
-const API_BASE = (() => {
-  if (window.KOMPLAIN_API_BASE) return window.KOMPLAIN_API_BASE;
+const HOSTED_API_BASE = 'https://komplain-ai.onrender.com/api';
+const LOCAL_API_BASE = 'http://127.0.0.1:8000/api';
+
+const API_BASES = (() => {
+  if (window.KOMPLAIN_API_BASE) return [window.KOMPLAIN_API_BASE];
 
   const isLocalFrontend = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
   return isLocalFrontend
-    ? 'http://127.0.0.1:8000/api'
-    : 'https://komplain-ai.onrender.com/api';
+    ? [LOCAL_API_BASE, HOSTED_API_BASE]
+    : [HOSTED_API_BASE];
 })();
+
+let activeApiBase = API_BASES[0];
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
@@ -20,10 +25,15 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 function adjustTone(text, tone) {
   if (tone === 'formal') {
-    return text.replace(/^Hi there,/, 'Dear Customer,').replace(/^Hi,/, 'Dear Customer,').replace(/— Komplain.ai Support/, 'Sincerely,\nCustomer Support');
+    return text
+      .replace(/^Hi there,/, 'Dear Customer,')
+      .replace(/^Hi,/, 'Dear Customer,')
+      .replace(/(?:--|\u2014) Komplain.ai Support/g, 'Sincerely,\nCustomer Support');
   }
   if (tone === 'technical') {
-    return text.replace(/^Hi there,\n\n/, '[AUTO-DRAFT · GLM-5.1]\n\n').replace(/^Hi,\n\n/, '[AUTO-DRAFT · GLM-5.1]\n\n');
+    return text
+      .replace(/^Hi there,\n\n/, '[AUTO-DRAFT - GLM-5.1]\n\n')
+      .replace(/^Hi,\n\n/, '[AUTO-DRAFT - GLM-5.1]\n\n');
   }
   return text;
 }
@@ -70,16 +80,16 @@ function buildAmount(record) {
   if (decision === 'REFUND' && order?.total && order?.currency) {
     return `${order.currency} ${Number(order.total).toFixed(2)}`;
   }
-  if (decision === 'RESHIP') return '1 × replacement';
-  return '—';
+  if (decision === 'RESHIP') return '1 x replacement';
+  return '-';
 }
 
 function buildPolicy(record) {
-  if (!record.context.order_found && !record.intake.order_id) return 'Supervisor review · missing order ID';
-  if (!record.context.order_found) return 'Supervisor review · order lookup failed';
-  if (record.reasoning.decision === 'REFUND') return 'Order policy · refund path selected';
-  if (record.reasoning.decision === 'RESHIP') return 'Order policy · replacement path selected';
-  return 'Supervisor logic · manual review';
+  if (!record.context.order_found && !record.intake.order_id) return 'Supervisor review - missing order ID';
+  if (!record.context.order_found) return 'Supervisor review - order lookup failed';
+  if (record.reasoning.decision === 'REFUND') return 'Order policy - refund path selected';
+  if (record.reasoning.decision === 'RESHIP') return 'Order policy - replacement path selected';
+  return 'Supervisor logic - manual review';
 }
 
 function buildResolution(record) {
@@ -102,12 +112,12 @@ function buildCaseFromRecord(record) {
   return {
     id: record.id,
     displayId: buildDisplayCaseId(record.id),
-    preview: record.complaint_text.slice(0, 72) + (record.complaint_text.length > 72 ? '…' : ''),
+    preview: record.complaint_text.slice(0, 72) + (record.complaint_text.length > 72 ? '...' : ''),
     resolution: resolution.type,
     confidence: record.reasoning.confidence,
     status: buildCaseStatus(record),
     timestamp: formatTimestamp(record.created_at),
-    order: record.intake.order_id || '—',
+    order: record.intake.order_id || '-',
     lang: inferLanguage(record.complaint_text),
     complaintId: record.id,
     source: 'api',
@@ -151,12 +161,27 @@ function buildTimelineEvents(apiEvents) {
 }
 
 async function apiFetch(path, options) {
-  const response = await fetch(`${API_BASE}${path}`, options);
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Request failed with ${response.status}`);
+  const candidates = [activeApiBase, ...API_BASES.filter((base) => base !== activeApiBase)];
+  let lastError = null;
+
+  for (const base of candidates) {
+    try {
+      const response = await fetch(`${base}${path}`, options);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Request failed with ${response.status}`);
+      }
+      activeApiBase = base;
+      return response.json();
+    } catch (error) {
+      lastError = error;
+      const canTryNextApi = error instanceof TypeError && candidates.indexOf(base) < candidates.length - 1;
+      if (!canTryNextApi) throw error;
+      console.warn(`API at ${base} is unavailable, trying fallback.`, error);
+    }
   }
-  return response.json();
+
+  throw lastError || new Error('API request failed.');
 }
 
 async function pollForCompletion(complaintId, onEvents) {
@@ -208,7 +233,7 @@ function App() {
   const [totalDuration, setTotalDuration] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [cases, setCases] = useState([]);
+  const [cases, setCases] = useState(window.SEED_CASES || []);
   const [caseRecords, setCaseRecords] = useState({});
   const [caseEvents, setCaseEvents] = useState({});
   const [modalCase, setModalCase] = useState(null);
@@ -221,10 +246,16 @@ function App() {
   }, [theme, density]);
 
   useEffect(() => {
-    const onMsg = (e) => {
-      if (!e.data || typeof e.data !== 'object') return;
-      if (e.data.type === '__activate_edit_mode') { setTweaksHostActive(true); setTweaksUserOpen(true); }
-      if (e.data.type === '__deactivate_edit_mode') { setTweaksHostActive(false); setTweaksUserOpen(false); }
+    const onMsg = (event) => {
+      if (!event.data || typeof event.data !== 'object') return;
+      if (event.data.type === '__activate_edit_mode') {
+        setTweaksHostActive(true);
+        setTweaksUserOpen(true);
+      }
+      if (event.data.type === '__deactivate_edit_mode') {
+        setTweaksHostActive(false);
+        setTweaksUserOpen(false);
+      }
     };
     window.addEventListener('message', onMsg);
     window.parent.postMessage({ type: '__edit_mode_available' }, '*');
@@ -232,7 +263,10 @@ function App() {
   }, []);
 
   const persist = (edits) => window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
-  const wrap = (setter, key) => (value) => { setter(value); persist({ [key]: value }); };
+  const wrap = (setter, key) => (value) => {
+    setter(value);
+    persist({ [key]: value });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -241,7 +275,7 @@ function App() {
       try {
         const records = await apiFetch('/complaints');
         if (cancelled) return;
-        const completed = records.filter((r) => r && r.intake && r.context && r.reasoning && r.response);
+        const completed = records.filter((record) => record && record.intake && record.context && record.reasoning && record.response);
         const mapped = [...completed]
           .sort((a, b) => parseTimestamp(b.created_at) - parseTimestamp(a.created_at))
           .map(buildCaseFromRecord);
@@ -250,10 +284,13 @@ function App() {
           return acc;
         }, {});
         setCaseRecords(recordMap);
-        setCases(mapped.slice(0, 5));
+        setCases(mapped.length ? mapped.slice(0, 5) : (window.SEED_CASES || []));
       } catch (error) {
         console.error(error);
-        if (!cancelled) setErrorMessage('Backend not reachable. Make sure the API is running on port 8000.');
+        if (!cancelled) {
+          setErrorMessage('Local backend is offline, so the dashboard is showing sample cases. Start the backend on port 8000 or use the hosted API fallback when running a complaint.');
+          setCases(window.SEED_CASES || []);
+        }
       }
     }
 
@@ -330,7 +367,7 @@ function App() {
     } catch (error) {
       console.error(error);
       setRunning(false);
-      setErrorMessage('Could not resolve complaint. Check the backend server and ILMU setup.');
+      setErrorMessage('Could not resolve complaint. Start the local backend with a valid ILMU setup, or confirm the hosted API is reachable.');
       setEditingResolution(false);
       setEvents([
         { at: 120, agent: 'supervisor', status: 'started', message: 'Pipeline started' },
@@ -396,6 +433,7 @@ function App() {
   };
 
   const openCase = async (caseItem) => {
+    if (!caseItem) return;
     setModalCase(caseItem);
     if (caseItem.source !== 'api' || caseEvents[caseItem.complaintId]) return;
 
@@ -405,6 +443,12 @@ function App() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const openLiveCaseDetail = () => {
+    if (!liveCaseId.current) return;
+    const activeCase = cases.find((item) => item.id === liveCaseId.current);
+    if (activeCase) openCase(activeCase);
   };
 
   let modalResolution = null;
@@ -442,28 +486,49 @@ function App() {
   return (
     <div className="app">
       <Topbar
-        theme={theme} setTheme={wrap(setTheme, 'theme')}
-        density={density} setDensity={wrap(setDensity, 'density')}
-        tone={tone} setTone={wrap(setTone, 'tone')}
-        traceStyle={traceStyle} setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
-        showTweaksUI={false}
+        theme={theme}
+        setTheme={wrap(setTheme, 'theme')}
+        density={density}
+        setDensity={wrap(setDensity, 'density')}
+      />
+
+      <CommandCenter
+        cases={cases}
+        running={running}
+        resolution={approveReplies}
+        events={events}
+        tone={tone}
+        setTone={wrap(setTone, 'tone')}
+        traceStyle={traceStyle}
+        setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
+        onResolve={resolveComplaint}
+        canResolve={Boolean(complaint.trim())}
       />
 
       <div className="workspace">
         <ComplaintForm
-          complaint={complaint} setComplaint={setComplaint}
-          orderId={orderId} setOrderId={setOrderId}
-          onResolve={resolveComplaint} running={running}
-          scenarios={window.SCENARIOS} onScenario={loadScenario}
+          complaint={complaint}
+          setComplaint={setComplaint}
+          orderId={orderId}
+          setOrderId={setOrderId}
+          onResolve={resolveComplaint}
+          running={running}
+          scenarios={window.SCENARIOS}
+          onScenario={loadScenario}
+          activeScenario={scenarioKey}
         />
         <AgentTracePanel
-          events={events} running={running}
-          scenario={scenarioKey} traceStyle={traceStyle}
+          events={events}
+          running={running}
+          scenario={scenarioKey}
+          traceStyle={traceStyle}
           totalDuration={totalDuration}
         />
         <ResolutionCard
-          running={running} resolution={approveReplies}
-          onApprove={approve} tone={tone}
+          running={running}
+          resolution={approveReplies}
+          onApprove={approve}
+          tone={tone}
           isEditing={editingResolution}
           draft={resolutionDraft}
           onDraftChange={setResolutionDraft}
@@ -471,14 +536,14 @@ function App() {
           onCancelEdit={cancelEditingResolution}
           onSaveEdit={saveEditingResolution}
           onCopyReply={copyReply}
-          onOpenDetail={() => liveCaseId.current && openCase(cases.find((item) => item.id === liveCaseId.current))}
-          scenarioKey={scenarioKey}
+          onOpenDetail={openLiveCaseDetail}
         />
       </div>
 
       {errorMessage && (
-        <div className="panel" style={{ marginTop: 14, padding: 16, color: 'var(--warn-fg)', borderColor: 'var(--warn)' }}>
-          {errorMessage}
+        <div className="case-log alert alert-warning" role="alert">
+          <span className="badge badge-warn">Notice</span>
+          <span>{errorMessage}</span>
         </div>
       )}
 
@@ -497,16 +562,21 @@ function App() {
 
       {tweaksHostActive && (
         <TweaksPanel
-          open={tweaksUserOpen} setOpen={setTweaksUserOpen}
-          theme={theme} setTheme={wrap(setTheme, 'theme')}
-          density={density} setDensity={wrap(setDensity, 'density')}
-          tone={tone} setTone={wrap(setTone, 'tone')}
-          traceStyle={traceStyle} setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
+          open={tweaksUserOpen}
+          setOpen={setTweaksUserOpen}
+          theme={theme}
+          setTheme={wrap(setTheme, 'theme')}
+          density={density}
+          setDensity={wrap(setDensity, 'density')}
+          tone={tone}
+          setTone={wrap(setTone, 'tone')}
+          traceStyle={traceStyle}
+          setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
         />
       )}
       {tweaksHostActive && !tweaksUserOpen && (
-        <button className="tweaks-fab" onClick={() => setTweaksUserOpen(true)}>
-          <span className="tweaks-dot"></span> Tweaks
+        <button className="tweaks-fab" type="button" onClick={() => setTweaksUserOpen(true)}>
+          <span className="tweaks-dot" aria-hidden="true"></span> Tweaks
         </button>
       )}
     </div>

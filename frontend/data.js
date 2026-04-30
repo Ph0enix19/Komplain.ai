@@ -1,4 +1,4 @@
-// Komplain.ai — scenarios + simulated agent pipelines
+// Komplain.ai scenarios and simulated agent pipelines.
 
 window.SCENARIOS = [
   {
@@ -27,7 +27,7 @@ window.SCENARIOS = [
 window.MOCK_ORDERS = {
   'ORD-2041': {
     id: 'ORD-2041',
-    product_name: 'Baju Kurung Moden — Maroon XL',
+    product_name: 'Baju Kurung Moden - Maroon XL',
     order_date: '2026-04-07',
     delivery_status: 'delayed',
     days_since_order: 14,
@@ -38,7 +38,7 @@ window.MOCK_ORDERS = {
   },
   'ORD-1887': {
     id: 'ORD-1887',
-    product_name: 'Linen Midi Dress — Sage M',
+    product_name: 'Linen Midi Dress - Sage M',
     order_date: '2026-04-18',
     delivery_status: 'delivered',
     days_since_order: 3,
@@ -49,7 +49,6 @@ window.MOCK_ORDERS = {
   },
 };
 
-// Pre-built case log with prior resolved cases so the table feels populated
 window.SEED_CASES = [
   {
     id: 'CMP-24A8',
@@ -103,38 +102,36 @@ window.SEED_CASES = [
   },
 ];
 
-// Each scenario: array of events. Times are relative ms from Resolve click.
-// Each event -> { at, agent, status, message, output? }
 window.PIPELINES = {
   manglish: {
     resolution: {
       type: 'REFUND',
       confidence: 0.91,
       reason: 'Order ORD-2041 has been in processing state for 14 days with no tracking movement. The refund window is active and there is no evidence of delivery.',
-      policy: 'Order policy · undelivered goods after reasonable period',
-      response_en: "Hi there,\n\nThanks for reaching out about order ORD-2041. I can see that your Baju Kurung Moden (Maroon, XL) has been stuck in processing for 14 days with no movement from J&T. I am sorry for the wait.\n\nWe have authorised a full refund of RM 89.00 to your original payment method within 3-5 business days. No return is required.\n\n— Komplain.ai Support",
-      response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami tentang pesanan ORD-2041. Kami sedar Baju Kurung Moden (Maroon, XL) anda telah tersangkut di status processing selama 14 hari tanpa sebarang pergerakan dari J&T. Kami mohon maaf atas kelewatan ini.\n\nKami telah memproses bayaran balik penuh sebanyak RM 89.00 ke kaedah pembayaran asal dalam masa 3-5 hari bekerja. Anda tidak perlu pulangkan apa-apa.\n\n— Komplain.ai Support",
+      policy: 'Order policy - undelivered goods after reasonable period',
+      response_en: "Hi there,\n\nThanks for reaching out about order ORD-2041. I can see that your Baju Kurung Moden (Maroon, XL) has been stuck in processing for 14 days with no movement from J&T. I am sorry for the wait.\n\nWe have authorised a full refund of RM 89.00 to your original payment method within 3-5 business days. No return is required.\n\n-- Komplain.ai Support",
+      response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami tentang pesanan ORD-2041. Kami sedar Baju Kurung Moden (Maroon, XL) anda telah tersangkut di status processing selama 14 hari tanpa sebarang pergerakan dari J&T. Kami mohon maaf atas kelewatan ini.\n\nKami telah memproses bayaran balik penuh sebanyak RM 89.00 ke kaedah pembayaran asal dalam masa 3-5 hari bekerja. Anda tidak perlu pulangkan apa-apa.\n\n-- Komplain.ai Support",
       amount: 'RM 89.00',
       requires_review: false,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised · GLM-5.1' },
-      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint · 247 chars' },
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 247 chars' },
       { at: 620, agent: 'intake', status: 'running', message: 'Detecting language' },
       { at: 980, agent: 'intake', status: 'running', message: 'Extracting intent + urgency' },
-      { at: 1340, agent: 'intake', status: 'completed', message: 'Intake complete · urgency 4/5', output: {
+      { at: 1340, agent: 'intake', status: 'completed', message: 'Intake complete - urgency 4/5', output: {
         complaint_type: 'delivery_delay',
         sentiment: 'frustrated',
         urgency_score: 4,
         extracted_order_id: 'ORD-2041',
         language_detected: 'Manglish (BM+EN)',
-        summary_en: 'Customer reports parcel stuck in processing for 2 weeks and requests refund if unresolved today.'
+        summary_en: 'Customer reports parcel stuck in processing for 2 weeks and requests refund if unresolved today.',
       }},
       { at: 1480, agent: 'context', status: 'started', message: 'Fetching order ORD-2041' },
-      { at: 1820, agent: 'context', status: 'running', message: 'Joining orders · policies · tracking' },
-      { at: 2240, agent: 'context', status: 'completed', message: 'Order found · delayed 14d', output: {
+      { at: 1820, agent: 'context', status: 'running', message: 'Joining orders - policies - tracking' },
+      { at: 2240, agent: 'context', status: 'completed', message: 'Order found - delayed 14d', output: {
         order_id: 'ORD-2041',
-        product: 'Baju Kurung Moden — Maroon XL',
+        product: 'Baju Kurung Moden - Maroon XL',
         delivery_status: 'delayed',
         days_since_order: 14,
         courier: 'J&T Express',
@@ -143,23 +140,23 @@ window.PIPELINES = {
         within_policy: true,
       }},
       { at: 2380, agent: 'reasoning', status: 'started', message: 'Applying GLM-5.1 reasoning chain' },
-      { at: 2780, agent: 'reasoning', status: 'running', message: 'Step 1/4 · Is complaint valid?' },
-      { at: 3180, agent: 'reasoning', status: 'running', message: 'Step 2/4 · What does evidence support?' },
-      { at: 3580, agent: 'reasoning', status: 'running', message: 'Step 3/4 · Consumer Protection Regs 2024 §12' },
-      { at: 3940, agent: 'reasoning', status: 'running', message: 'Step 4/4 · Selecting resolution' },
-      { at: 4340, agent: 'reasoning', status: 'completed', message: 'Decision · REFUND · conf 0.91', output: {
+      { at: 2780, agent: 'reasoning', status: 'running', message: 'Step 1/4 - Is complaint valid?' },
+      { at: 3180, agent: 'reasoning', status: 'running', message: 'Step 2/4 - What does evidence support?' },
+      { at: 3580, agent: 'reasoning', status: 'running', message: 'Step 3/4 - Consumer Protection Regs 2024 Section 12' },
+      { at: 3940, agent: 'reasoning', status: 'running', message: 'Step 4/4 - Selecting resolution' },
+      { at: 4340, agent: 'reasoning', status: 'completed', message: 'Decision - REFUND - conf 0.91', output: {
         resolution_type: 'REFUND',
         confidence_score: 0.91,
-        policy_reference: 'Consumer Protection (Electronic Trade) Regs 2024, §12(3)',
+        policy_reference: 'Consumer Protection (Electronic Trade) Regs 2024, Section 12(3)',
         reason: 'No evidence of delivery; within 30-day window.',
       }},
       { at: 4500, agent: 'response', status: 'started', message: 'Drafting bilingual reply' },
-      { at: 4920, agent: 'response', status: 'running', message: 'Tone-matching · empathetic, BM-first' },
+      { at: 4920, agent: 'response', status: 'running', message: 'Tone-matching - empathetic, BM-first' },
       { at: 5320, agent: 'response', status: 'completed', message: 'EN + BM drafts ready', output: {
-        response_en_preview: "Hi there, Thanks for reaching out about order ORD-2041...",
-        response_bm_preview: "Hai, Terima kasih kerana hubungi kami tentang pesanan ORD-2041...",
+        response_en_preview: 'Hi there, Thanks for reaching out about order ORD-2041...',
+        response_bm_preview: 'Hai, Terima kasih kerana hubungi kami tentang pesanan ORD-2041...',
       }},
-      { at: 5460, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved · 4/4 agents OK' },
+      { at: 5460, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - 4/4 agents OK' },
     ],
   },
   clean: {
@@ -167,17 +164,17 @@ window.PIPELINES = {
       type: 'RESHIP',
       confidence: 0.95,
       reason: 'Item delivered 3 days ago with reported damage. Policy permits reshipping within the 7-day window because inventory is in stock and the customer is open to replacement.',
-      policy: 'Damage policy · reship preferred within 7 days',
-      response_en: "Hi,\n\nThank you for letting us know about ORD-1887. I am sorry the Linen Midi Dress arrived with a torn seam.\n\nWe have arranged a replacement in the same size and colour to ship today with Ninja Van. It should arrive within 2-3 working days. No return is required for the damaged item.\n\n— Komplain.ai Support",
-      response_bm: "Hai,\n\nTerima kasih kerana memaklumkan kami tentang ORD-1887. Kami mohon maaf kerana Linen Midi Dress anda sampai dengan jahitan yang koyak.\n\nKami telah mengatur penghantaran gantian dalam saiz dan warna yang sama melalui Ninja Van. Ia dijangka tiba dalam masa 2-3 hari bekerja. Anda tidak perlu pulangkan barang yang rosak.\n\n— Komplain.ai Support",
-      amount: '1 × replacement',
+      policy: 'Damage policy - reship preferred within 7 days',
+      response_en: "Hi,\n\nThank you for letting us know about ORD-1887. I am sorry the Linen Midi Dress arrived with a torn seam.\n\nWe have arranged a replacement in the same size and colour to ship today with Ninja Van. It should arrive within 2-3 working days. No return is required for the damaged item.\n\n-- Komplain.ai Support",
+      response_bm: "Hai,\n\nTerima kasih kerana memaklumkan kami tentang ORD-1887. Kami mohon maaf kerana Linen Midi Dress anda sampai dengan jahitan yang koyak.\n\nKami telah mengatur penghantaran gantian dalam saiz dan warna yang sama melalui Ninja Van. Ia dijangka tiba dalam masa 2-3 hari bekerja. Anda tidak perlu pulangkan barang yang rosak.\n\n-- Komplain.ai Support",
+      amount: '1 x replacement',
       requires_review: false,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised · GLM-5.1' },
-      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint · 164 chars' },
-      { at: 560, agent: 'intake', status: 'running', message: 'Detecting language · EN' },
-      { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete · urgency 3/5', output: {
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 164 chars' },
+      { at: 560, agent: 'intake', status: 'running', message: 'Detecting language - EN' },
+      { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete - urgency 3/5', output: {
         complaint_type: 'damage',
         sentiment: 'neutral',
         urgency_score: 3,
@@ -186,9 +183,9 @@ window.PIPELINES = {
         summary_en: 'Customer reports torn seam on received dress; open to replacement or refund.',
       }},
       { at: 1080, agent: 'context', status: 'started', message: 'Fetching order ORD-1887' },
-      { at: 1480, agent: 'context', status: 'completed', message: 'Order found · delivered 3d ago', output: {
+      { at: 1480, agent: 'context', status: 'completed', message: 'Order found - delivered 3d ago', output: {
         order_id: 'ORD-1887',
-        product: 'Linen Midi Dress — Sage M',
+        product: 'Linen Midi Dress - Sage M',
         delivery_status: 'delivered',
         days_since_order: 3,
         refund_window_days: 7,
@@ -197,15 +194,15 @@ window.PIPELINES = {
       }},
       { at: 1640, agent: 'reasoning', status: 'started', message: 'Applying GLM-5.1 reasoning chain' },
       { at: 2040, agent: 'reasoning', status: 'running', message: 'Evaluating reship vs refund' },
-      { at: 2540, agent: 'reasoning', status: 'completed', message: 'Decision · RESHIP · conf 0.95', output: {
+      { at: 2540, agent: 'reasoning', status: 'completed', message: 'Decision - RESHIP - conf 0.95', output: {
         resolution_type: 'RESHIP',
         confidence_score: 0.95,
-        policy_reference: 'Damage policy §2.1',
+        policy_reference: 'Damage policy Section 2.1',
         reason: 'In-stock, within window, customer open to replacement.',
       }},
       { at: 2700, agent: 'response', status: 'started', message: 'Drafting bilingual reply' },
       { at: 3240, agent: 'response', status: 'completed', message: 'EN + BM drafts ready' },
-      { at: 3380, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved · 4/4 agents OK' },
+      { at: 3380, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - 4/4 agents OK' },
     ],
   },
   edge: {
@@ -213,17 +210,17 @@ window.PIPELINES = {
       type: 'CLARIFY',
       confidence: 0.62,
       reason: 'Complaint asserts damage and requests refund but contains no order reference. Intake Agent could not extract an order ID; Context Agent cannot enrich without one. Supervisor intercepted and generated a bilingual clarification request rather than forcing a low-confidence resolution.',
-      policy: 'Supervisor review · missing_context handler',
-      response_en: "Hi,\n\nThanks for getting in touch. I understand you would like a refund because the item arrived damaged.\n\nTo find your order and process this quickly, please share your order number. You can find it in your confirmation email or under My Orders.\n\n— Komplain.ai Support",
-      response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami. Kami faham anda ingin bayaran balik kerana barang yang diterima rosak.\n\nUntuk membantu kami menyemak pesanan anda dengan cepat, sila kongsikan nombor pesanan anda. Anda boleh menemuinya dalam email pengesahan atau di bahagian My Orders.\n\n— Komplain.ai Support",
-      amount: '—',
+      policy: 'Supervisor review - missing_context handler',
+      response_en: "Hi,\n\nThanks for getting in touch. I understand you would like a refund because the item arrived damaged.\n\nTo find your order and process this quickly, please share your order number. You can find it in your confirmation email or under My Orders.\n\n-- Komplain.ai Support",
+      response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami. Kami faham anda ingin bayaran balik kerana barang yang diterima rosak.\n\nUntuk membantu kami menyemak pesanan anda dengan cepat, sila kongsikan nombor pesanan anda. Anda boleh menemuinya dalam email pengesahan atau di bahagian My Orders.\n\n-- Komplain.ai Support",
+      amount: '-',
       requires_review: true,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised · GLM-5.1' },
-      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint · 32 chars' },
-      { at: 560, agent: 'intake', status: 'running', message: 'Detecting language · BM' },
-      { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete · no order_id', output: {
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 32 chars' },
+      { at: 560, agent: 'intake', status: 'running', message: 'Detecting language - BM' },
+      { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete - no order_id', output: {
         complaint_type: 'damage',
         sentiment: 'neutral',
         urgency_score: 2,
@@ -231,28 +228,28 @@ window.PIPELINES = {
         language_detected: 'Bahasa Malaysia',
         summary_en: 'Customer requests refund due to damaged item; no order reference provided.',
       }},
-      { at: 1080, agent: 'context', status: 'started', message: 'Lookup attempt · order_id=null' },
-      { at: 1420, agent: 'context', status: 'failed', message: 'No order_id → context unavailable', output: {
+      { at: 1080, agent: 'context', status: 'started', message: 'Lookup attempt - order_id=null' },
+      { at: 1420, agent: 'context', status: 'failed', message: 'No order_id -> context unavailable', output: {
         context_available: false,
         reason: 'No extractable order ID; no alternate identifiers (email, phone) present.',
       }},
-      { at: 1560, agent: 'supervisor', status: 'running', message: 'Intercept · engaging clarification flow' },
-      { at: 1920, agent: 'reasoning', status: 'started', message: 'Mode · clarify (no context)' },
-      { at: 2320, agent: 'reasoning', status: 'completed', message: 'Needs order_id · bilingual prompt', output: {
+      { at: 1560, agent: 'supervisor', status: 'running', message: 'Intercept - engaging clarification flow' },
+      { at: 1920, agent: 'reasoning', status: 'started', message: 'Mode - clarify (no context)' },
+      { at: 2320, agent: 'reasoning', status: 'completed', message: 'Needs order_id - bilingual prompt', output: {
         resolution_type: 'CLARIFY',
         confidence_score: 0.62,
         reason: 'Insufficient information to decide without order reference.',
       }},
-      { at: 2480, agent: 'response', status: 'started', message: 'Drafting clarification · BM + EN' },
-      { at: 2980, agent: 'response', status: 'completed', message: 'Clarification ready · requires review' },
-      { at: 3120, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved · status PENDING_INFO' },
+      { at: 2480, agent: 'response', status: 'started', message: 'Drafting clarification - BM + EN' },
+      { at: 2980, agent: 'response', status: 'completed', message: 'Clarification ready - requires review' },
+      { at: 3120, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - status PENDING_INFO' },
     ],
   },
 };
 
 window.AGENTS = [
-  { key: 'intake',    name: 'Intake Agent',    role: 'Parses raw complaint · extracts intent, language, urgency' },
-  { key: 'context',   name: 'Context Agent',   role: 'Enriches with order data · policy · delivery status' },
-  { key: 'reasoning', name: 'Reasoning Agent', role: 'GLM-5.1 core · applies multi-step policy reasoning' },
-  { key: 'response',  name: 'Response Agent',  role: 'Drafts bilingual EN + BM reply · matches tone' },
+  { key: 'intake', name: 'Intake Agent', role: 'Parses raw complaint - extracts intent, language, urgency' },
+  { key: 'context', name: 'Context Agent', role: 'Enriches with order data - policy - delivery status' },
+  { key: 'reasoning', name: 'Reasoning Agent', role: 'GLM-5.1 core - applies multi-step policy reasoning' },
+  { key: 'response', name: 'Response Agent', role: 'Drafts bilingual EN + BM reply - matches tone' },
 ];
