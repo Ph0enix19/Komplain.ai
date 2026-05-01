@@ -172,8 +172,7 @@ async def context_agent(
         return _validated(ContextResult, fallback_context(intake, order), "Fallback context returned invalid data.")
 
     prompt = (
-        f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
-        f"Order lookup result:\n{order if order is not None else 'null'}"
+        f"Intake:\n{intake.model_dump_json(indent=2)}\n\nOrder lookup result:\n{order if order is not None else 'null'}"
     )
     try:
         payload = await asyncio.wait_for(
@@ -317,10 +316,7 @@ async def supervisor_logic(
         _mark_execution_mode(metrics, "fallback")
         return fallback_supervisor(reasoning, context)
 
-    prompt = (
-        f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
-        f"Context:\n{context.model_dump_json(indent=2)}"
-    )
+    prompt = f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\nContext:\n{context.model_dump_json(indent=2)}"
     try:
         payload = await asyncio.wait_for(
             _chat_json_with_metrics(
