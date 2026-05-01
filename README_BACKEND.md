@@ -29,8 +29,9 @@ backend/requirements.txt
    ```env
    LLM_PROVIDER=zai
    ZAI_API_KEY=your_zai_api_key_here
-   ZAI_BASE_URL=https://api.z.ai/api/coding/paas/v4
-   ZAI_MODEL=your_current_glm_model_here
+   ZAI_BASE_URL=https://api.z.ai/api/paas/v4
+   ZAI_MODEL=glm-5.1
+   ZAI_TEMPERATURE=0.1
    GROQ_API_KEY=your_groq_api_key_here
    GROQ_MODEL=llama-3.1-8b-instant
    ```

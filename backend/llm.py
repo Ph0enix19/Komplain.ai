@@ -10,8 +10,8 @@ from typing import Any
 import httpx
 
 _REASONING_DEFAULT = object()
-DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
-DEFAULT_ZAI_MODEL = "glm-4.5-air"
+DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/paas/v4"
+DEFAULT_ZAI_MODEL = "glm-5.1"
 COST_PER_1K_TOKENS_RM = 0.002
 logger = logging.getLogger(__name__)
 
@@ -58,6 +58,7 @@ class ILMUClient:
             self.reasoning_effort = None
             self.supports_reasoning_effort = False
             self.thinking_type = os.getenv("ZAI_THINKING_TYPE", "disabled").strip().lower()
+            self.temperature = float(os.getenv("ZAI_TEMPERATURE", "0.1"))
             timeout_env_var = "ZAI_TIMEOUT"
             timeout_default = "60"
         else:
@@ -254,6 +255,7 @@ class ILMUClient:
     def _apply_provider_options(self, payload: dict[str, Any]) -> None:
         if self.provider != "zai":
             return
+        payload["temperature"] = self.temperature
         if self.thinking_type in {"", "none", "default"}:
             return
         payload["thinking"] = {"type": self.thinking_type}

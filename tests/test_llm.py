@@ -70,9 +70,27 @@ def test_provider_switching_selects_zai_primary(monkeypatch: pytest.MonkeyPatch)
     assert client.provider == "zai"
     assert client.api_key_env_var == "ZAI_API_KEY"
     assert client.model == "glm-current-test"
-    assert client.base_url == "https://api.z.ai/api/coding/paas/v4"
+    assert client.base_url == "https://api.z.ai/api/paas/v4"
     assert client.fallback_client is not None
     assert client.fallback_client.provider == "groq"
+
+
+@pytest.mark.asyncio
+async def test_zai_payload_uses_low_temperature(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LLM_PROVIDER", "zai")
+    monkeypatch.setenv("ZAI_API_KEY", "zai-key")
+    monkeypatch.setenv("ZAI_TEMPERATURE", "0.1")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-key")
+    client = ILMUClient(enable_fallback=False)
+
+    async def fake_completion(payload: dict) -> dict:
+        assert payload["model"] == "glm-5.1"
+        assert payload["temperature"] == 0.1
+        return {"choices": [{"message": {"content": '{"status": "ok"}'}}]}
+
+    monkeypatch.setattr(client, "_create_chat_completion", fake_completion)
+
+    assert await client.chat_json("Return status.", "Return JSON.") == {"status": "ok"}
 
 
 def test_provider_switching_selects_groq(monkeypatch: pytest.MonkeyPatch) -> None:
