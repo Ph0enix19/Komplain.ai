@@ -2,16 +2,14 @@
 
 const { useState, useEffect, useRef } = React;
 
-const HOSTED_API_BASE = 'https://komplain-ai.onrender.com/api';
+const HOSTED_API_BASE = 'https://komplaintest.onrender.com/api';
 const LOCAL_API_BASE = 'http://127.0.0.1:8000/api';
 
 const API_BASES = (() => {
   if (window.KOMPLAIN_API_BASE) return [window.KOMPLAIN_API_BASE];
 
   const isLocalFrontend = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
-  const isVercelFrontend = window.location.hostname.endsWith('.vercel.app');
   if (isLocalFrontend) return [LOCAL_API_BASE, HOSTED_API_BASE];
-  if (isVercelFrontend) return [`${window.location.origin}/api`, HOSTED_API_BASE];
   return [HOSTED_API_BASE];
 })();
 
