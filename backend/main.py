@@ -101,7 +101,7 @@ async def run_supervisor_logic(reasoning: dict, context: dict, metrics: dict | N
 
 
 async def _run_timed_agent(agent: str, action) -> tuple[dict, dict]:
-    metrics = {"agent": agent, "input_tokens": 0, "output_tokens": 0}
+    metrics = {"agent": agent, "input_tokens": 0, "output_tokens": 0, "execution_mode": "unknown"}
     started_at = time.time()
     payload = await action(metrics)
     metrics["duration"] = round(time.time() - started_at, 2)
@@ -116,6 +116,7 @@ def _payload_with_metrics(payload: dict, metrics: dict) -> dict:
         "duration": metrics["duration"],
         "input_tokens": metrics["input_tokens"],
         "output_tokens": metrics["output_tokens"],
+        "execution_mode": metrics["execution_mode"],
     }
 
 

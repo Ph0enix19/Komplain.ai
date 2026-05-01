@@ -751,7 +751,7 @@
 
 .log-line {
   display: grid;
-  grid-template-columns: 54px 10px minmax(0, 1fr);
+  grid-template-columns: 54px 10px 64px minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
   color: var(--text-muted);
@@ -760,6 +760,10 @@
 }
 
 .log-time {
+  color: var(--text-subtle);
+}
+
+.log-mode {
   color: var(--text-subtle);
 }
 

@@ -45,6 +45,10 @@ function fmtDuration(duration) {
   return `${Number(duration || 0).toFixed(2)}s`;
 }
 
+function fmtExecutionMode(mode) {
+  return mode === 'llm' ? 'LLM' : mode === 'fallback' ? 'Fallback' : 'Mode unknown';
+}
+
 function statusBadgeClass(status, isActive) {
   if (status === 'completed') return 'badge-accent';
   if (status === 'failed') return 'badge-danger';
@@ -75,7 +79,10 @@ function TraceStepper({ events }) {
               <div className="trace-step-meta">
                 <span className={'badge ' + statusBadgeClass(state.status, isActive)}>{state.status}</span>
                 {state.events.length > 0 && (
-                  <span className="mono trace-time">{fmtDuration(state.events[state.events.length - 1].duration)}</span>
+                  <>
+                    <span className="badge">{fmtExecutionMode(state.events[state.events.length - 1].execution_mode)}</span>
+                    <span className="mono trace-time">{fmtDuration(state.events[state.events.length - 1].duration)}</span>
+                  </>
                 )}
               </div>
             </div>
@@ -86,6 +93,7 @@ function TraceStepper({ events }) {
                   <div key={lineIndex} className="log-line mono">
                     <span className="log-time">{fmtDuration(event.duration)}</span>
                     <span className={'log-dot status-' + event.status}></span>
+                    <span className="log-mode">{fmtExecutionMode(event.execution_mode)}</span>
                     <span className="log-msg">{event.message}</span>
                   </div>
                 ))}
@@ -125,6 +133,7 @@ function TraceCards({ events }) {
                 <div key={lineIndex} className="mono log-line">
                   <span className="log-time">{fmtDuration(event.duration)}</span>
                   <span className={'log-dot status-' + event.status}></span>
+                  <span className="log-mode">{fmtExecutionMode(event.execution_mode)}</span>
                   <span className="log-msg">{event.message}</span>
                 </div>
               ))}
@@ -191,7 +200,7 @@ function TraceTimeline({ events }) {
               ))}
             </div>
             <div className="tl-meta mono">
-              {finalEvent ? fmtDuration(finalEvent.duration) : (isActive ? '...' : '-')}
+              {finalEvent ? `${fmtExecutionMode(finalEvent.execution_mode)} · ${fmtDuration(finalEvent.duration)}` : (isActive ? '...' : '-')}
             </div>
           </div>
         );

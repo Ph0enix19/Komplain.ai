@@ -82,6 +82,11 @@ def _record_usage(metrics: dict | None, usage: dict[str, int]) -> None:
     metrics["output_tokens"] = int(metrics.get("output_tokens", 0)) + int(usage.get("output_tokens", 0))
 
 
+def _mark_execution_mode(metrics: dict | None, mode: str) -> None:
+    if metrics is not None:
+        metrics["execution_mode"] = mode
+
+
 async def _chat_json_with_metrics(
     llm_client: ILMUClient,
     *,
@@ -103,15 +108,18 @@ async def _chat_json_with_metrics(
                 "output_tokens": estimate_tokens(json.dumps(payload, ensure_ascii=False)),
             }
             _record_usage(metrics, usage)
+            _mark_execution_mode(metrics, "llm")
         return payload
 
     payload, usage = await llm_client.chat_json_with_usage(prompt, **chat_kwargs)
     _record_usage(metrics, usage)
+    _mark_execution_mode(metrics, "llm")
     return payload
 
 
 async def intake_agent(llm_client: ILMUClient, complaint_text: str, metrics: dict | None = None) -> IntakeResult:
     if not use_llm_agents():
+        _mark_execution_mode(metrics, "fallback")
         return _validated(IntakeResult, fallback_intake(complaint_text), "Fallback intake returned invalid data.")
 
     prompt = f"Complaint:\n{complaint_text}"
@@ -128,6 +136,7 @@ async def intake_agent(llm_client: ILMUClient, complaint_text: str, metrics: dic
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
     except Exception:
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_intake(complaint_text)
     if isinstance(payload.get("customer_name"), str):
         payload["customer_name"] = payload["customer_name"].strip() or None
@@ -159,6 +168,7 @@ async def context_agent(
 ) -> ContextResult:
     order = data_manager.get_order(intake.order_id) if intake.order_id else None
     if not use_llm_agents():
+        _mark_execution_mode(metrics, "fallback")
         return _validated(ContextResult, fallback_context(intake, order), "Fallback context returned invalid data.")
 
     prompt = (
@@ -178,6 +188,7 @@ async def context_agent(
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
     except Exception:
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_context(intake, order)
     payload["order_found"] = bool(order)
     payload["order_data"] = order
@@ -192,6 +203,7 @@ async def reasoning_agent(
     metrics: dict | None = None,
 ) -> ReasoningResult:
     if not use_llm_agents():
+        _mark_execution_mode(metrics, "fallback")
         return _validated(
             ReasoningResult,
             fallback_reasoning(complaint_text, intake, context),
@@ -215,6 +227,7 @@ async def reasoning_agent(
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
     except Exception:
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_reasoning(complaint_text, intake, context)
     if isinstance(payload.get("decision"), str):
         payload["decision"] = payload["decision"].strip().upper()
@@ -232,6 +245,7 @@ async def reasoning_agent(
         }
         payload["decision"] = decision_aliases.get(payload["decision"], payload["decision"])
         if payload["decision"] not in {"REFUND", "RESHIP", "ESCALATE", "DISMISS"}:
+            _mark_execution_mode(metrics, "fallback")
             payload = fallback_reasoning(complaint_text, intake, context)
     try:
         payload["confidence"] = max(0.0, min(1.0, float(payload.get("confidence", 0))))
@@ -243,6 +257,7 @@ async def reasoning_agent(
     try:
         return _validated(ReasoningResult, payload, "Reasoning agent returned invalid data.")
     except RuntimeError:
+        _mark_execution_mode(metrics, "fallback")
         return _validated(
             ReasoningResult,
             fallback_reasoning(complaint_text, intake, context),
@@ -258,6 +273,7 @@ async def response_agent(
     metrics: dict | None = None,
 ) -> ResponseResult:
     if not use_llm_agents():
+        _mark_execution_mode(metrics, "fallback")
         return _validated(
             ResponseResult,
             fallback_response(reasoning, context),
@@ -282,6 +298,7 @@ async def response_agent(
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
     except Exception:
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_response(reasoning, context)
     if isinstance(payload.get("english"), str):
         payload["english"] = payload["english"].strip()
@@ -297,6 +314,7 @@ async def supervisor_logic(
     metrics: dict | None = None,
 ) -> dict:
     if not use_llm_agents():
+        _mark_execution_mode(metrics, "fallback")
         return fallback_supervisor(reasoning, context)
 
     prompt = (
@@ -316,9 +334,11 @@ async def supervisor_logic(
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
         )
     except Exception:
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_supervisor(reasoning, context)
     required_keys = {"requires_human_review", "priority", "supervisor_note"}
     if not required_keys.issubset(payload):
+        _mark_execution_mode(metrics, "fallback")
         payload = fallback_supervisor(reasoning, context)
 
     payload["requires_human_review"] = bool(payload["requires_human_review"])
@@ -506,6 +526,7 @@ def build_event(
                 "duration": metrics.get("duration", 0.0),
                 "input_tokens": metrics.get("input_tokens", 0),
                 "output_tokens": metrics.get("output_tokens", 0),
+                "execution_mode": metrics.get("execution_mode", "unknown"),
             }
         )
     return event

@@ -156,6 +156,7 @@ def test_complaint_events_endpoint_returns_agent_steps(tmp_path, monkeypatch) ->
             time.sleep(0.05)
 
     assert {event["step"] for event in events} >= {"intake", "context", "reasoning", "response", "supervisor"}
+    assert {event["execution_mode"] for event in events} == {"llm"}
 
 
 def test_run_complaint_pipeline_directly_returns_completed_payload(tmp_path, monkeypatch) -> None:
@@ -173,3 +174,4 @@ def test_run_complaint_pipeline_directly_returns_completed_payload(tmp_path, mon
     assert result["reasoning"]["decision"] == "REFUND"
     assert result["response"]["english"]
     assert result["response"]["bahasa_malaysia"]
+    assert result["agent_metrics"]["intake"]["execution_mode"] == "llm"

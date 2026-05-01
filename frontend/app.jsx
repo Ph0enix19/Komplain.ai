@@ -148,6 +148,7 @@ function buildTimelineEvents(apiEvents) {
       duration,
       input_tokens: event.input_tokens ?? event.payload?.input_tokens ?? 0,
       output_tokens: event.output_tokens ?? event.payload?.output_tokens ?? 0,
+      execution_mode: event.execution_mode ?? event.payload?.execution_mode ?? 'unknown',
     };
 
     events.push({
