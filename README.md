@@ -93,10 +93,11 @@ Komplain.ai is an **AI copilot for e-commerce support teams**. It turns raw, uns
 A support operator can:
 
 1. Submit a complaint (with or without an order ID)
-2. Watch each agent step run in a live trace
-3. Review the final recommendation, confidence score, and policy rationale
-4. Edit the bilingual customer reply and click Approve
-5. Audit any past case from the case log
+2. Watch each agent step run in a live trace with real latency and token telemetry
+3. Review the final recommendation, confidence score, policy rationale, total latency, token count, and estimated cost
+4. Copy or edit the bilingual customer reply and click Approve
+5. Start the next complaint from a cleared workspace with no stale trace or resolution data
+6. Audit any past case from the case log
 
 The backend persists only the latest five complaints and their event logs — focused MVP scope, designed to scale into PostgreSQL and multi-tenant SaaS post-hackathon.
 
@@ -113,6 +114,18 @@ The backend persists only the latest five complaints and their event logs — fo
 | 5 | **Supervisor** | Independent validation, confidence flag, escalation priority | Groq |
 
 > **Human-in-the-Loop:** Every AI-generated resolution requires explicit supervisor approval before any reply is dispatched.
+
+### Pipeline Telemetry
+
+Each complaint run records operational telemetry for the full agent pipeline:
+
+- Per-agent latency is measured with `time.time()` and rounded to 2 decimal places.
+- Agent event logs include `duration`, `input_tokens`, and `output_tokens`.
+- The final complaint record includes aggregate `total_latency`, `total_tokens`, and `estimated_cost_rm`.
+- Token usage is read from the provider response when available. If the provider does not return usage, Komplain.ai estimates tokens with a simple word-count heuristic.
+- Estimated cost uses `COST_PER_1K_TOKENS_RM = 0.002`, so `estimated_cost_rm = (total_tokens / 1000) * COST_PER_1K_TOKENS_RM`.
+
+These telemetry fields are returned by `/api/complaints`, available in persisted complaint records, and surfaced in the frontend agent trace, case detail view, command center, and resolution card.
 
 For the full architectural rationale, agent prompts, validation strategy, and roadmap, see **[docs/SAD.pdf](./docs/SAD.pdf)**.
 
@@ -241,6 +254,27 @@ Set these environment variables in the Render dashboard:
 
 Full OpenAPI documentation is auto-generated at `/docs` on the running backend.
 
+### Complaint Response Telemetry
+
+Completed complaint records include the original resolution fields plus telemetry fields:
+
+```json
+{
+  "agent_metrics": {
+    "intake": {
+      "duration": 0.73,
+      "input_tokens": 184,
+      "output_tokens": 37
+    }
+  },
+  "total_latency": 4.42,
+  "total_tokens": 891,
+  "estimated_cost_rm": 0.001782
+}
+```
+
+The event stream endpoint, `/api/complaints/{id}/stream`, emits agent events with the same per-agent telemetry and sends the aggregate totals in the final `done` event when the complaint record is available.
+
 ---
 
 ## Quality Gates & CI
@@ -272,8 +306,8 @@ pytest -v
 Current coverage focus:
 
 - API endpoints: health, LLM smoke endpoint, complaint creation, complaint retrieval, event traces
-- LLM client: JSON parsing, markdown JSON extraction, key-value fallback, provider switching
-- Agents: intake extraction, context lookup, reasoning enum validation, bilingual response output, supervisor flags
+- LLM client: JSON parsing, markdown JSON extraction, key-value fallback, provider switching, token usage estimation
+- Agents: intake extraction, language detection, context lookup, reasoning enum validation, bilingual response output, supervisor flags
 - Storage: JSON save/load, order lookup, FIFO complaint cap, event pruning
 
 To run the optional real Groq smoke path locally:

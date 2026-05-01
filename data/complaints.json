@@ -1,8 +1,8 @@
 [
   {
-    "id": "7f7217d4-262a-4e80-b801-656d719a3977",
+    "id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-04-30T04:55:46.880611+00:00",
+    "created_at": "2026-05-01T02:16:52.216523+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
@@ -17,30 +17,65 @@
     },
     "reasoning": {
       "decision": "ESCALATE",
-      "confidence": 0.7,
-      "rationale": "Missing order data",
+      "confidence": 0.8,
+      "rationale": "Order not found, missing context",
       "requires_human_review": true
     },
     "response": {
-      "english": "Sorry to hear your item is damaged. We're having trouble locating your order. Our team will review this and get back to you soon.",
-      "bahasa_malaysia": "Maaf kerana barang anda rosak. Kami mengalami masalah mencari data pesanan anda. Pasukan kami akan meninjau dan menghubungi anda tidak lama lagi."
+      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order. Our team will review your case and contact you soon.",
+      "bahasa_malaysia": "Maaf kerana barang anda rosak. Kami mengalami masalah mencari pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Missing order data"
-    }
+      "supervisor_note": "Order not found"
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 160,
+        "output_tokens": 34,
+        "duration": 0.6
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 157,
+        "output_tokens": 19,
+        "duration": 0.59
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 255,
+        "output_tokens": 41,
+        "duration": 0.56
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 198,
+        "output_tokens": 85,
+        "duration": 1.19
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 181,
+        "output_tokens": 28,
+        "duration": 0.61
+      }
+    },
+    "total_latency": 3.55,
+    "total_tokens": 1158,
+    "estimated_cost_rm": 0.002316
   },
   {
-    "id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "complaint_text": "hello what ai are you",
-    "created_at": "2026-04-30T04:56:08.395047+00:00",
+    "id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "complaint_text": "Eh, hello? My order got missing lah! I wait so long already, then check-check, things not there. How like this? Can help check or not? Really cannot tahan waiting like this, please settle fast leh.",
+    "created_at": "2026-05-01T02:17:06.967221+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
       "order_id": null,
-      "issue_type": "unknown",
-      "sentiment": "neutral"
+      "issue_type": "delivery_delay",
+      "sentiment": "negative"
     },
     "context": {
       "order_found": false,
@@ -50,93 +85,65 @@
     "reasoning": {
       "decision": "ESCALATE",
       "confidence": 0.9,
-      "rationale": "Order data not available",
-      "requires_human_review": true
-    },
-    "response": {
-      "english": "Sorry, we couldn't find your order data. We're escalating this issue for further review.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari data pesanan anda. Kami akan mengangkat isu ini untuk semakan lanjut."
-    },
-    "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Missing order data"
-    }
-  },
-  {
-    "id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "complaint_text": "asdasf.asf,asf,sa f,asf asfasfasfa",
-    "created_at": "2026-04-30T04:56:23.262297+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": null,
-      "issue_type": "unknown",
-      "sentiment": "neutral"
-    },
-    "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order data"
-    },
-    "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Missing order context",
-      "requires_human_review": true
-    },
-    "response": {
-      "english": "Sorry, we couldn't find your order. We're escalating this issue for further review.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari pesanan anda. Kami mengangkat isu ini untuk semakan lanjut."
-    },
-    "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Order data missing"
-    }
-  },
-  {
-    "id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
-    "complaint_text": "asdasf.asf,asf,sa f,asf asfasfasfa\n\nOrder ID: ord-2051",
-    "created_at": "2026-04-30T04:56:33.767440+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-2051",
-      "issue_type": "unknown",
-      "sentiment": "neutral"
-    },
-    "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "Order not found"
-    },
-    "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.8,
       "rationale": "Order not found",
       "requires_human_review": true
     },
     "response": {
-      "english": "Sorry, we couldn't locate your order (ord-2051). We're escalating this issue for further review to ensure your concern is addressed.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari tempahan anda (ord-2051). Kami akan meningkatkan isu ini untuk semakan lanjut untuk memastikan kebimbangan anda dapat diatasi."
+      "english": "Sorry to hear that your order is missing. We're escalating this issue to our team for further investigation. Please allow us some time to look into this and we'll get back to you as soon as possible.",
+      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami akan meningkatkan isu ini kepada pasukan kami untuk penyiasatan lanjut. Sila beri kami sedikit masa untuk menyiasat hal ini dan kami akan hubungi anda secepat mungkin."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Order not found, needs review"
-    }
+      "supervisor_note": "Order not found, escalate to human review"
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 199,
+        "output_tokens": 33,
+        "duration": 0.53
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 156,
+        "output_tokens": 19,
+        "duration": 0.58
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 293,
+        "output_tokens": 38,
+        "duration": 0.68
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 234,
+        "output_tokens": 112,
+        "duration": 1.43
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 178,
+        "output_tokens": 33,
+        "duration": 0.6
+      }
+    },
+    "total_latency": 3.82,
+    "total_tokens": 1295,
+    "estimated_cost_rm": 0.00259
   },
   {
-    "id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
-    "complaint_text": "asdasf.asf,asf,sa f,asf asfasfasfa\n\nOrder ID: ord-2041",
-    "created_at": "2026-04-30T04:56:49.591683+00:00",
+    "id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
+    "complaint_text": "Eh, hello? My order got missing lah! I wait so long already, then check-check, things not there. How like this? Can help check or not? Really cannot tahan waiting like this, please settle fast leh.\n\nOrder ID: ORD-2041",
+    "created_at": "2026-05-01T02:21:17.655019+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
       "order_id": "ORD-2041",
-      "issue_type": "unknown",
-      "sentiment": "neutral"
+      "issue_type": "delivery_delay",
+      "sentiment": "negative",
+      "language": "Manglish"
     },
     "context": {
       "order_found": true,
@@ -149,22 +156,201 @@
         "currency": "MYR",
         "delivery_date": null
       },
-      "notes": "Order ORD-2041 found"
+      "notes": "Order exists"
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.8,
+      "rationale": "Order exists but has a delivery delay",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Sorry to hear that your order is missing. We've checked and found that your order exists but has been delayed. We'll reship your Baju Kurung Moden - Maroon XL as soon as possible.",
+      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami telah semak dan mendapati order anda wujud tetapi tertangguh. Kami akan menghantar semula Baju Kurung Moden - Maroon XL anda secepat mungkin."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Decision to reship aligns with order status"
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 222,
+        "output_tokens": 46,
+        "duration": 0.66
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 230,
+        "output_tokens": 17,
+        "duration": 0.55
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 382,
+        "output_tokens": 41,
+        "duration": 0.69
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 313,
+        "output_tokens": 112,
+        "duration": 1.0
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 249,
+        "output_tokens": 34,
+        "duration": 0.55
+      }
+    },
+    "total_latency": 3.45,
+    "total_tokens": 1646,
+    "estimated_cost_rm": 0.003292
+  },
+  {
+    "id": "1fe6e124-8833-45b8-b600-579f19dceff2",
+    "complaint_text": "hello how are youy\n\nOrder ID: ORD-2041",
+    "created_at": "2026-05-01T02:21:37.448697+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "unknown",
+      "sentiment": "neutral",
+      "language": "EN"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order located"
     },
     "reasoning": {
       "decision": "ESCALATE",
       "confidence": 0.8,
-      "rationale": "Unclear complaint details",
+      "rationale": "Unclear complaint",
       "requires_human_review": true
     },
     "response": {
-      "english": "Dear Aina, thank you for reaching out about your order ORD-2041. We apologize, but the complaint details provided are unclear. Our team will review your case and contact you for further clarification.",
-      "bahasa_malaysia": "Kepada Aina, terima kasih kerana menghubungi kami mengenai pesanan ORD-2041. Kami memohon maaf, tetapi butiran aduan yang diberikan tidak jelas. Pasukan kami akan meninjau kes anda dan menghubungi anda untuk penjelasan lanjut."
+      "english": "Hello Aina, thank you for reaching out. We've located your order (ORD-2041) and see that it's been shipped. However, we need more information about your concern. Our team will be in touch soon to assist you further.",
+      "bahasa_malaysia": "Hai Aina, terima kasih kerana menghubungi kami. Kami telah menjumpai pesanan anda (ORD-2041) dan melihat bahawa ia telah dihantar. Walau bagaimanapun, kami perlukan maklumat lebih lanjut mengenai kebimbangan anda. Pasukan kami akan menghubungi anda tidak lama lagi untuk membantu anda."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Unclear complaint details for order ORD-2041"
-    }
+      "supervisor_note": "Unclear complaint regarding shipped order"
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 180,
+        "output_tokens": 43,
+        "duration": 0.62
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 227,
+        "output_tokens": 17,
+        "duration": 0.57
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 337,
+        "output_tokens": 38,
+        "duration": 0.52
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 268,
+        "output_tokens": 152,
+        "duration": 1.21
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 246,
+        "output_tokens": 31,
+        "duration": 0.54
+      }
+    },
+    "total_latency": 3.46,
+    "total_tokens": 1539,
+    "estimated_cost_rm": 0.003078
+  },
+  {
+    "id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "complaint_text": "Saya nak refund. Barang rosak.",
+    "created_at": "2026-05-01T02:22:06.412320+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "damaged_item",
+      "sentiment": "negative",
+      "language": "BM"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order data"
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.8,
+      "rationale": "Order not found, unclear issue",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order details. Our team will review your case and contact you soon.",
+      "bahasa_malaysia": "Sesiapa menyesal kerana barang anda rosak. Kami menghadapi masalah mencari butiran pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order not found, unclear issue"
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 176,
+        "output_tokens": 41,
+        "duration": 0.58
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 164,
+        "output_tokens": 18,
+        "duration": 0.52
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 261,
+        "output_tokens": 41,
+        "duration": 0.68
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 197,
+        "output_tokens": 92,
+        "duration": 1.17
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 180,
+        "output_tokens": 31,
+        "duration": 0.49
+      }
+    },
+    "total_latency": 3.44,
+    "total_tokens": 1201,
+    "estimated_cost_rm": 0.002402
   }
 ]

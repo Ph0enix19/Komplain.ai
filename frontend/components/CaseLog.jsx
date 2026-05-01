@@ -166,6 +166,11 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
     daysSince: order.days_since_order || '-',
     refundWindow: order.seller_policy_refund_days || '-',
   } : null;
+  const pipelineDurationMs = caseData.totalLatency
+    ? Math.round(caseData.totalLatency * 1000)
+    : (events.length ? Math.max(...events.map((event) => event.at || 0)) : 0);
+  const totalTokens = caseData.totalTokens || resolution?.total_tokens || 0;
+  const estimatedCostRm = caseData.estimatedCostRm || resolution?.estimated_cost_rm || 0;
 
   return (
     <div className="modal-scrim" onClick={onClose} role="presentation">
@@ -220,7 +225,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                       <div className="modal-trace-log">
                         {mine.map((event, eventIndex) => (
                           <div key={eventIndex} className="log-line mono">
-                            <span className="log-time">{(event.at / 1000).toFixed(2)}s</span>
+                            <span className="log-time">{`${Number(event.duration || 0).toFixed(2)}s`}</span>
                             <span className={'log-dot status-' + event.status}></span>
                             <span className="log-msg">{event.message}</span>
                           </div>
@@ -265,7 +270,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                   <span className="t-dot"></span>
                   <div>
                     <div className="t-title">Pipeline completed</div>
-                    <div className="t-meta mono">4 agents - GLM-5.1</div>
+                    <div className="t-meta mono">{window.AGENTS.length} agents - {formatDurationMs(pipelineDurationMs)}</div>
                   </div>
                 </li>
                 <li className={'timeline-item ' + (caseData.status === 'resolved' ? 'done' : 'active')}>
@@ -283,6 +288,15 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                   </div>
                 </li>
               </ol>
+            </div>
+
+            <div className="side-block">
+              <div className="section-label mono">PIPELINE TELEMETRY</div>
+              <div className="kv-grid mono">
+                <div><span className="kv-k">latency</span><span>{formatDurationMs(pipelineDurationMs)}</span></div>
+                <div><span className="kv-k">tokens</span><span>{totalTokens}</span></div>
+                <div><span className="kv-k">cost_rm</span><span>{Number(estimatedCostRm || 0).toFixed(6)}</span></div>
+              </div>
             </div>
 
             {orderView && (

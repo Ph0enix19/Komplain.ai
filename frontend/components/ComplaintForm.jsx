@@ -86,7 +86,7 @@ function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve
             </>
           )}
         </button>
-        <div className="form-foot-hint mono">4 agents - GLM-5.1 - live run</div>
+        <div className="form-foot-hint mono">{window.AGENTS.length} agents - GLM-5.1 - live run</div>
       </div>
     </aside>
   );

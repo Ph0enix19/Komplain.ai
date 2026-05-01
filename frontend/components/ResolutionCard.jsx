@@ -114,6 +114,14 @@ function ResolutionCard({
         {hasAmount && <div className="res-amount mono">{resolution.amount}</div>}
       </div>
 
+      {resolution.total_latency > 0 && (
+        <div className="res-telemetry mono">
+          <span>Latency {formatDurationMs(resolution.total_latency * 1000)}</span>
+          <span>{resolution.total_tokens || 0} tokens</span>
+          <span>RM {Number(resolution.estimated_cost_rm || 0).toFixed(6)}</span>
+        </div>
+      )}
+
       <ConfidenceMeter value={resolution.confidence} />
 
       {resolution.requires_review && (
@@ -191,6 +199,27 @@ function ResolutionCard({
 
 function ReplyBlock({ lang, text, tone, primary, editable, onChange, onCopy }) {
   const replyLabel = lang === 'EN' ? 'English reply' : 'Bahasa Malaysia reply';
+  const [copied, setCopied] = React.useState(false);
+  const copyTimerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    setCopied(false);
+    return () => {
+      if (copyTimerRef.current) window.clearTimeout(copyTimerRef.current);
+    };
+  }, [text]);
+
+  const copyText = async () => {
+    if (!onCopy || copied) return;
+    try {
+      await onCopy(text);
+      setCopied(true);
+      if (copyTimerRef.current) window.clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = window.setTimeout(() => setCopied(false), 1500);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className={'reply ' + (primary ? 'reply-primary' : '')}>
@@ -199,11 +228,25 @@ function ReplyBlock({ lang, text, tone, primary, editable, onChange, onCopy }) {
         <span className="reply-lang mono">{replyLabel}</span>
         <span className="reply-meta mono">{text.length} chars - tone: {tone}</span>
         {onCopy && (
-          <button className="reply-copy" type="button" title="Copy reply" aria-label={`Copy ${replyLabel}`} onClick={() => onCopy(text)}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <rect x="9" y="9" width="13" height="13" rx="2" />
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-            </svg>
+          <button
+            className={'reply-copy ' + (copied ? 'is-copied' : '')}
+            type="button"
+            title={copied ? 'Copied reply' : 'Copy reply'}
+            aria-label={`${copied ? 'Copied' : 'Copy'} ${replyLabel}`}
+            onClick={copyText}
+            disabled={copied}
+          >
+            {copied ? (
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            )}
+            <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
         )}
       </div>

@@ -53,6 +53,10 @@ function formatTimestamp(value) {
   return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
+function formatDurationMs(value) {
+  return `${(Number(value || 0) / 1000).toFixed(2)}s`;
+}
+
 function buildDisplayCaseId(rawId, fallback = 'CMP-LIVE') {
   if (!rawId) return fallback;
   if (rawId.startsWith('CMP-')) return rawId;
@@ -104,6 +108,9 @@ function buildResolution(record) {
     response_bm: record.response.bahasa_malaysia,
     amount: buildAmount(record),
     requires_review: record.reasoning.requires_human_review,
+    total_latency: record.total_latency || 0,
+    total_tokens: record.total_tokens || 0,
+    estimated_cost_rm: record.estimated_cost_rm || 0,
   };
 }
 
@@ -118,43 +125,42 @@ function buildCaseFromRecord(record) {
     status: buildCaseStatus(record),
     timestamp: formatTimestamp(record.created_at),
     order: record.intake.order_id || '-',
-    lang: inferLanguage(record.complaint_text),
+    lang: record.intake.language || inferLanguage(record.complaint_text),
     complaintId: record.id,
     source: 'api',
+    totalLatency: record.total_latency || 0,
+    totalTokens: record.total_tokens || 0,
+    estimatedCostRm: record.estimated_cost_rm || 0,
   };
 }
 
 function buildTimelineEvents(apiEvents) {
   const events = [];
-  let cursor = 120;
+  let cursor = 0;
 
   apiEvents.forEach((event) => {
     const isContextFailure = event.step === 'context' && event.payload?.order_found === false;
+    const duration = Number(event.duration ?? event.payload?.duration ?? 0);
+    const durationMs = Math.max(0, Math.round(duration * 1000));
+    const startedAt = cursor;
+    const finishedAt = cursor + durationMs;
+    const telemetry = {
+      duration,
+      input_tokens: event.input_tokens ?? event.payload?.input_tokens ?? 0,
+      output_tokens: event.output_tokens ?? event.payload?.output_tokens ?? 0,
+    };
+
     events.push({
-      at: cursor,
+      at: finishedAt,
+      startAt: startedAt,
+      endAt: finishedAt,
       agent: event.step,
-      status: 'started',
-      message: `${event.step[0].toUpperCase()}${event.step.slice(1)} agent started`,
-    });
-    cursor += 280;
-    events.push({
-      at: cursor,
-      agent: event.step,
-      status: isContextFailure ? 'failed' : 'running',
+      status: isContextFailure ? 'failed' : 'completed',
       message: event.message,
-      output: isContextFailure ? event.payload : null,
+      output: event.payload,
+      ...telemetry,
     });
-    cursor += 320;
-    if (!isContextFailure) {
-      events.push({
-        at: cursor,
-        agent: event.step,
-        status: 'completed',
-        message: event.message,
-        output: event.payload,
-      });
-      cursor += 260;
-    }
+    cursor = finishedAt;
   });
 
   return events;
@@ -311,15 +317,29 @@ function App() {
     setErrorMessage('');
   };
 
+  const resetWorkspace = () => {
+    // Clear the live workspace after the final approval so the next case starts fresh.
+    setComplaint('');
+    setOrderId('');
+    setScenarioKey('');
+    setEvents([]);
+    setResolution(null);
+    setEditingResolution(false);
+    setResolutionDraft({ response_en: '', response_bm: '' });
+    setTotalDuration(0);
+    setRunning(false);
+    setErrorMessage('');
+    setActiveCaseId(null);
+    setModalCase(null);
+    liveCaseId.current = null;
+  };
+
   const resolveComplaint = async () => {
     if (running) return;
 
     setRunning(true);
     setErrorMessage('');
-    setEvents([
-      { at: 0, agent: 'intake', status: 'started', message: 'GLM agent pipeline started' },
-      { at: 120, agent: 'intake', status: 'running', message: 'Waiting for GLM-5.1 response' },
-    ]);
+    setEvents([]);
     setResolution(null);
     setTotalDuration(0);
 
@@ -349,7 +369,8 @@ function App() {
       const timelineEvents = buildTimelineEvents(apiEvents);
       const nextResolution = buildResolution(final);
       const nextCase = buildCaseFromRecord(final);
-      const finishAt = timelineEvents.length ? timelineEvents[timelineEvents.length - 1].at + 260 : 0;
+      const lastTimelineEvent = timelineEvents[timelineEvents.length - 1];
+      const finishAt = final.total_latency ? Math.round(final.total_latency * 1000) : (lastTimelineEvent?.at || 0);
 
       setCaseRecords((prev) => ({ ...prev, [final.id]: final }));
       setCaseEvents((prev) => ({ ...prev, [final.id]: timelineEvents }));
@@ -369,15 +390,16 @@ function App() {
       setRunning(false);
       setErrorMessage('Could not resolve complaint. Start the local backend with a valid ILMU setup, or confirm the hosted API is reachable.');
       setEditingResolution(false);
-      setEvents([
-        { at: 120, agent: 'supervisor', status: 'started', message: 'Pipeline started' },
-        { at: 520, agent: 'supervisor', status: 'failed', message: 'Request to backend failed' },
-      ]);
+      setEvents([{ at: 0, agent: 'supervisor', status: 'failed', message: 'Request to backend failed' }]);
     }
   };
 
   const approve = () => {
-    setCases((prev) => prev.map((item) => item.id === liveCaseId.current ? { ...item, status: 'resolved' } : item));
+    const approvedId = liveCaseId.current;
+    if (approvedId) {
+      setCases((prev) => prev.map((item) => item.id === approvedId ? { ...item, status: 'resolved' } : item));
+    }
+    resetWorkspace();
   };
 
   const startEditingResolution = () => {
@@ -425,11 +447,7 @@ function App() {
   };
 
   const copyReply = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (error) {
-      console.error(error);
-    }
+    return navigator.clipboard.writeText(text);
   };
 
   const openCase = async (caseItem) => {
@@ -497,6 +515,7 @@ function App() {
         running={running}
         resolution={approveReplies}
         events={events}
+        totalDuration={totalDuration}
         tone={tone}
         setTone={wrap(setTone, 'tone')}
         traceStyle={traceStyle}

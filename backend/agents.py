@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import re
 from uuid import uuid4
 
 from pydantic import ValidationError
 
-from backend.llm import ILMUClient
+from backend.llm import ILMUClient, estimate_tokens
 from backend.models import (
     ContextResult,
     IntakeResult,
@@ -23,6 +24,7 @@ Return only valid JSON with exactly these keys:
 - order_id: string or null
 - issue_type: one of "damaged_item", "delivery_delay", "wrong_item", "delivery", "billing", "refund_request", "unknown"
 - sentiment: one of "positive", "neutral", "negative"
+- language: one of "EN", "BM", "Manglish"
 Do not include explanations or markdown."""
 
 CONTEXT_SYSTEM = """You are the context agent for a customer complaints workflow.
@@ -58,6 +60,7 @@ Return only valid JSON with exactly these keys:
 - supervisor_note: short string"""
 
 AGENT_LLM_TIMEOUT_SECONDS = float(os.getenv("AGENT_LLM_TIMEOUT_SECONDS", "180"))
+_DEFAULT_REASONING_EFFORT = object()
 
 
 def use_llm_agents() -> bool:
@@ -71,15 +74,54 @@ def _validated(model_cls, payload: dict, error_message: str):
         raise RuntimeError(error_message) from exc
 
 
-async def intake_agent(llm_client: ILMUClient, complaint_text: str) -> IntakeResult:
+def _record_usage(metrics: dict | None, usage: dict[str, int]) -> None:
+    if metrics is None:
+        return
+    # Agent metrics are accumulated per LLM call so fallback clients remain compatible.
+    metrics["input_tokens"] = int(metrics.get("input_tokens", 0)) + int(usage.get("input_tokens", 0))
+    metrics["output_tokens"] = int(metrics.get("output_tokens", 0)) + int(usage.get("output_tokens", 0))
+
+
+async def _chat_json_with_metrics(
+    llm_client: ILMUClient,
+    *,
+    prompt: str,
+    system: str,
+    metrics: dict | None,
+    max_tokens: int | None = None,
+    reasoning_effort=_DEFAULT_REASONING_EFFORT,
+) -> dict:
+    chat_kwargs = {"system": system, "max_tokens": max_tokens}
+    if reasoning_effort is not _DEFAULT_REASONING_EFFORT:
+        chat_kwargs["reasoning_effort"] = reasoning_effort
+
+    if metrics is None or not hasattr(llm_client, "chat_json_with_usage"):
+        payload = await llm_client.chat_json(prompt, **chat_kwargs)
+        if metrics is not None:
+            usage = {
+                "input_tokens": estimate_tokens(f"{system}\n{prompt}"),
+                "output_tokens": estimate_tokens(json.dumps(payload, ensure_ascii=False)),
+            }
+            _record_usage(metrics, usage)
+        return payload
+
+    payload, usage = await llm_client.chat_json_with_usage(prompt, **chat_kwargs)
+    _record_usage(metrics, usage)
+    return payload
+
+
+async def intake_agent(llm_client: ILMUClient, complaint_text: str, metrics: dict | None = None) -> IntakeResult:
     if not use_llm_agents():
         return _validated(IntakeResult, fallback_intake(complaint_text), "Fallback intake returned invalid data.")
 
+    prompt = f"Complaint:\n{complaint_text}"
     try:
         payload = await asyncio.wait_for(
-            llm_client.chat_json(
-                prompt=f"Complaint:\n{complaint_text}",
+            _chat_json_with_metrics(
+                llm_client,
+                prompt=prompt,
                 system=INTAKE_SYSTEM,
+                metrics=metrics,
                 max_tokens=256,
                 reasoning_effort=None,
             ),
@@ -105,6 +147,7 @@ async def intake_agent(llm_client: ILMUClient, complaint_text: str) -> IntakeRes
         payload["issue_type"] = issue_aliases.get(payload["issue_type"], payload["issue_type"])
     if isinstance(payload.get("sentiment"), str):
         payload["sentiment"] = payload["sentiment"].strip().lower()
+    payload["language"] = normalize_language(payload.get("language"), complaint_text)
     return _validated(IntakeResult, payload, "Intake agent returned invalid data.")
 
 
@@ -112,19 +155,23 @@ async def context_agent(
     llm_client: ILMUClient,
     data_manager: DataManager,
     intake: IntakeResult,
+    metrics: dict | None = None,
 ) -> ContextResult:
     order = data_manager.get_order(intake.order_id) if intake.order_id else None
     if not use_llm_agents():
         return _validated(ContextResult, fallback_context(intake, order), "Fallback context returned invalid data.")
 
+    prompt = (
+        f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
+        f"Order lookup result:\n{order if order is not None else 'null'}"
+    )
     try:
         payload = await asyncio.wait_for(
-            llm_client.chat_json(
-                prompt=(
-                    f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
-                    f"Order lookup result:\n{order if order is not None else 'null'}"
-                ),
+            _chat_json_with_metrics(
+                llm_client,
+                prompt=prompt,
                 system=CONTEXT_SYSTEM,
+                metrics=metrics,
                 max_tokens=256,
                 reasoning_effort=None,
             ),
@@ -142,6 +189,7 @@ async def reasoning_agent(
     complaint_text: str,
     intake: IntakeResult,
     context: ContextResult,
+    metrics: dict | None = None,
 ) -> ReasoningResult:
     if not use_llm_agents():
         return _validated(
@@ -150,15 +198,18 @@ async def reasoning_agent(
             "Fallback reasoning returned invalid data.",
         )
 
+    prompt = (
+        f"Complaint:\n{complaint_text}\n\n"
+        f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
+        f"Context:\n{context.model_dump_json(indent=2)}"
+    )
     try:
         payload = await asyncio.wait_for(
-            llm_client.chat_json(
-                prompt=(
-                    f"Complaint:\n{complaint_text}\n\n"
-                    f"Intake:\n{intake.model_dump_json(indent=2)}\n\n"
-                    f"Context:\n{context.model_dump_json(indent=2)}"
-                ),
+            _chat_json_with_metrics(
+                llm_client,
+                prompt=prompt,
                 system=REASONING_SYSTEM,
+                metrics=metrics,
                 max_tokens=1024,
             ),
             timeout=AGENT_LLM_TIMEOUT_SECONDS,
@@ -204,6 +255,7 @@ async def response_agent(
     complaint_text: str,
     reasoning: ReasoningResult,
     context: ContextResult,
+    metrics: dict | None = None,
 ) -> ResponseResult:
     if not use_llm_agents():
         return _validated(
@@ -212,15 +264,18 @@ async def response_agent(
             "Fallback response returned invalid data.",
         )
 
+    prompt = (
+        f"Complaint:\n{complaint_text}\n\n"
+        f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
+        f"Context:\n{context.model_dump_json(indent=2)}"
+    )
     try:
         payload = await asyncio.wait_for(
-            llm_client.chat_json(
-                prompt=(
-                    f"Complaint:\n{complaint_text}\n\n"
-                    f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
-                    f"Context:\n{context.model_dump_json(indent=2)}"
-                ),
+            _chat_json_with_metrics(
+                llm_client,
+                prompt=prompt,
                 system=RESPONSE_SYSTEM,
+                metrics=metrics,
                 max_tokens=1024,
                 reasoning_effort=None,
             ),
@@ -239,18 +294,22 @@ async def supervisor_logic(
     llm_client: ILMUClient,
     reasoning: ReasoningResult,
     context: ContextResult,
+    metrics: dict | None = None,
 ) -> dict:
     if not use_llm_agents():
         return fallback_supervisor(reasoning, context)
 
+    prompt = (
+        f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
+        f"Context:\n{context.model_dump_json(indent=2)}"
+    )
     try:
         payload = await asyncio.wait_for(
-            llm_client.chat_json(
-                prompt=(
-                    f"Reasoning:\n{reasoning.model_dump_json(indent=2)}\n\n"
-                    f"Context:\n{context.model_dump_json(indent=2)}"
-                ),
+            _chat_json_with_metrics(
+                llm_client,
+                prompt=prompt,
                 system=SUPERVISOR_SYSTEM,
+                metrics=metrics,
                 max_tokens=256,
                 reasoning_effort=None,
             ),
@@ -293,7 +352,34 @@ def fallback_intake(complaint_text: str) -> dict:
         "order_id": order_match.group(0).upper() if order_match else None,
         "issue_type": issue_type,
         "sentiment": sentiment,
+        "language": detect_language(complaint_text),
     }
+
+
+def detect_language(text: str) -> str:
+    lowered = text.lower()
+    bm_pattern = r"\b(saya|barang|tak|lagi|nak|pesanan|terima kasih|rosak|lambat|salah|bayaran balik)\b"
+    en_pattern = r"\b(order|tracking|refund|processing|delivered|damaged|replacement|delay)\b"
+    has_bm = bool(re.search(bm_pattern, lowered))
+    has_en = bool(re.search(en_pattern, lowered))
+    if has_bm and has_en:
+        return "Manglish"
+    if has_bm:
+        return "BM"
+    return "EN"
+
+
+def normalize_language(value, complaint_text: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        return detect_language(complaint_text)
+    normalized = value.strip().lower().replace("_", " ").replace("-", " ")
+    if normalized in {"en", "eng", "english"}:
+        return "EN"
+    if normalized in {"bm", "bahasa", "bahasa malaysia", "malay", "ms"}:
+        return "BM"
+    if normalized in {"manglish", "mixed", "mixed bm en", "bm en", "english malay", "malay english"}:
+        return "Manglish"
+    return detect_language(complaint_text)
 
 
 def fallback_context(intake: IntakeResult, order: dict | None) -> dict:
@@ -396,10 +482,16 @@ def fallback_supervisor(reasoning: ReasoningResult, context: ContextResult) -> d
     }
 
 
-def build_event(complaint_id: str, step: str, message: str, payload: dict | None = None) -> dict:
+def build_event(
+    complaint_id: str,
+    step: str,
+    message: str,
+    payload: dict | None = None,
+    metrics: dict | None = None,
+) -> dict:
     from datetime import datetime, timezone
 
-    return {
+    event = {
         "id": str(uuid4()),
         "complaint_id": complaint_id,
         "step": step,
@@ -407,3 +499,13 @@ def build_event(complaint_id: str, step: str, message: str, payload: dict | None
         "payload": payload or {},
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
+    if metrics:
+        event.update(
+            {
+                "agent": metrics.get("agent", step),
+                "duration": metrics.get("duration", 0.0),
+                "input_tokens": metrics.get("input_tokens", 0),
+                "output_tokens": metrics.get("output_tokens", 0),
+            }
+        )
+    return event

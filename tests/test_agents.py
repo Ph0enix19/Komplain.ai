@@ -36,6 +36,7 @@ async def test_intake_extracts_order_id_from_llm_payload(monkeypatch: pytest.Mon
                 "order_id": " km-1001 ",
                 "issue_type": "damaged",
                 "sentiment": "negative",
+                "language": "english",
             }
         ]
     )
@@ -44,6 +45,7 @@ async def test_intake_extracts_order_id_from_llm_payload(monkeypatch: pytest.Mon
 
     assert result.order_id == "KM-1001"
     assert result.issue_type == "damaged_item"
+    assert result.language == "EN"
 
 
 def test_fallback_intake_extracts_order_id_without_llm() -> None:
@@ -51,6 +53,13 @@ def test_fallback_intake_extracts_order_id_without_llm() -> None:
 
     assert result["order_id"] == "ORD-1887"
     assert result["issue_type"] == "damaged_item"
+    assert result["language"] == "Manglish"
+
+
+def test_fallback_intake_detects_mixed_language() -> None:
+    result = fallback_intake("Saya nak refund. Barang rosak.")
+
+    assert result["language"] == "Manglish"
 
 
 @pytest.mark.asyncio

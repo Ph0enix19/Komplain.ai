@@ -5,6 +5,7 @@ function CommandCenter({
   running,
   resolution,
   events,
+  totalDuration,
   tone,
   setTone,
   traceStyle,
@@ -19,6 +20,9 @@ function CommandCenter({
     ? Math.round((window.AGENTS.filter((agent) => completedAgents.has(agent.key)).length / window.AGENTS.length) * 100)
     : 0;
   const latestResolution = resolution?.type || 'READY';
+  const pipelineValue = running
+    ? `${completion}%`
+    : (totalDuration ? formatDurationMs(totalDuration) : 'Idle');
 
   return (
     <section className="command-center" aria-labelledby="command-title">
@@ -64,7 +68,7 @@ function CommandCenter({
         <MetricTile label="Decision" value={latestResolution} tone={resolution?.requires_review ? 'warn' : 'primary'} icon="spark" />
         <MetricTile label="Resolved" value={String(resolvedCount)} tone="success" icon="check" />
         <MetricTile label="Review queue" value={String(reviewCount)} tone={reviewCount ? 'warn' : 'neutral'} icon="review" />
-        <MetricTile label="Pipeline" value={running ? `${completion}%` : 'Idle'} tone={running ? 'info' : 'neutral'} icon="flow" />
+        <MetricTile label="Pipeline" value={pipelineValue} tone={running ? 'info' : (totalDuration ? 'success' : 'neutral')} icon="flow" />
       </div>
     </section>
   );

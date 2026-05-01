@@ -252,4 +252,5 @@ window.AGENTS = [
   { key: 'context', name: 'Context Agent', role: 'Enriches with order data - policy - delivery status' },
   { key: 'reasoning', name: 'Reasoning Agent', role: 'GLM-5.1 core - applies multi-step policy reasoning' },
   { key: 'response', name: 'Response Agent', role: 'Drafts bilingual EN + BM reply - matches tone' },
+  { key: 'supervisor', name: 'Supervisor Agent', role: 'Validates outcome - decides review priority' },
 ];

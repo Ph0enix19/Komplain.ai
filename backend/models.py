@@ -24,6 +24,7 @@ class IntakeResult(BaseModel):
     order_id: Optional[str] = None
     issue_type: str = "unknown"
     sentiment: str = "neutral"
+    language: str = "EN"
 
 
 class ContextResult(BaseModel):

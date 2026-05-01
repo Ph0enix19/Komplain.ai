@@ -23,6 +23,7 @@ class FakeLLMClient:
                 "order_id": "KM-1001",
                 "issue_type": "damaged_item",
                 "sentiment": "negative",
+                "language": "EN",
             }
         if "context agent" in system:
             return {"order_found": True, "notes": "Order found"}

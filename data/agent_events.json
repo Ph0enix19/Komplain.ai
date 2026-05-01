@@ -1,264 +1,231 @@
 [
   {
-    "id": "6d83d0bb-9f46-4bbc-a2a2-3a0cab0e7964",
-    "complaint_id": "7f7217d4-262a-4e80-b801-656d719a3977",
+    "id": "d633d16b-8228-47bf-8fff-e3960772a2ae",
+    "complaint_id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "step": "intake",
     "message": "Intake completed",
     "payload": {
       "customer_name": null,
       "order_id": null,
       "issue_type": "damaged_item",
-      "sentiment": "negative"
+      "sentiment": "negative",
+      "agent": "intake",
+      "duration": 0.6,
+      "input_tokens": 160,
+      "output_tokens": 34
     },
-    "created_at": "2026-04-30T04:55:47.471949+00:00"
+    "created_at": "2026-05-01T02:16:52.819072+00:00",
+    "agent": "intake",
+    "duration": 0.6,
+    "input_tokens": 160,
+    "output_tokens": 34
   },
   {
-    "id": "374e24ed-55c2-4d38-ae0c-21c42c673fe3",
-    "complaint_id": "7f7217d4-262a-4e80-b801-656d719a3977",
+    "id": "7fcea6c6-d7a9-4c5b-a70c-231de5caa1ca",
+    "complaint_id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "step": "context",
     "message": "Context loaded",
     "payload": {
       "order_found": false,
       "order_data": null,
-      "notes": "No order data available"
+      "notes": "No order data available",
+      "agent": "context",
+      "duration": 0.59,
+      "input_tokens": 157,
+      "output_tokens": 19
     },
-    "created_at": "2026-04-30T04:55:48.043234+00:00"
+    "created_at": "2026-05-01T02:16:53.405917+00:00",
+    "agent": "context",
+    "duration": 0.59,
+    "input_tokens": 157,
+    "output_tokens": 19
   },
   {
-    "id": "92ee9d90-0b72-4bff-aaea-850defd586a8",
-    "complaint_id": "7f7217d4-262a-4e80-b801-656d719a3977",
-    "step": "reasoning",
-    "message": "Reasoning completed",
-    "payload": {
-      "decision": "ESCALATE",
-      "confidence": 0.7,
-      "rationale": "Missing order data",
-      "requires_human_review": true
-    },
-    "created_at": "2026-04-30T04:55:48.658519+00:00"
-  },
-  {
-    "id": "978e508a-6ca1-41f6-9fc3-2f41a10c7d23",
-    "complaint_id": "7f7217d4-262a-4e80-b801-656d719a3977",
-    "step": "response",
-    "message": "Response generated",
-    "payload": {
-      "english": "Sorry to hear your item is damaged. We're having trouble locating your order. Our team will review this and get back to you soon.",
-      "bahasa_malaysia": "Maaf kerana barang anda rosak. Kami mengalami masalah mencari data pesanan anda. Pasukan kami akan meninjau dan menghubungi anda tidak lama lagi."
-    },
-    "created_at": "2026-04-30T04:55:49.764438+00:00"
-  },
-  {
-    "id": "4e8d6506-d34b-4ac9-8d37-0c9181b55726",
-    "complaint_id": "7f7217d4-262a-4e80-b801-656d719a3977",
-    "step": "supervisor",
-    "message": "Supervisor decision",
-    "payload": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Missing order data"
-    },
-    "created_at": "2026-04-30T04:55:49.765722+00:00"
-  },
-  {
-    "id": "7ca0235a-638f-4908-9518-e20aa6aad707",
-    "complaint_id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "step": "intake",
-    "message": "Intake completed",
-    "payload": {
-      "customer_name": null,
-      "order_id": null,
-      "issue_type": "unknown",
-      "sentiment": "neutral"
-    },
-    "created_at": "2026-04-30T04:56:08.964295+00:00"
-  },
-  {
-    "id": "d63dbf21-813e-439c-9d92-99c5b08b941b",
-    "complaint_id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "step": "context",
-    "message": "Context loaded",
-    "payload": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order data available"
-    },
-    "created_at": "2026-04-30T04:56:09.426214+00:00"
-  },
-  {
-    "id": "29336014-ca38-476d-ba21-2e4cab0742b5",
-    "complaint_id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "step": "reasoning",
-    "message": "Reasoning completed",
-    "payload": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Order data not available",
-      "requires_human_review": true
-    },
-    "created_at": "2026-04-30T04:56:10.038010+00:00"
-  },
-  {
-    "id": "2e59386f-f941-4b21-aa1d-056070280f93",
-    "complaint_id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "step": "response",
-    "message": "Response generated",
-    "payload": {
-      "english": "Sorry, we couldn't find your order data. We're escalating this issue for further review.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari data pesanan anda. Kami akan mengangkat isu ini untuk semakan lanjut."
-    },
-    "created_at": "2026-04-30T04:56:11.078617+00:00"
-  },
-  {
-    "id": "7de48f9d-ea5f-41ba-b100-a3fbf160afc7",
-    "complaint_id": "d96c0949-78e8-4050-bed8-e13d27ebfef3",
-    "step": "supervisor",
-    "message": "Supervisor decision",
-    "payload": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Missing order data"
-    },
-    "created_at": "2026-04-30T04:56:11.079718+00:00"
-  },
-  {
-    "id": "dfc0884d-d098-4e9e-99af-19ff24fb9b2c",
-    "complaint_id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "step": "intake",
-    "message": "Intake completed",
-    "payload": {
-      "customer_name": null,
-      "order_id": null,
-      "issue_type": "unknown",
-      "sentiment": "neutral"
-    },
-    "created_at": "2026-04-30T04:56:23.759763+00:00"
-  },
-  {
-    "id": "f91eb4c9-198d-4b01-8d0f-042628022a7f",
-    "complaint_id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "step": "context",
-    "message": "Context loaded",
-    "payload": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order data"
-    },
-    "created_at": "2026-04-30T04:56:24.349099+00:00"
-  },
-  {
-    "id": "ecd52692-9df0-414f-bd6d-d8d42c1881f0",
-    "complaint_id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "step": "reasoning",
-    "message": "Reasoning completed",
-    "payload": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Missing order context",
-      "requires_human_review": true
-    },
-    "created_at": "2026-04-30T04:56:24.959496+00:00"
-  },
-  {
-    "id": "b3205124-6211-4822-93dc-2973d3e1bbb8",
-    "complaint_id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "step": "response",
-    "message": "Response generated",
-    "payload": {
-      "english": "Sorry, we couldn't find your order. We're escalating this issue for further review.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari pesanan anda. Kami mengangkat isu ini untuk semakan lanjut."
-    },
-    "created_at": "2026-04-30T04:56:26.079313+00:00"
-  },
-  {
-    "id": "9aefb4fb-0871-4087-a88e-f3445cf1a17b",
-    "complaint_id": "d9cbbfe7-a957-4d50-bcf6-4dc6581c58ff",
-    "step": "supervisor",
-    "message": "Supervisor decision",
-    "payload": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Order data missing"
-    },
-    "created_at": "2026-04-30T04:56:26.080317+00:00"
-  },
-  {
-    "id": "0184e985-3ce9-4371-9c39-0a7742a1322a",
-    "complaint_id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
-    "step": "intake",
-    "message": "Intake completed",
-    "payload": {
-      "customer_name": null,
-      "order_id": "ORD-2051",
-      "issue_type": "unknown",
-      "sentiment": "neutral"
-    },
-    "created_at": "2026-04-30T04:56:34.361493+00:00"
-  },
-  {
-    "id": "464c594f-4f2a-44d3-95eb-115ccdfec7fa",
-    "complaint_id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
-    "step": "context",
-    "message": "Context loaded",
-    "payload": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "Order not found"
-    },
-    "created_at": "2026-04-30T04:56:34.816842+00:00"
-  },
-  {
-    "id": "03614caa-170e-4b41-a832-502732dd39a7",
-    "complaint_id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
+    "id": "96ddbf6e-6434-4bf0-abf7-0902a1e54f98",
+    "complaint_id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "step": "reasoning",
     "message": "Reasoning completed",
     "payload": {
       "decision": "ESCALATE",
       "confidence": 0.8,
-      "rationale": "Order not found",
-      "requires_human_review": true
+      "rationale": "Order not found, missing context",
+      "requires_human_review": true,
+      "agent": "reasoning",
+      "duration": 0.56,
+      "input_tokens": 255,
+      "output_tokens": 41
     },
-    "created_at": "2026-04-30T04:56:35.376043+00:00"
+    "created_at": "2026-05-01T02:16:53.965503+00:00",
+    "agent": "reasoning",
+    "duration": 0.56,
+    "input_tokens": 255,
+    "output_tokens": 41
   },
   {
-    "id": "c1e1cdcb-85c8-4c71-9dc2-36924f1a413c",
-    "complaint_id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
+    "id": "c6b07eaa-4f09-499b-b59d-2b46a0365bf2",
+    "complaint_id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "step": "response",
     "message": "Response generated",
     "payload": {
-      "english": "Sorry, we couldn't locate your order (ord-2051). We're escalating this issue for further review to ensure your concern is addressed.",
-      "bahasa_malaysia": "Maaf, kami tidak dapat mencari tempahan anda (ord-2051). Kami akan meningkatkan isu ini untuk semakan lanjut untuk memastikan kebimbangan anda dapat diatasi."
+      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order. Our team will review your case and contact you soon.",
+      "bahasa_malaysia": "Maaf kerana barang anda rosak. Kami mengalami masalah mencari pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi.",
+      "agent": "response",
+      "duration": 1.19,
+      "input_tokens": 198,
+      "output_tokens": 85
     },
-    "created_at": "2026-04-30T04:56:36.573856+00:00"
+    "created_at": "2026-05-01T02:16:55.160716+00:00",
+    "agent": "response",
+    "duration": 1.19,
+    "input_tokens": 198,
+    "output_tokens": 85
   },
   {
-    "id": "be4c9aba-181b-44bb-bbfc-60e5f13377f5",
-    "complaint_id": "9f457447-3cc3-46d7-90cc-9fff63259fc1",
+    "id": "c032eeb7-e650-4ace-b0fc-251130646ac3",
+    "complaint_id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
     "step": "supervisor",
     "message": "Supervisor decision",
     "payload": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Order not found, needs review"
+      "supervisor_note": "Order not found",
+      "agent": "supervisor",
+      "duration": 0.61,
+      "input_tokens": 181,
+      "output_tokens": 28
     },
-    "created_at": "2026-04-30T04:56:36.574821+00:00"
+    "created_at": "2026-05-01T02:16:55.162147+00:00",
+    "agent": "supervisor",
+    "duration": 0.61,
+    "input_tokens": 181,
+    "output_tokens": 28
   },
   {
-    "id": "728a7170-c772-4cdc-ab19-383957193880",
-    "complaint_id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
+    "id": "34d310a1-0a01-4f9a-b65b-2428d82c3f5c",
+    "complaint_id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "delivery_delay",
+      "sentiment": "negative",
+      "agent": "intake",
+      "duration": 0.53,
+      "input_tokens": 199,
+      "output_tokens": 33
+    },
+    "created_at": "2026-05-01T02:17:07.502936+00:00",
+    "agent": "intake",
+    "duration": 0.53,
+    "input_tokens": 199,
+    "output_tokens": 33
+  },
+  {
+    "id": "a804aa57-71f1-401f-bb04-515a6d7590ac",
+    "complaint_id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order data available",
+      "agent": "context",
+      "duration": 0.58,
+      "input_tokens": 156,
+      "output_tokens": 19
+    },
+    "created_at": "2026-05-01T02:17:08.087551+00:00",
+    "agent": "context",
+    "duration": 0.58,
+    "input_tokens": 156,
+    "output_tokens": 19
+  },
+  {
+    "id": "842950e6-62c1-442a-944e-be7252736d96",
+    "complaint_id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "ESCALATE",
+      "confidence": 0.9,
+      "rationale": "Order not found",
+      "requires_human_review": true,
+      "agent": "reasoning",
+      "duration": 0.68,
+      "input_tokens": 293,
+      "output_tokens": 38
+    },
+    "created_at": "2026-05-01T02:17:08.768578+00:00",
+    "agent": "reasoning",
+    "duration": 0.68,
+    "input_tokens": 293,
+    "output_tokens": 38
+  },
+  {
+    "id": "34c31be6-7290-4ef0-bfea-9cf7b150f1bf",
+    "complaint_id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Sorry to hear that your order is missing. We're escalating this issue to our team for further investigation. Please allow us some time to look into this and we'll get back to you as soon as possible.",
+      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami akan meningkatkan isu ini kepada pasukan kami untuk penyiasatan lanjut. Sila beri kami sedikit masa untuk menyiasat hal ini dan kami akan hubungi anda secepat mungkin.",
+      "agent": "response",
+      "duration": 1.43,
+      "input_tokens": 234,
+      "output_tokens": 112
+    },
+    "created_at": "2026-05-01T02:17:10.203343+00:00",
+    "agent": "response",
+    "duration": 1.43,
+    "input_tokens": 234,
+    "output_tokens": 112
+  },
+  {
+    "id": "c9193af8-ea02-4e05-9688-99c28f8e4b9b",
+    "complaint_id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order not found, escalate to human review",
+      "agent": "supervisor",
+      "duration": 0.6,
+      "input_tokens": 178,
+      "output_tokens": 33
+    },
+    "created_at": "2026-05-01T02:17:10.204630+00:00",
+    "agent": "supervisor",
+    "duration": 0.6,
+    "input_tokens": 178,
+    "output_tokens": 33
+  },
+  {
+    "id": "8b5a3351-6301-44b6-9d22-7621db959c7c",
+    "complaint_id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
     "step": "intake",
     "message": "Intake completed",
     "payload": {
       "customer_name": null,
       "order_id": "ORD-2041",
-      "issue_type": "unknown",
-      "sentiment": "neutral"
+      "issue_type": "delivery_delay",
+      "sentiment": "negative",
+      "language": "Manglish",
+      "agent": "intake",
+      "duration": 0.66,
+      "input_tokens": 222,
+      "output_tokens": 46
     },
-    "created_at": "2026-04-30T04:56:50.104629+00:00"
+    "created_at": "2026-05-01T02:21:18.323101+00:00",
+    "agent": "intake",
+    "duration": 0.66,
+    "input_tokens": 222,
+    "output_tokens": 46
   },
   {
-    "id": "65c37b64-8416-4944-aad4-a914fe963adb",
-    "complaint_id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
+    "id": "6c084e6b-c9b2-460a-be89-64aa81e2385d",
+    "complaint_id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
     "step": "context",
     "message": "Context loaded",
     "payload": {
@@ -272,44 +239,288 @@
         "currency": "MYR",
         "delivery_date": null
       },
-      "notes": "Order ORD-2041 found"
+      "notes": "Order exists",
+      "agent": "context",
+      "duration": 0.55,
+      "input_tokens": 230,
+      "output_tokens": 17
     },
-    "created_at": "2026-04-30T04:56:50.805556+00:00"
+    "created_at": "2026-05-01T02:21:18.878805+00:00",
+    "agent": "context",
+    "duration": 0.55,
+    "input_tokens": 230,
+    "output_tokens": 17
   },
   {
-    "id": "a1822653-b66a-4854-a483-a8245b9dceea",
-    "complaint_id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
+    "id": "987f65c0-c5e8-42d2-b796-3dc5abd16344",
+    "complaint_id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "RESHIP",
+      "confidence": 0.8,
+      "rationale": "Order exists but has a delivery delay",
+      "requires_human_review": false,
+      "agent": "reasoning",
+      "duration": 0.69,
+      "input_tokens": 382,
+      "output_tokens": 41
+    },
+    "created_at": "2026-05-01T02:21:19.565264+00:00",
+    "agent": "reasoning",
+    "duration": 0.69,
+    "input_tokens": 382,
+    "output_tokens": 41
+  },
+  {
+    "id": "ad866198-78c3-42e5-89d7-cc556ab4c768",
+    "complaint_id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Sorry to hear that your order is missing. We've checked and found that your order exists but has been delayed. We'll reship your Baju Kurung Moden - Maroon XL as soon as possible.",
+      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami telah semak dan mendapati order anda wujud tetapi tertangguh. Kami akan menghantar semula Baju Kurung Moden - Maroon XL anda secepat mungkin.",
+      "agent": "response",
+      "duration": 1.0,
+      "input_tokens": 313,
+      "output_tokens": 112
+    },
+    "created_at": "2026-05-01T02:21:20.566384+00:00",
+    "agent": "response",
+    "duration": 1.0,
+    "input_tokens": 313,
+    "output_tokens": 112
+  },
+  {
+    "id": "0614ae6b-5d8f-4806-bb86-38946db68dd8",
+    "complaint_id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Decision to reship aligns with order status",
+      "agent": "supervisor",
+      "duration": 0.55,
+      "input_tokens": 249,
+      "output_tokens": 34
+    },
+    "created_at": "2026-05-01T02:21:20.567609+00:00",
+    "agent": "supervisor",
+    "duration": 0.55,
+    "input_tokens": 249,
+    "output_tokens": 34
+  },
+  {
+    "id": "b591f16a-8953-406f-afc6-307ea4aec1ce",
+    "complaint_id": "1fe6e124-8833-45b8-b600-579f19dceff2",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "unknown",
+      "sentiment": "neutral",
+      "language": "EN",
+      "agent": "intake",
+      "duration": 0.62,
+      "input_tokens": 180,
+      "output_tokens": 43
+    },
+    "created_at": "2026-05-01T02:21:38.068459+00:00",
+    "agent": "intake",
+    "duration": 0.62,
+    "input_tokens": 180,
+    "output_tokens": 43
+  },
+  {
+    "id": "b2587e90-7331-488c-9d66-45616aea6473",
+    "complaint_id": "1fe6e124-8833-45b8-b600-579f19dceff2",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order located",
+      "agent": "context",
+      "duration": 0.57,
+      "input_tokens": 227,
+      "output_tokens": 17
+    },
+    "created_at": "2026-05-01T02:21:38.638574+00:00",
+    "agent": "context",
+    "duration": 0.57,
+    "input_tokens": 227,
+    "output_tokens": 17
+  },
+  {
+    "id": "6ea1d5f9-8ae7-4dbf-be07-8d1241b25e55",
+    "complaint_id": "1fe6e124-8833-45b8-b600-579f19dceff2",
     "step": "reasoning",
     "message": "Reasoning completed",
     "payload": {
       "decision": "ESCALATE",
       "confidence": 0.8,
-      "rationale": "Unclear complaint details",
-      "requires_human_review": true
+      "rationale": "Unclear complaint",
+      "requires_human_review": true,
+      "agent": "reasoning",
+      "duration": 0.52,
+      "input_tokens": 337,
+      "output_tokens": 38
     },
-    "created_at": "2026-04-30T04:56:51.481858+00:00"
+    "created_at": "2026-05-01T02:21:39.159454+00:00",
+    "agent": "reasoning",
+    "duration": 0.52,
+    "input_tokens": 337,
+    "output_tokens": 38
   },
   {
-    "id": "4ed5ba00-fb75-419a-9a3b-ca45d7032a28",
-    "complaint_id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
+    "id": "b90c1025-d17c-43a7-b9ce-d21e28d43be8",
+    "complaint_id": "1fe6e124-8833-45b8-b600-579f19dceff2",
     "step": "response",
     "message": "Response generated",
     "payload": {
-      "english": "Dear Aina, thank you for reaching out about your order ORD-2041. We apologize, but the complaint details provided are unclear. Our team will review your case and contact you for further clarification.",
-      "bahasa_malaysia": "Kepada Aina, terima kasih kerana menghubungi kami mengenai pesanan ORD-2041. Kami memohon maaf, tetapi butiran aduan yang diberikan tidak jelas. Pasukan kami akan meninjau kes anda dan menghubungi anda untuk penjelasan lanjut."
+      "english": "Hello Aina, thank you for reaching out. We've located your order (ORD-2041) and see that it's been shipped. However, we need more information about your concern. Our team will be in touch soon to assist you further.",
+      "bahasa_malaysia": "Hai Aina, terima kasih kerana menghubungi kami. Kami telah menjumpai pesanan anda (ORD-2041) dan melihat bahawa ia telah dihantar. Walau bagaimanapun, kami perlukan maklumat lebih lanjut mengenai kebimbangan anda. Pasukan kami akan menghubungi anda tidak lama lagi untuk membantu anda.",
+      "agent": "response",
+      "duration": 1.21,
+      "input_tokens": 268,
+      "output_tokens": 152
     },
-    "created_at": "2026-04-30T04:56:52.578602+00:00"
+    "created_at": "2026-05-01T02:21:40.371957+00:00",
+    "agent": "response",
+    "duration": 1.21,
+    "input_tokens": 268,
+    "output_tokens": 152
   },
   {
-    "id": "f410ab4f-fffc-4a17-8449-ac596b3d53d4",
-    "complaint_id": "02967316-5fb2-4bc9-9ffc-af9d318bd546",
+    "id": "d26a4c8f-e575-4dea-ab49-e413aacb3a0a",
+    "complaint_id": "1fe6e124-8833-45b8-b600-579f19dceff2",
     "step": "supervisor",
     "message": "Supervisor decision",
     "payload": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Unclear complaint details for order ORD-2041"
+      "supervisor_note": "Unclear complaint regarding shipped order",
+      "agent": "supervisor",
+      "duration": 0.54,
+      "input_tokens": 246,
+      "output_tokens": 31
     },
-    "created_at": "2026-04-30T04:56:52.579589+00:00"
+    "created_at": "2026-05-01T02:21:40.373340+00:00",
+    "agent": "supervisor",
+    "duration": 0.54,
+    "input_tokens": 246,
+    "output_tokens": 31
+  },
+  {
+    "id": "676edc69-39b4-4213-b7e7-455aa3078a59",
+    "complaint_id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "step": "intake",
+    "message": "Intake completed",
+    "payload": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "damaged_item",
+      "sentiment": "negative",
+      "language": "BM",
+      "agent": "intake",
+      "duration": 0.58,
+      "input_tokens": 176,
+      "output_tokens": 41
+    },
+    "created_at": "2026-05-01T02:22:07.000141+00:00",
+    "agent": "intake",
+    "duration": 0.58,
+    "input_tokens": 176,
+    "output_tokens": 41
+  },
+  {
+    "id": "682fc76c-0b6f-49dc-a4c8-deaeb53c7820",
+    "complaint_id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "step": "context",
+    "message": "Context loaded",
+    "payload": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order data",
+      "agent": "context",
+      "duration": 0.52,
+      "input_tokens": 164,
+      "output_tokens": 18
+    },
+    "created_at": "2026-05-01T02:22:07.521892+00:00",
+    "agent": "context",
+    "duration": 0.52,
+    "input_tokens": 164,
+    "output_tokens": 18
+  },
+  {
+    "id": "4712f8a2-30c2-4d65-80a4-854586b78880",
+    "complaint_id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "step": "reasoning",
+    "message": "Reasoning completed",
+    "payload": {
+      "decision": "ESCALATE",
+      "confidence": 0.8,
+      "rationale": "Order not found, unclear issue",
+      "requires_human_review": true,
+      "agent": "reasoning",
+      "duration": 0.68,
+      "input_tokens": 261,
+      "output_tokens": 41
+    },
+    "created_at": "2026-05-01T02:22:08.199094+00:00",
+    "agent": "reasoning",
+    "duration": 0.68,
+    "input_tokens": 261,
+    "output_tokens": 41
+  },
+  {
+    "id": "bf5d8c70-afee-47a6-93fb-4ebc6c86587c",
+    "complaint_id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "step": "response",
+    "message": "Response generated",
+    "payload": {
+      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order details. Our team will review your case and contact you soon.",
+      "bahasa_malaysia": "Sesiapa menyesal kerana barang anda rosak. Kami menghadapi masalah mencari butiran pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi.",
+      "agent": "response",
+      "duration": 1.17,
+      "input_tokens": 197,
+      "output_tokens": 92
+    },
+    "created_at": "2026-05-01T02:22:09.371794+00:00",
+    "agent": "response",
+    "duration": 1.17,
+    "input_tokens": 197,
+    "output_tokens": 92
+  },
+  {
+    "id": "8512b0f5-1075-4452-bbdb-dc519e85308b",
+    "complaint_id": "6e725655-a49d-4982-9ab1-135397953c93",
+    "step": "supervisor",
+    "message": "Supervisor decision",
+    "payload": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order not found, unclear issue",
+      "agent": "supervisor",
+      "duration": 0.49,
+      "input_tokens": 180,
+      "output_tokens": 31
+    },
+    "created_at": "2026-05-01T02:22:09.373195+00:00",
+    "agent": "supervisor",
+    "duration": 0.49,
+    "input_tokens": 180,
+    "output_tokens": 31
   }
 ]

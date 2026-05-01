@@ -9,6 +9,12 @@ from typing import Any
 import httpx
 
 _REASONING_DEFAULT = object()
+COST_PER_1K_TOKENS_RM = 0.002
+
+
+def estimate_tokens(text: str) -> int:
+    # Lightweight fallback when providers omit token usage details.
+    return int(len(text.split()) * 1.3)
 
 
 class ILMUClient:
@@ -82,6 +88,42 @@ class ILMUClient:
 
         raise RuntimeError(f"Unexpected message content from {self.provider.upper()} API.")
 
+    async def chat_with_usage(
+        self,
+        prompt: str,
+        system: str = "You are a helpful assistant.",
+        max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
+    ) -> tuple[str, dict[str, int]]:
+        if not self.api_key:
+            raise RuntimeError(f"{self.api_key_env_var} is not configured.")
+
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens or self.MAX_TOKENS,
+        }
+        effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
+        if self.supports_reasoning_effort and effort:
+            payload["reasoning_effort"] = effort
+        message, usage = await self._create_message_with_retries(payload, include_usage=True)
+
+        if isinstance(message, str):
+            return message, usage
+        if isinstance(message, list):
+            text_parts = []
+            for item in message:
+                if isinstance(item, dict) and item.get("type") == "text":
+                    text_parts.append(str(item.get("text", "")))
+                elif isinstance(item, str):
+                    text_parts.append(item)
+            return "".join(text_parts), usage
+
+        raise RuntimeError(f"Unexpected message content from {self.provider.upper()} API.")
+
     async def chat_json(
         self,
         prompt: str,
@@ -138,6 +180,7 @@ class ILMUClient:
         payload: dict[str, Any],
         *,
         expected_json: bool = False,
+        include_usage: bool = False,
     ) -> Any:
         variants = [dict(payload)]
         if expected_json:
@@ -149,14 +192,20 @@ class ILMUClient:
             no_reasoning.pop("reasoning_effort", None)
             variants.append(no_reasoning)
 
+        last_usage = {"input_tokens": self._estimate_payload_input_tokens(payload), "output_tokens": 0}
         for variant in variants:
             for attempt in range(self.MAX_NULL_CONTENT_RETRIES + 1):
                 data = await self._create_chat_completion(variant)
                 message = self._message_content(data)
+                last_usage = self._usage_from_response(data, variant, message)
                 if isinstance(message, (str, list)):
+                    if include_usage:
+                        return message, last_usage
                     return message
                 if attempt < self.MAX_NULL_CONTENT_RETRIES:
                     await asyncio.sleep(0.75 * (attempt + 1))
+        if include_usage:
+            return None, last_usage
         return None
 
     @staticmethod
@@ -227,6 +276,38 @@ class ILMUClient:
                 return parsed
             raise
 
+    async def chat_json_with_usage(
+        self,
+        prompt: str,
+        system: str,
+        *,
+        max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
+    ) -> tuple[dict[str, Any], dict[str, int]]:
+        if not self.api_key:
+            raise RuntimeError(f"{self.api_key_env_var} is not configured.")
+
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens or self.MAX_TOKENS,
+            "response_format": {"type": "json_object"},
+        }
+        effort = self.reasoning_effort if reasoning_effort is _REASONING_DEFAULT else reasoning_effort
+        if self.supports_reasoning_effort and effort:
+            payload["reasoning_effort"] = effort
+
+        raw_text, usage = await self._create_message_with_retries(payload, expected_json=True, include_usage=True)
+        if not isinstance(raw_text, str):
+            raw_text, fallback_usage = await self._chat_key_value_with_usage(
+                prompt, system, max_tokens=max_tokens, reasoning_effort=reasoning_effort
+            )
+            usage = self._merge_usage(usage, fallback_usage)
+        return self._extract_structured_object(raw_text), usage
+
     @staticmethod
     def _extract_key_value_object(text: str) -> dict[str, Any]:
         parsed: dict[str, Any] = {}
@@ -252,3 +333,93 @@ class ILMUClient:
                 except ValueError:
                     parsed[key] = value
         return parsed
+
+    async def _chat_key_value_with_usage(
+        self,
+        prompt: str,
+        system: str,
+        *,
+        max_tokens: int | None = None,
+        reasoning_effort: Any = _REASONING_DEFAULT,
+    ) -> tuple[str, dict[str, int]]:
+        safe_system = re.sub(r"\bJSON\b", "plain text", system, flags=re.IGNORECASE)
+        safe_prompt = re.sub(r"\bJSON\b", "plain text fields", prompt, flags=re.IGNORECASE)
+        key_value_system = (
+            f"{safe_system}\n\n"
+            "Return the requested fields as plain text. "
+            "Use exactly one field per line in this format: key: value. "
+            "Do not use markdown, bullets, tables, or explanations."
+        )
+        return await self.chat_with_usage(
+            safe_prompt,
+            system=key_value_system,
+            max_tokens=max_tokens,
+            reasoning_effort=reasoning_effort,
+        )
+
+    @classmethod
+    def _usage_from_response(
+        cls,
+        data: dict[str, Any],
+        payload: dict[str, Any],
+        message: Any,
+    ) -> dict[str, int]:
+        usage = data.get("usage") if isinstance(data, dict) else None
+        usage = usage if isinstance(usage, dict) else {}
+
+        input_tokens = cls._coerce_token_count(usage.get("prompt_tokens") or usage.get("input_tokens"))
+        output_tokens = cls._coerce_token_count(usage.get("completion_tokens") or usage.get("output_tokens"))
+        total_tokens = cls._coerce_token_count(usage.get("total_tokens"))
+
+        estimated_input = cls._estimate_payload_input_tokens(payload)
+        if input_tokens is None:
+            input_tokens = estimated_input
+        if output_tokens is None:
+            if total_tokens is not None and total_tokens >= input_tokens:
+                output_tokens = total_tokens - input_tokens
+            else:
+                output_tokens = estimate_tokens(cls._message_text(message))
+
+        return {"input_tokens": input_tokens, "output_tokens": output_tokens}
+
+    @staticmethod
+    def _coerce_token_count(value: Any) -> int | None:
+        if value is None:
+            return None
+        try:
+            return max(0, int(value))
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def _estimate_payload_input_tokens(cls, payload: dict[str, Any]) -> int:
+        messages = payload.get("messages", [])
+        parts = []
+        if isinstance(messages, list):
+            for message in messages:
+                if isinstance(message, dict):
+                    parts.append(cls._message_text(message.get("content", "")))
+        return estimate_tokens("\n".join(parts))
+
+    @staticmethod
+    def _message_text(message: Any) -> str:
+        if isinstance(message, str):
+            return message
+        if isinstance(message, list):
+            text_parts = []
+            for item in message:
+                if isinstance(item, dict):
+                    text_parts.append(str(item.get("text") or item.get("content") or ""))
+                elif isinstance(item, str):
+                    text_parts.append(item)
+            return "".join(text_parts)
+        if message is None:
+            return ""
+        return json.dumps(message, ensure_ascii=False)
+
+    @staticmethod
+    def _merge_usage(*usages: dict[str, int]) -> dict[str, int]:
+        return {
+            "input_tokens": sum(int(usage.get("input_tokens", 0)) for usage in usages),
+            "output_tokens": sum(int(usage.get("output_tokens", 0)) for usage in usages),
+        }

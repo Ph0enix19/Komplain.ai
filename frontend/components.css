@@ -1090,6 +1090,21 @@
   text-align: right;
 }
 
+.res-telemetry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  color: var(--text-subtle);
+  font-size: 11px;
+}
+
+.res-telemetry span {
+  padding: 4px 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface-soft);
+}
+
 .conf {
   display: grid;
   gap: var(--space-2);
@@ -1262,20 +1277,33 @@
 }
 
 .reply-copy {
-  display: grid;
-  width: 28px;
+  display: inline-flex;
+  min-width: 68px;
   height: 28px;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
   border: 1px solid transparent;
   border-radius: var(--radius-xs);
   background: transparent;
   color: var(--text-subtle);
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .reply-copy:hover {
   border-color: var(--border);
   background: var(--surface);
   color: var(--text);
+}
+
+.reply-copy.is-copied,
+.reply-copy:disabled {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success-fg);
+  cursor: default;
 }
 
 .reply-body {

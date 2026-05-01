@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import json
+import time
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 from uuid import uuid4
@@ -19,7 +21,7 @@ from backend.agents import (
     response_agent,
     supervisor_logic,
 )
-from backend.llm import ILMUClient
+from backend.llm import COST_PER_1K_TOKENS_RM, ILMUClient
 from backend.models import (
     ComplaintCreate,
     ContextResult,
@@ -47,64 +49,166 @@ data_manager = DataManager(data_dir="data")
 ilmu_client = ILMUClient()
 
 
-async def run_intake_agent(complaint_text: str) -> dict:
-    return (await intake_agent(ilmu_client, complaint_text)).model_dump()
+async def run_intake_agent(complaint_text: str, metrics: dict | None = None) -> dict:
+    return (await intake_agent(ilmu_client, complaint_text, metrics=metrics)).model_dump()
 
 
-async def run_context_agent(intake: dict) -> dict:
-    return (await context_agent(ilmu_client, data_manager, IntakeResult(**intake))).model_dump()
+async def run_context_agent(intake: dict, metrics: dict | None = None) -> dict:
+    return (await context_agent(ilmu_client, data_manager, IntakeResult(**intake), metrics=metrics)).model_dump()
 
 
-async def run_reasoning_agent(complaint_text: str, intake: dict, context: dict) -> dict:
+async def run_reasoning_agent(
+    complaint_text: str,
+    intake: dict,
+    context: dict,
+    metrics: dict | None = None,
+) -> dict:
     return (
         await reasoning_agent(
             ilmu_client,
             complaint_text,
             IntakeResult(**intake),
             ContextResult(**context),
+            metrics=metrics,
         )
     ).model_dump()
 
 
-async def run_response_agent(complaint_text: str, reasoning: dict, context: dict) -> dict:
+async def run_response_agent(
+    complaint_text: str,
+    reasoning: dict,
+    context: dict,
+    metrics: dict | None = None,
+) -> dict:
     return (
         await response_agent(
             ilmu_client,
             complaint_text,
             ReasoningResult(**reasoning),
             ContextResult(**context),
+            metrics=metrics,
         )
     ).model_dump()
 
 
-async def run_supervisor_logic(reasoning: dict, context: dict) -> dict:
+async def run_supervisor_logic(reasoning: dict, context: dict, metrics: dict | None = None) -> dict:
     return await supervisor_logic(
         ilmu_client,
         ReasoningResult(**reasoning),
         ContextResult(**context),
+        metrics=metrics,
     )
+
+
+async def _run_timed_agent(agent: str, action) -> tuple[dict, dict]:
+    metrics = {"agent": agent, "input_tokens": 0, "output_tokens": 0}
+    started_at = time.time()
+    payload = await action(metrics)
+    metrics["duration"] = round(time.time() - started_at, 2)
+    return payload, metrics
+
+
+def _payload_with_metrics(payload: dict, metrics: dict) -> dict:
+    # Include agent telemetry in the event payload without changing existing fields.
+    return {
+        **payload,
+        "agent": metrics["agent"],
+        "duration": metrics["duration"],
+        "input_tokens": metrics["input_tokens"],
+        "output_tokens": metrics["output_tokens"],
+    }
+
+
+def _pipeline_totals(metrics_list: list[dict]) -> dict:
+    total_tokens = sum(item["input_tokens"] + item["output_tokens"] for item in metrics_list)
+    return {
+        "total_latency": round(sum(item["duration"] for item in metrics_list), 2),
+        "total_tokens": total_tokens,
+        "estimated_cost_rm": round((total_tokens / 1000) * COST_PER_1K_TOKENS_RM, 6),
+    }
 
 
 async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created_at: str) -> dict:
-    intake_payload = await run_intake_agent(complaint_text)
+    intake_payload, intake_metrics = await _run_timed_agent(
+        "intake",
+        lambda metrics: run_intake_agent(complaint_text, metrics),
+    )
     intake = IntakeResult(**intake_payload)
-    data_manager.add_event(build_event(complaint_id, "intake", "Intake completed", intake_payload))
+    data_manager.add_event(
+        build_event(
+            complaint_id,
+            "intake",
+            "Intake completed",
+            _payload_with_metrics(intake_payload, intake_metrics),
+            intake_metrics,
+        )
+    )
 
-    context_payload = await run_context_agent(intake_payload)
+    context_payload, context_metrics = await _run_timed_agent(
+        "context",
+        lambda metrics: run_context_agent(intake_payload, metrics),
+    )
     context = ContextResult(**context_payload)
-    data_manager.add_event(build_event(complaint_id, "context", "Context loaded", context_payload))
+    data_manager.add_event(
+        build_event(
+            complaint_id,
+            "context",
+            "Context loaded",
+            _payload_with_metrics(context_payload, context_metrics),
+            context_metrics,
+        )
+    )
 
-    reasoning_payload = await run_reasoning_agent(complaint_text, intake_payload, context_payload)
+    reasoning_payload, reasoning_metrics = await _run_timed_agent(
+        "reasoning",
+        lambda metrics: run_reasoning_agent(complaint_text, intake_payload, context_payload, metrics),
+    )
     reasoning = ReasoningResult(**reasoning_payload)
-    data_manager.add_event(build_event(complaint_id, "reasoning", "Reasoning completed", reasoning_payload))
+    data_manager.add_event(
+        build_event(
+            complaint_id,
+            "reasoning",
+            "Reasoning completed",
+            _payload_with_metrics(reasoning_payload, reasoning_metrics),
+            reasoning_metrics,
+        )
+    )
 
-    response_payload, supervisor = await asyncio.gather(
-        run_response_agent(complaint_text, reasoning_payload, context_payload),
-        run_supervisor_logic(reasoning_payload, context_payload),
+    (response_payload, response_metrics), (supervisor, supervisor_metrics) = await asyncio.gather(
+        _run_timed_agent(
+            "response",
+            lambda metrics: run_response_agent(complaint_text, reasoning_payload, context_payload, metrics),
+        ),
+        _run_timed_agent(
+            "supervisor",
+            lambda metrics: run_supervisor_logic(reasoning_payload, context_payload, metrics),
+        ),
     )
     response = ResponseResult(**response_payload)
-    data_manager.add_event(build_event(complaint_id, "response", "Response generated", response_payload))
-    data_manager.add_event(build_event(complaint_id, "supervisor", "Supervisor decision", supervisor))
+    data_manager.add_event(
+        build_event(
+            complaint_id,
+            "response",
+            "Response generated",
+            _payload_with_metrics(response_payload, response_metrics),
+            response_metrics,
+        )
+    )
+    data_manager.add_event(
+        build_event(
+            complaint_id,
+            "supervisor",
+            "Supervisor decision",
+            _payload_with_metrics(supervisor, supervisor_metrics),
+            supervisor_metrics,
+        )
+    )
+
+    agent_metrics = {
+        item["agent"]: item
+        for item in [intake_metrics, context_metrics, reasoning_metrics, response_metrics, supervisor_metrics]
+    }
+    totals = _pipeline_totals(list(agent_metrics.values()))
 
     complaint = {
         "id": complaint_id,
@@ -116,6 +220,8 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created
         "reasoning": reasoning.model_dump(),
         "response": response.model_dump(),
         "supervisor": supervisor,
+        "agent_metrics": agent_metrics,
+        **totals,
     }
     data_manager.add_complaint(complaint)
     return complaint
@@ -226,16 +332,22 @@ async def stream_complaint_events(complaint_id: str) -> StreamingResponse:
             while sent < len(matching):
                 event = matching[sent]
                 yield f"event: {event['step']}\n"
-                yield f"data: {event}\n\n"
+                yield f"data: {json.dumps(event)}\n\n"
                 sent += 1
 
-            if sent >= 5:
+            current = data_manager.get_complaint(complaint_id)
+            if sent >= 5 and current and current.get("status") != "PROCESSING":
                 break
 
             retries += 1
             await asyncio.sleep(0.5)
 
+        current = data_manager.get_complaint(complaint_id) or {}
+        done_payload = {"status": "complete"}
+        for key in ("total_latency", "total_tokens", "estimated_cost_rm"):
+            if key in current:
+                done_payload[key] = current[key]
         yield "event: done\n"
-        yield 'data: {"status": "complete"}\n\n'
+        yield f"data: {json.dumps(done_payload)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

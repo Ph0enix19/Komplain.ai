@@ -41,6 +41,10 @@ function fmtTime(at) {
   return (at / 1000).toFixed(2) + 's';
 }
 
+function fmtDuration(duration) {
+  return `${Number(duration || 0).toFixed(2)}s`;
+}
+
 function statusBadgeClass(status, isActive) {
   if (status === 'completed') return 'badge-accent';
   if (status === 'failed') return 'badge-danger';
@@ -71,7 +75,7 @@ function TraceStepper({ events }) {
               <div className="trace-step-meta">
                 <span className={'badge ' + statusBadgeClass(state.status, isActive)}>{state.status}</span>
                 {state.events.length > 0 && (
-                  <span className="mono trace-time">{fmtTime(state.events[state.events.length - 1].at)}</span>
+                  <span className="mono trace-time">{fmtDuration(state.events[state.events.length - 1].duration)}</span>
                 )}
               </div>
             </div>
@@ -80,7 +84,7 @@ function TraceStepper({ events }) {
               <div className="trace-log">
                 {logLines.map((event, lineIndex) => (
                   <div key={lineIndex} className="log-line mono">
-                    <span className="log-time">{fmtTime(event.at)}</span>
+                    <span className="log-time">{fmtDuration(event.duration)}</span>
                     <span className={'log-dot status-' + event.status}></span>
                     <span className="log-msg">{event.message}</span>
                   </div>
@@ -119,7 +123,7 @@ function TraceCards({ events }) {
               {state.events.length === 0 && <div className="agent-card-idle mono">idle - awaiting upstream</div>}
               {state.events.slice(-2).map((event, lineIndex) => (
                 <div key={lineIndex} className="mono log-line">
-                  <span className="log-time">{fmtTime(event.at)}</span>
+                  <span className="log-time">{fmtDuration(event.duration)}</span>
                   <span className={'log-dot status-' + event.status}></span>
                   <span className="log-msg">{event.message}</span>
                 </div>
@@ -143,21 +147,22 @@ function TraceCards({ events }) {
 }
 
 function TraceTimeline({ events }) {
-  const total = 6000;
   const maxAt = events.length ? Math.max(...events.map((event) => event.at)) : 100;
-  const scale = Math.max(total, maxAt + 500);
+  const scale = Math.max(100, maxAt);
+  const rulerSeconds = Math.max(1, Math.ceil(scale / 1000));
 
   return (
     <div className="trace trace-timeline">
       <div className="tl-ruler mono" aria-hidden="true">
-        {[0, 1, 2, 3, 4, 5, 6].map((second) => (
+        {Array.from({ length: rulerSeconds + 1 }, (_, second) => (
           <span key={second} style={{ left: `${(second * 1000 / scale) * 100}%` }}>{second}s</span>
         ))}
       </div>
       {window.AGENTS.map((agent, index) => {
         const state = AgentStatus(events, agent.key);
-        const startAt = state.events[0]?.at;
-        const endAt = state.events.find((event) => event.status === 'completed' || event.status === 'failed')?.at;
+        const finalEvent = state.events.find((event) => event.status === 'completed' || event.status === 'failed');
+        const startAt = state.events[0]?.startAt ?? state.events[0]?.at;
+        const endAt = finalEvent?.endAt ?? finalEvent?.at;
         const isActive = state.status === 'running' || state.status === 'started';
 
         return (
@@ -186,7 +191,7 @@ function TraceTimeline({ events }) {
               ))}
             </div>
             <div className="tl-meta mono">
-              {endAt ? fmtTime(endAt - startAt) : (isActive ? '...' : '-')}
+              {finalEvent ? fmtDuration(finalEvent.duration) : (isActive ? '...' : '-')}
             </div>
           </div>
         );
@@ -197,7 +202,7 @@ function TraceTimeline({ events }) {
 
 function AgentTracePanel({ events, running, traceStyle, totalDuration }) {
   const completedCount = window.AGENTS.filter((agent) => AgentStatus(events, agent.key).status === 'completed').length;
-  const pct = running ? Math.min(95, (completedCount / 4) * 100) : (events.length ? 100 : 0);
+  const pct = running ? Math.min(95, (completedCount / window.AGENTS.length) * 100) : (events.length ? 100 : 0);
   const supervisorLast = [...events].reverse().find((event) => event.agent === 'supervisor');
 
   return (
@@ -206,7 +211,7 @@ function AgentTracePanel({ events, running, traceStyle, totalDuration }) {
         <div className="panel-title">
           <span className="panel-ix mono">02</span>
           <h2 id="agent-trace-title">Agent trace</h2>
-          <span className="mono subhead">4-agent pipeline with supervisor validation</span>
+          <span className="mono subhead">{window.AGENTS.length}-agent pipeline with live telemetry</span>
         </div>
         <div className="panel-actions">
           {running && <span className="live-dot"><span className="live-dot-inner"></span>Live</span>}
