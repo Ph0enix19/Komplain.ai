@@ -12,6 +12,8 @@ from backend.storage import DataManager
 
 class FakeLLMClient:
     model = "fake-groq"
+    provider = "groq"
+    fallback_client = None
 
     async def chat(self, prompt: str, *_args, **_kwargs) -> str:
         return f"mocked response for: {prompt}"

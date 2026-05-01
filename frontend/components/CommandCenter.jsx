@@ -12,12 +12,13 @@ function CommandCenter({
   setTraceStyle,
   onResolve,
   canResolve,
+  agents = window.AGENTS,
 }) {
   const resolvedCount = cases.filter((caseItem) => caseItem.status === 'resolved').length;
   const reviewCount = cases.filter((caseItem) => caseItem.status === 'review' || caseItem.status === 'pending').length;
   const completedAgents = new Set(events.filter((event) => event.status === 'completed').map((event) => event.agent));
   const completion = events.length
-    ? Math.round((window.AGENTS.filter((agent) => completedAgents.has(agent.key)).length / window.AGENTS.length) * 100)
+    ? Math.round((agents.filter((agent) => completedAgents.has(agent.key)).length / agents.length) * 100)
     : 0;
   const latestResolution = resolution?.type || 'READY';
   const pipelineValue = running
@@ -65,7 +66,7 @@ function CommandCenter({
       </div>
 
       <div className="command-metrics" aria-label="Dashboard metrics">
-        <MetricTile label="Decision" value={latestResolution} tone={resolution?.requires_review ? 'warn' : 'primary'} icon="spark" />
+        <MetricTile label="Decision" value={latestResolution} tone={resolution?.review_warning ? 'warn' : 'primary'} icon="spark" />
         <MetricTile label="Resolved" value={String(resolvedCount)} tone="success" icon="check" />
         <MetricTile label="Review queue" value={String(reviewCount)} tone={reviewCount ? 'warn' : 'neutral'} icon="review" />
         <MetricTile label="Pipeline" value={pipelineValue} tone={running ? 'info' : (totalDuration ? 'success' : 'neutral')} icon="flow" />

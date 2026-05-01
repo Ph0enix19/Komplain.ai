@@ -4,8 +4,8 @@ window.SCENARIOS = [
   {
     key: 'manglish',
     label: 'Delivery delay',
-    blurb: 'Mixed BM+EN, 14-day delay',
-    complaint: "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
+    blurb: 'Manglish, 14-day delay',
+    complaint: "Hi team, saya punya order ORD-2041 dah dua minggu still tak sampai. Tracking stuck dekat KUL Hub, no movement at all. Kalau tak boleh settle today, saya nak refund ya.",
     orderId: 'ORD-2041',
   },
   {
@@ -14,6 +14,13 @@ window.SCENARIOS = [
     blurb: 'EN, item damaged after delivery',
     complaint: "Hi, I received my order ORD-1887 but the item is damaged. The dress has a torn seam on the side. I'd like a replacement or refund please.",
     orderId: 'ORD-1887',
+  },
+  {
+    key: 'wrong',
+    label: 'Wrong item',
+    blurb: 'EN, replacement needed',
+    complaint: "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
+    orderId: 'KM-1003',
   },
   {
     key: 'edge',
@@ -46,6 +53,17 @@ window.MOCK_ORDERS = {
     seller_policy_reship_allowed: true,
     courier: 'Ninja Van',
     tracking: 'NV77812HC',
+  },
+  'KM-1003': {
+    id: 'KM-1003',
+    product_name: 'Gaming Mouse',
+    order_date: '2026-04-17',
+    delivery_status: 'delivered',
+    days_since_order: 4,
+    seller_policy_refund_days: 7,
+    seller_policy_reship_allowed: true,
+    courier: 'DHL eCommerce',
+    tracking: 'DHL55291003MY',
   },
 };
 
@@ -115,8 +133,8 @@ window.PIPELINES = {
       requires_review: false,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
-      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 247 chars' },
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - {model}' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 167 chars' },
       { at: 620, agent: 'intake', status: 'running', message: 'Detecting language' },
       { at: 980, agent: 'intake', status: 'running', message: 'Extracting intent + urgency' },
       { at: 1340, agent: 'intake', status: 'completed', message: 'Intake complete - urgency 4/5', output: {
@@ -139,7 +157,7 @@ window.PIPELINES = {
         refund_window_days: 30,
         within_policy: true,
       }},
-      { at: 2380, agent: 'reasoning', status: 'started', message: 'Applying GLM-5.1 reasoning chain' },
+      { at: 2380, agent: 'reasoning', status: 'started', message: 'Applying {model} reasoning chain' },
       { at: 2780, agent: 'reasoning', status: 'running', message: 'Step 1/4 - Is complaint valid?' },
       { at: 3180, agent: 'reasoning', status: 'running', message: 'Step 2/4 - What does evidence support?' },
       { at: 3580, agent: 'reasoning', status: 'running', message: 'Step 3/4 - Consumer Protection Regs 2024 Section 12' },
@@ -171,7 +189,7 @@ window.PIPELINES = {
       requires_review: false,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - {model}' },
       { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 164 chars' },
       { at: 560, agent: 'intake', status: 'running', message: 'Detecting language - EN' },
       { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete - urgency 3/5', output: {
@@ -192,7 +210,7 @@ window.PIPELINES = {
         reship_allowed: true,
         within_policy: true,
       }},
-      { at: 1640, agent: 'reasoning', status: 'started', message: 'Applying GLM-5.1 reasoning chain' },
+      { at: 1640, agent: 'reasoning', status: 'started', message: 'Applying {model} reasoning chain' },
       { at: 2040, agent: 'reasoning', status: 'running', message: 'Evaluating reship vs refund' },
       { at: 2540, agent: 'reasoning', status: 'completed', message: 'Decision - RESHIP - conf 0.95', output: {
         resolution_type: 'RESHIP',
@@ -203,6 +221,52 @@ window.PIPELINES = {
       { at: 2700, agent: 'response', status: 'started', message: 'Drafting bilingual reply' },
       { at: 3240, agent: 'response', status: 'completed', message: 'EN + BM drafts ready' },
       { at: 3380, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - 4/4 agents OK' },
+    ],
+  },
+  wrong: {
+    resolution: {
+      type: 'RESHIP',
+      confidence: 0.93,
+      reason: 'Customer received the wrong item for KM-1003. The delivered order is within the replacement window, stock is available, and the customer explicitly requested the correct item.',
+      policy: 'Wrong item policy - replacement preferred within 7 days',
+      response_en: "Hi Nurul,\n\nThanks for letting us know about order KM-1003. I am sorry the wrong item was packed in your parcel.\n\nWe have arranged a replacement Gaming Mouse to ship with DHL eCommerce today. It should reach you within 2-3 working days. No extra payment is needed.\n\n-- Komplain.ai Support",
+      response_bm: "Hai Nurul,\n\nTerima kasih kerana maklumkan kami tentang pesanan KM-1003. Kami mohon maaf kerana barang yang salah telah dimasukkan dalam parcel anda.\n\nKami telah mengatur penghantaran gantian Gaming Mouse melalui DHL eCommerce hari ini. Ia dijangka sampai dalam masa 2-3 hari bekerja. Tiada bayaran tambahan diperlukan.\n\n-- Komplain.ai Support",
+      amount: '1 x replacement',
+      requires_review: false,
+    },
+    events: [
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - {model}' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 129 chars' },
+      { at: 560, agent: 'intake', status: 'running', message: 'Detecting language - EN' },
+      { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete - replacement requested', output: {
+        complaint_type: 'wrong_item',
+        sentiment: 'neutral',
+        urgency_score: 3,
+        extracted_order_id: 'KM-1003',
+        language_detected: 'English',
+        summary_en: 'Customer received the wrong item and asks for the correct item to be sent.',
+      }},
+      { at: 1080, agent: 'context', status: 'started', message: 'Fetching order KM-1003' },
+      { at: 1480, agent: 'context', status: 'completed', message: 'Order found - delivered 4d ago', output: {
+        order_id: 'KM-1003',
+        product: 'Gaming Mouse',
+        delivery_status: 'delivered',
+        days_since_order: 4,
+        refund_window_days: 7,
+        reship_allowed: true,
+        within_policy: true,
+      }},
+      { at: 1640, agent: 'reasoning', status: 'started', message: 'Applying {model} reasoning chain' },
+      { at: 2040, agent: 'reasoning', status: 'running', message: 'Evaluating replacement eligibility' },
+      { at: 2540, agent: 'reasoning', status: 'completed', message: 'Decision - RESHIP - conf 0.93', output: {
+        resolution_type: 'RESHIP',
+        confidence_score: 0.93,
+        policy_reference: 'Wrong item policy Section 3.2',
+        reason: 'Wrong item reported within 7-day window; correct item can be resent.',
+      }},
+      { at: 2700, agent: 'response', status: 'started', message: 'Drafting bilingual replacement reply' },
+      { at: 3240, agent: 'response', status: 'completed', message: 'EN + BM replacement drafts ready' },
+      { at: 3380, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - RESHIP approved' },
     ],
   },
   edge: {
@@ -217,7 +281,7 @@ window.PIPELINES = {
       requires_review: true,
     },
     events: [
-      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - GLM-5.1' },
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - {model}' },
       { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 32 chars' },
       { at: 560, agent: 'intake', status: 'running', message: 'Detecting language - BM' },
       { at: 920, agent: 'intake', status: 'completed', message: 'Intake complete - no order_id', output: {
@@ -250,7 +314,7 @@ window.PIPELINES = {
 window.AGENTS = [
   { key: 'intake', name: 'Intake Agent', role: 'Parses raw complaint - extracts intent, language, urgency' },
   { key: 'context', name: 'Context Agent', role: 'Enriches with order data - policy - delivery status' },
-  { key: 'reasoning', name: 'Reasoning Agent', role: 'GLM-5.1 core - applies multi-step policy reasoning' },
+  { key: 'reasoning', name: 'Reasoning Agent', role: '{model} core - applies multi-step policy reasoning' },
   { key: 'response', name: 'Response Agent', role: 'Drafts bilingual EN + BM reply - matches tone' },
   { key: 'supervisor', name: 'Supervisor Agent', role: 'Validates outcome - decides review priority' },
 ];

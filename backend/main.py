@@ -110,7 +110,7 @@ async def _run_timed_agent(agent: str, action) -> tuple[dict, dict]:
 
 def _payload_with_metrics(payload: dict, metrics: dict) -> dict:
     # Include agent telemetry in the event payload without changing existing fields.
-    return {
+    enriched = {
         **payload,
         "agent": metrics["agent"],
         "duration": metrics["duration"],
@@ -118,6 +118,10 @@ def _payload_with_metrics(payload: dict, metrics: dict) -> dict:
         "output_tokens": metrics["output_tokens"],
         "execution_mode": metrics["execution_mode"],
     }
+    for key in ("provider_used", "fallback_used", "fallback_reason"):
+        if key in metrics:
+            enriched[key] = metrics[key]
+    return enriched
 
 
 def _pipeline_totals(metrics_list: list[dict]) -> dict:
@@ -254,6 +258,9 @@ def health() -> dict:
         "status": "ok",
         "time": datetime.now(timezone.utc).isoformat(),
         "complaints_count": len(data_manager.complaints),
+        "llm_provider": ilmu_client.provider,
+        "llm_model": ilmu_client.model,
+        "fallback_provider": ilmu_client.fallback_client.provider if ilmu_client.fallback_client else None,
     }
 
 

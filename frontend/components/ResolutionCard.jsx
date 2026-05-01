@@ -11,6 +11,7 @@ const RESOLUTION_META = {
 function ConfidenceMeter({ value }) {
   const pct = Math.round(value * 100);
   const low = value < 0.8;
+  const confidenceLabel = low ? 'review threshold 0.80' : 'good confidence';
 
   return (
     <div className="conf">
@@ -24,7 +25,7 @@ function ConfidenceMeter({ value }) {
       </div>
       <div className="conf-foot mono">
         <span>0.0</span>
-        <span style={{ color: low ? 'var(--warning-fg)' : 'var(--text-subtle)' }}>review threshold 0.80</span>
+        <span style={{ color: low ? 'var(--warning-fg)' : 'var(--text-subtle)' }}>{confidenceLabel}</span>
         <span>1.0</span>
       </div>
     </div>
@@ -124,7 +125,7 @@ function ResolutionCard({
 
       <ConfidenceMeter value={resolution.confidence} />
 
-      {resolution.requires_review && (
+      {resolution.review_warning && (
         <div className="review-flag" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />

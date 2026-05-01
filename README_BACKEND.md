@@ -25,11 +25,16 @@ backend/requirements.txt
    source .venv/bin/activate
    pip install -r backend/requirements.txt
    ```
-2. Start Ollama and ensure model exists:
-   ```bash
-   ollama pull qwen2.5:7b
-   ollama serve
+2. Configure LLM environment variables:
+   ```env
+   LLM_PROVIDER=zai
+   ZAI_API_KEY=your_zai_api_key_here
+   ZAI_BASE_URL=https://api.z.ai/api/coding/paas/v4
+   ZAI_MODEL=your_current_glm_model_here
+   GROQ_API_KEY=your_groq_api_key_here
+   GROQ_MODEL=llama-3.1-8b-instant
    ```
+   Z.ai / GLM is the primary provider. Groq remains the fallback when Z.ai times out, rate-limits, returns invalid output, or is missing configuration.
 3. Run API:
    ```bash
    uvicorn backend.main:app --reload --port 8000
@@ -50,7 +55,8 @@ backend/requirements.txt
 
 - App loads all JSON files at startup into memory.
 - App writes back on every update.
-- No DB, no auth, no external API.
+- No DB and no auth in the MVP.
+- Do not commit `.env` or provider API keys; configure secrets through local environment variables or Render.
 
 ## Example complaint payload
 

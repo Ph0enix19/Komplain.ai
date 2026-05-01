@@ -6,3 +6,4 @@ scan the repository root discover the existing `app` object.
 
 from backend.main import app
 
+__all__ = ["app"]

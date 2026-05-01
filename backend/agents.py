@@ -61,6 +61,7 @@ Return only valid JSON with exactly these keys:
 
 AGENT_LLM_TIMEOUT_SECONDS = float(os.getenv("AGENT_LLM_TIMEOUT_SECONDS", "180"))
 _DEFAULT_REASONING_EFFORT = object()
+ORDER_ID_PATTERN = re.compile(r"\b(?:ORD|KM)-\d+\b", flags=re.IGNORECASE)
 
 
 def use_llm_agents() -> bool:
@@ -74,17 +75,41 @@ def _validated(model_cls, payload: dict, error_message: str):
         raise RuntimeError(error_message) from exc
 
 
-def _record_usage(metrics: dict | None, usage: dict[str, int]) -> None:
+def _record_usage(metrics: dict | None, usage: dict) -> None:
     if metrics is None:
         return
     # Agent metrics are accumulated per LLM call so fallback clients remain compatible.
     metrics["input_tokens"] = int(metrics.get("input_tokens", 0)) + int(usage.get("input_tokens", 0))
     metrics["output_tokens"] = int(metrics.get("output_tokens", 0)) + int(usage.get("output_tokens", 0))
+    if "provider_used" in usage:
+        metrics["provider_used"] = usage["provider_used"]
+    if "fallback_used" in usage:
+        metrics["fallback_used"] = bool(usage["fallback_used"])
+    if usage.get("fallback_reason"):
+        metrics["fallback_reason"] = usage["fallback_reason"]
 
 
 def _mark_execution_mode(metrics: dict | None, mode: str) -> None:
     if metrics is not None:
         metrics["execution_mode"] = mode
+
+
+def extract_order_id(text: str) -> str | None:
+    match = ORDER_ID_PATTERN.search(text)
+    return match.group(0).upper() if match else None
+
+
+def _should_auto_reship_wrong_item(intake: IntakeResult, context: ContextResult) -> bool:
+    return bool(context.order_found and intake.issue_type == "wrong_item")
+
+
+def _is_high_confidence_automated_resolution(reasoning: ReasoningResult, context: ContextResult) -> bool:
+    return bool(
+        context.order_found
+        and reasoning.decision in {"REFUND", "RESHIP"}
+        and reasoning.confidence >= 0.8
+        and not reasoning.requires_human_review
+    )
 
 
 async def _chat_json_with_metrics(
@@ -113,7 +138,7 @@ async def _chat_json_with_metrics(
 
     payload, usage = await llm_client.chat_json_with_usage(prompt, **chat_kwargs)
     _record_usage(metrics, usage)
-    _mark_execution_mode(metrics, "llm")
+    _mark_execution_mode(metrics, "fallback" if usage.get("fallback_used") else "llm")
     return payload
 
 
@@ -142,6 +167,8 @@ async def intake_agent(llm_client: ILMUClient, complaint_text: str, metrics: dic
         payload["customer_name"] = payload["customer_name"].strip() or None
     if isinstance(payload.get("order_id"), str):
         payload["order_id"] = payload["order_id"].strip().upper() or None
+    if not payload.get("order_id"):
+        payload["order_id"] = extract_order_id(complaint_text)
     if isinstance(payload.get("issue_type"), str):
         payload["issue_type"] = payload["issue_type"].strip().lower()
         issue_aliases = {
@@ -251,6 +278,12 @@ async def reasoning_agent(
     except (TypeError, ValueError):
         raise RuntimeError("Reasoning agent returned invalid confidence.")
     payload["requires_human_review"] = bool(payload.get("requires_human_review"))
+    if _should_auto_reship_wrong_item(intake, context):
+        payload["decision"] = "RESHIP"
+        payload["requires_human_review"] = False
+        payload["confidence"] = max(payload["confidence"], 0.82)
+        if not payload.get("rationale") or "manual" in str(payload.get("rationale")).lower():
+            payload["rationale"] = "Wrong item reported for an order found in the system; replacement is the preferred policy path."
     if isinstance(payload.get("rationale"), str):
         payload["rationale"] = payload["rationale"].strip()
     try:
@@ -342,12 +375,16 @@ async def supervisor_logic(
     if payload["priority"] not in {"normal", "high"}:
         payload["priority"] = "high" if payload["requires_human_review"] else "normal"
     payload["supervisor_note"] = str(payload["supervisor_note"]).strip()
+    if _is_high_confidence_automated_resolution(reasoning, context):
+        payload["requires_human_review"] = False
+        payload["priority"] = "normal"
+        if not payload["supervisor_note"] or "manual" in payload["supervisor_note"].lower():
+            payload["supervisor_note"] = "High-confidence automated resolution; no manual review required."
     return payload
 
 
 def fallback_intake(complaint_text: str) -> dict:
     lowered = complaint_text.lower()
-    order_match = re.search(r"\b(?:ORD|KM)-\d+\b", complaint_text, flags=re.IGNORECASE)
     issue_type = "unknown"
     if any(word in lowered for word in ("damaged", "broken", "torn", "rosak", "koyak")):
         issue_type = "damaged_item"
@@ -365,7 +402,7 @@ def fallback_intake(complaint_text: str) -> dict:
     )
     return {
         "customer_name": None,
-        "order_id": order_match.group(0).upper() if order_match else None,
+        "order_id": extract_order_id(complaint_text),
         "issue_type": issue_type,
         "sentiment": sentiment,
         "language": detect_language(complaint_text),
@@ -525,4 +562,7 @@ def build_event(
                 "execution_mode": metrics.get("execution_mode", "unknown"),
             }
         )
+        for key in ("provider_used", "fallback_used", "fallback_reason"):
+            if key in metrics:
+                event[key] = metrics[key]
     return event

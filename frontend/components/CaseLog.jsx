@@ -150,7 +150,7 @@ function StatusPill({ status }) {
   return <span className={'badge ' + config.cls}>{config.label}</span>;
 }
 
-function CaseDetailModal({ caseData, events, resolution, onClose, scenarioComplaint, orderData }) {
+function CaseDetailModal({ caseData, events, resolution, onClose, scenarioComplaint, orderData, agents = window.AGENTS }) {
   if (!caseData) return null;
 
   const meta = RESOLUTION_META[caseData.resolution] || RESOLUTION_META.REFUND;
@@ -208,7 +208,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
             <section className="modal-section">
               <div className="section-label mono">AGENT TRACE - FULL</div>
               <div className="modal-trace">
-                {window.AGENTS.map((agent, index) => {
+                {agents.map((agent, index) => {
                   const mine = events.filter((event) => event.agent === agent.key);
                   const last = mine[mine.length - 1];
                   const output = mine.find((event) => event.output)?.output;
@@ -270,7 +270,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
                   <span className="t-dot"></span>
                   <div>
                     <div className="t-title">Pipeline completed</div>
-                    <div className="t-meta mono">{window.AGENTS.length} agents - {formatDurationMs(pipelineDurationMs)}</div>
+                    <div className="t-meta mono">{agents.length} agents - {formatDurationMs(pipelineDurationMs)}</div>
                   </div>
                 </li>
                 <li className={'timeline-item ' + (caseData.status === 'resolved' ? 'done' : 'active')}>

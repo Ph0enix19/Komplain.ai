@@ -45,8 +45,9 @@ function fmtDuration(duration) {
   return `${Number(duration || 0).toFixed(2)}s`;
 }
 
-function fmtExecutionMode(mode) {
-  return mode === 'llm' ? 'LLM' : mode === 'fallback' ? 'Fallback' : 'Mode unknown';
+function fmtExecutionMode(mode, event) {
+  if (event?.fallback_used || mode === 'fallback') return 'Fallback';
+  return mode === 'llm' ? 'LLM' : 'Mode unknown';
 }
 
 function statusBadgeClass(status, isActive) {
@@ -56,11 +57,11 @@ function statusBadgeClass(status, isActive) {
   return '';
 }
 
-function TraceStepper({ events }) {
+function TraceStepper({ events, agents = window.AGENTS }) {
   return (
     <div className="trace trace-stepper">
       <div className="trace-rail" aria-hidden="true"></div>
-      {window.AGENTS.map((agent, index) => {
+      {agents.map((agent, index) => {
         const state = AgentStatus(events, agent.key);
         const isActive = state.status === 'running' || state.status === 'started';
         const logLines = state.events.slice(-3);
@@ -80,7 +81,7 @@ function TraceStepper({ events }) {
                 <span className={'badge ' + statusBadgeClass(state.status, isActive)}>{state.status}</span>
                 {state.events.length > 0 && (
                   <>
-                    <span className="badge">{fmtExecutionMode(state.events[state.events.length - 1].execution_mode)}</span>
+                    <span className="badge">{fmtExecutionMode(state.events[state.events.length - 1].execution_mode, state.events[state.events.length - 1])}</span>
                     <span className="mono trace-time">{fmtDuration(state.events[state.events.length - 1].duration)}</span>
                   </>
                 )}
@@ -93,7 +94,7 @@ function TraceStepper({ events }) {
                   <div key={lineIndex} className="log-line mono">
                     <span className="log-time">{fmtDuration(event.duration)}</span>
                     <span className={'log-dot status-' + event.status}></span>
-                    <span className="log-mode">{fmtExecutionMode(event.execution_mode)}</span>
+                    <span className="log-mode">{fmtExecutionMode(event.execution_mode, event)}</span>
                     <span className="log-msg">{event.message}</span>
                   </div>
                 ))}
@@ -112,10 +113,10 @@ function TraceStepper({ events }) {
   );
 }
 
-function TraceCards({ events }) {
+function TraceCards({ events, agents = window.AGENTS }) {
   return (
     <div className="trace trace-cards">
-      {window.AGENTS.map((agent, index) => {
+      {agents.map((agent, index) => {
         const state = AgentStatus(events, agent.key);
         const isActive = state.status === 'running' || state.status === 'started';
 
@@ -133,7 +134,7 @@ function TraceCards({ events }) {
                 <div key={lineIndex} className="mono log-line">
                   <span className="log-time">{fmtDuration(event.duration)}</span>
                   <span className={'log-dot status-' + event.status}></span>
-                  <span className="log-mode">{fmtExecutionMode(event.execution_mode)}</span>
+                  <span className="log-mode">{fmtExecutionMode(event.execution_mode, event)}</span>
                   <span className="log-msg">{event.message}</span>
                 </div>
               ))}
@@ -155,7 +156,7 @@ function TraceCards({ events }) {
   );
 }
 
-function TraceTimeline({ events }) {
+function TraceTimeline({ events, agents = window.AGENTS }) {
   const maxAt = events.length ? Math.max(...events.map((event) => event.at)) : 100;
   const scale = Math.max(100, maxAt);
   const rulerSeconds = Math.max(1, Math.ceil(scale / 1000));
@@ -167,7 +168,7 @@ function TraceTimeline({ events }) {
           <span key={second} style={{ left: `${(second * 1000 / scale) * 100}%` }}>{second}s</span>
         ))}
       </div>
-      {window.AGENTS.map((agent, index) => {
+      {agents.map((agent, index) => {
         const state = AgentStatus(events, agent.key);
         const finalEvent = state.events.find((event) => event.status === 'completed' || event.status === 'failed');
         const startAt = state.events[0]?.startAt ?? state.events[0]?.at;
@@ -200,7 +201,7 @@ function TraceTimeline({ events }) {
               ))}
             </div>
             <div className="tl-meta mono">
-              {finalEvent ? `${fmtExecutionMode(finalEvent.execution_mode)} · ${fmtDuration(finalEvent.duration)}` : (isActive ? '...' : '-')}
+              {finalEvent ? `${fmtExecutionMode(finalEvent.execution_mode, finalEvent)} · ${fmtDuration(finalEvent.duration)}` : (isActive ? '...' : '-')}
             </div>
           </div>
         );
@@ -209,9 +210,9 @@ function TraceTimeline({ events }) {
   );
 }
 
-function AgentTracePanel({ events, running, traceStyle, totalDuration }) {
-  const completedCount = window.AGENTS.filter((agent) => AgentStatus(events, agent.key).status === 'completed').length;
-  const pct = running ? Math.min(95, (completedCount / window.AGENTS.length) * 100) : (events.length ? 100 : 0);
+function AgentTracePanel({ events, running, traceStyle, totalDuration, agents = window.AGENTS }) {
+  const completedCount = agents.filter((agent) => AgentStatus(events, agent.key).status === 'completed').length;
+  const pct = running ? Math.min(95, (completedCount / agents.length) * 100) : (events.length ? 100 : 0);
   const supervisorLast = [...events].reverse().find((event) => event.agent === 'supervisor');
 
   return (
@@ -220,7 +221,7 @@ function AgentTracePanel({ events, running, traceStyle, totalDuration }) {
         <div className="panel-title">
           <span className="panel-ix mono">02</span>
           <h2 id="agent-trace-title">Agent trace</h2>
-          <span className="mono subhead">{window.AGENTS.length}-agent pipeline with live telemetry</span>
+          <span className="mono subhead">{agents.length}-agent pipeline with live telemetry</span>
         </div>
         <div className="panel-actions">
           {running && <span className="live-dot"><span className="live-dot-inner"></span>Live</span>}
@@ -251,9 +252,9 @@ function AgentTracePanel({ events, running, traceStyle, totalDuration }) {
 
         {(events.length > 0 || running) && (
           <>
-            {traceStyle === 'cards' && <TraceCards events={events} />}
-            {traceStyle === 'timeline' && <TraceTimeline events={events} />}
-            {traceStyle === 'stepper' && <TraceStepper events={events} />}
+            {traceStyle === 'cards' && <TraceCards events={events} agents={agents} />}
+            {traceStyle === 'timeline' && <TraceTimeline events={events} agents={agents} />}
+            {traceStyle === 'stepper' && <TraceStepper events={events} agents={agents} />}
           </>
         )}
       </div>

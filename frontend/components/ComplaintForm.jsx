@@ -1,7 +1,20 @@
 // ComplaintForm: intake panel for a new support case
 
-function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve, running, scenarios, onScenario, activeScenario }) {
+function ComplaintForm({
+  complaint,
+  setComplaint,
+  orderId,
+  setOrderId,
+  onResolve,
+  running,
+  scenarios,
+  onScenario,
+  activeScenario,
+  modelLabel,
+  agents,
+}) {
   const hasComplaint = Boolean(complaint.trim());
+  const agentCount = agents?.length || window.AGENTS.length;
 
   return (
     <aside className={'panel form-panel ' + (!hasComplaint ? 'form-panel-needs-input' : '')} aria-labelledby="complaint-form-title">
@@ -86,7 +99,7 @@ function ComplaintForm({ complaint, setComplaint, orderId, setOrderId, onResolve
             </>
           )}
         </button>
-        <div className="form-foot-hint mono">{window.AGENTS.length} agents - GLM-5.1 - live run</div>
+        <div className="form-foot-hint mono">{agentCount} agents - {modelLabel || 'configured model'} - live run</div>
       </div>
     </aside>
   );

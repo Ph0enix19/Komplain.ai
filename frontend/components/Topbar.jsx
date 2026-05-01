@@ -1,6 +1,6 @@
 // Topbar + global workspace controls
 
-function Topbar({ theme, setTheme, density, setDensity }) {
+function Topbar({ theme, setTheme, density, setDensity, modelLabel }) {
   return (
     <header className="topbar">
       <div className="topbar-left">
@@ -22,7 +22,7 @@ function Topbar({ theme, setTheme, density, setDensity }) {
       <div className="topbar-center">
         <div className="pipeline-status" role="status" aria-live="polite">
           <span className="status-dot" aria-hidden="true"></span>
-          <span className="mono topbar-status-main">GLM-5.1 live API</span>
+          <span className="mono topbar-status-main">{modelLabel || 'configured model'} live API</span>
           <span className="divider-v" aria-hidden="true"></span>
           <span className="mono topbar-status-sub">supervised support workspace</span>
         </div>

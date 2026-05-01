@@ -1,142 +1,273 @@
 [
   {
-    "id": "cb9d4622-19cb-4502-988b-5a28e0c8e83a",
-    "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-05-01T02:16:52.216523+00:00",
+    "id": "cedbdef1-88fa-43f0-acac-2bbef0b4901a",
+    "complaint_text": "Hi, my order ORD-2041 still has not arrived after two weeks. Tracking has not moved and I would like a refund if this cannot be resolved today.",
+    "created_at": "2026-05-01T14:59:12.088862+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
+      "sentiment": "negative",
+      "language": "EN"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order exists and has been shipped but delivery date is not recorded in the system."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.9,
+      "rationale": "Order has not arrived after two weeks with no movement in tracking. Customer has requested a refund as resolution for today.",
+      "requires_human_review": false
+    },
+    "response": {
+      "english": "Dear Aina, we sincerely apologize for the delay in receiving your order ORD-2041 for the Baju Kurung Moden. Since your order has not arrived after two weeks with no tracking updates, we have processed a refund of MYR 89.00 to your original payment method. The refund should appear in your account within 5-7 business days. Thank you for your patience.",
+      "bahasa_malaysia": "Salam sejahtera Aina, kami memohon maaf atas kelewatan pesanan anda ORD-2041 untuk Baju Kurung Moden. Memandangkan pesanan anda belum diterima selepas dua minggu dan tiada kemaskini pemantauan, kami telah memproses pemulangan wang sebanyak MYR 89.00 kepada kaedah pembayaran asal. Pemulangan wang sepatutnya muncul dalam akaun anda dalam masa 5-7 hari bekerja. Terima kasih atas kesabaran anda."
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Order refund approved as it hasn't arrived after two weeks with no tracking movement."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 219,
+        "output_tokens": 49,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.74
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 247,
+        "output_tokens": 35,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.5
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 389,
+        "output_tokens": 61,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.93
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 337,
+        "output_tokens": 221,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 4.96
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 295,
+        "output_tokens": 45,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.13
+      }
+    },
+    "total_latency": 12.26,
+    "total_tokens": 1898,
+    "estimated_cost_rm": 0.003796
+  },
+  {
+    "id": "4ddb476f-05b0-4da4-bbb8-11dca2fee008",
+    "complaint_text": "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
+    "created_at": "2026-05-01T15:05:46.574983+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
       "order_id": null,
-      "issue_type": "damaged_item",
-      "sentiment": "negative"
+      "issue_type": "wrong_item",
+      "sentiment": "neutral",
+      "language": "EN"
     },
     "context": {
       "order_found": false,
       "order_data": null,
-      "notes": "No order data available"
+      "notes": "No order found in system"
     },
     "reasoning": {
       "decision": "ESCALATE",
       "confidence": 0.8,
-      "rationale": "Order not found, missing context",
+      "rationale": "Order not found in system - requires manual review to locate correct order details",
       "requires_human_review": true
     },
     "response": {
-      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order. Our team will review your case and contact you soon.",
-      "bahasa_malaysia": "Maaf kerana barang anda rosak. Kami mengalami masalah mencari pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi."
+      "english": "Thank you for contacting us about your order for the KM-1003 Gaming Mouse. We apologize for the inconvenience caused by receiving the wrong item. Unfortunately, we're unable to locate your order in our system at the moment. This requires manual review from our team to find the correct order details. A customer service representative will contact you shortly to resolve this issue and arrange a replacement with the correct item.",
+      "bahasa_malaysia": "Terima kasih telah menghubungi kami mengenai pesanan tetikus Gaming Mouse KM-1003. Kami memohon maaf atas kelewatan dan kemungkinan anda menerima item yang salah. Pada masa ini, kami tidak dapat menemukan pesaran anda dalam sistem kami. Ini memerlukan tinjauan manual dari pasukan kami untuk menemukan butiran pesanan yang betul. Wakil khidmat pelanggan akan menghubungi anda sebentar lagi untuk menyelesaikan isu ini dan mengatur penggantian dengan item yang betul."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Order not found"
+      "supervisor_note": "Order not found in system requires manual review to locate correct order details"
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 160,
-        "output_tokens": 34,
-        "duration": 0.6
+        "input_tokens": 214,
+        "output_tokens": 45,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.35
       },
       "context": {
         "agent": "context",
-        "input_tokens": 157,
-        "output_tokens": 19,
-        "duration": 0.59
+        "input_tokens": 182,
+        "output_tokens": 25,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.17
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 255,
-        "output_tokens": 41,
-        "duration": 0.56
+        "input_tokens": 300,
+        "output_tokens": 54,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.73
       },
       "response": {
         "agent": "response",
-        "input_tokens": 198,
-        "output_tokens": 85,
-        "duration": 1.19
+        "input_tokens": 245,
+        "output_tokens": 225,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 8.93
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 181,
-        "output_tokens": 28,
-        "duration": 0.61
+        "input_tokens": 208,
+        "output_tokens": 43,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.59
       }
     },
-    "total_latency": 3.55,
-    "total_tokens": 1158,
-    "estimated_cost_rm": 0.002316
+    "total_latency": 15.77,
+    "total_tokens": 1541,
+    "estimated_cost_rm": 0.003082
   },
   {
-    "id": "ce25992c-f223-46df-bebd-f1e4cec98fee",
-    "complaint_text": "Eh, hello? My order got missing lah! I wait so long already, then check-check, things not there. How like this? Can help check or not? Really cannot tahan waiting like this, please settle fast leh.",
-    "created_at": "2026-05-01T02:17:06.967221+00:00",
+    "id": "ffadfcf8-604c-4e88-858e-bdb397b39846",
+    "complaint_text": "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
+    "created_at": "2026-05-01T15:08:59.331087+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
-      "order_id": null,
-      "issue_type": "delivery_delay",
-      "sentiment": "negative"
+      "order_id": "KM-1003",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral",
+      "language": "EN"
     },
     "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order data available"
+      "order_found": true,
+      "order_data": {
+        "order_id": "KM-1003",
+        "customer_name": "Nurul",
+        "item": "Gaming Mouse",
+        "status": "DELIVERED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": "2026-04-19"
+      },
+      "notes": "Order KM-1003 found for Nurul, status DELIVERED, item Gaming Mouse"
     },
     "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.9,
-      "rationale": "Order not found",
-      "requires_human_review": true
+      "decision": "RESHIP",
+      "confidence": 0.95,
+      "rationale": "Customer received wrong item but the order is found and shows as DELIVERED. A replacement (reshipment) is appropriate.",
+      "requires_human_review": false
     },
     "response": {
-      "english": "Sorry to hear that your order is missing. We're escalating this issue to our team for further investigation. Please allow us some time to look into this and we'll get back to you as soon as possible.",
-      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami akan meningkatkan isu ini kepada pasukan kami untuk penyiasatan lanjut. Sila beri kami sedikit masa untuk menyiasat hal ini dan kami akan hubungi anda secepat mungkin."
+      "english": "Dear Nurul, we sincerely apologize for the inconvenience caused. We've located your order KM-1003 for the Gaming Mouse and will arrange for a replacement to be sent to you immediately. Thank you for your patience.",
+      "bahasa_malaysia": "Salam hormat kepada Nurul, kami memohon maaf atas kejadian ini. Kami telah mengesan pesanan KM-1003 untuk Gaming Mouse dan akan menyusulan penghantaran semak item yang betula segera. Terima kasih atas sabaran anda."
     },
     "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Order not found, escalate to human review"
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Reship decision confirmed for wrong item replacement"
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 199,
-        "output_tokens": 33,
-        "duration": 0.53
+        "input_tokens": 214,
+        "output_tokens": 45,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 4.98
       },
       "context": {
         "agent": "context",
-        "input_tokens": 156,
-        "output_tokens": 19,
-        "duration": 0.58
+        "input_tokens": 247,
+        "output_tokens": 38,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.25
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 293,
-        "output_tokens": 38,
-        "duration": 0.68
+        "input_tokens": 387,
+        "output_tokens": 63,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.24
       },
       "response": {
         "agent": "response",
-        "input_tokens": 234,
-        "output_tokens": 112,
-        "duration": 1.43
+        "input_tokens": 338,
+        "output_tokens": 125,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.52
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 178,
-        "output_tokens": 33,
-        "duration": 0.6
+        "input_tokens": 301,
+        "output_tokens": 38,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.42
       }
     },
-    "total_latency": 3.82,
-    "total_tokens": 1295,
-    "estimated_cost_rm": 0.00259
+    "total_latency": 13.41,
+    "total_tokens": 1796,
+    "estimated_cost_rm": 0.003592
   },
   {
-    "id": "fec0d846-c8de-4a3f-8dce-a5ac0ba5249f",
-    "complaint_text": "Eh, hello? My order got missing lah! I wait so long already, then check-check, things not there. How like this? Can help check or not? Really cannot tahan waiting like this, please settle fast leh.\n\nOrder ID: ORD-2041",
-    "created_at": "2026-05-01T02:21:17.655019+00:00",
+    "id": "3af6cc5f-7d4f-4804-87eb-0987ddada5ae",
+    "complaint_text": "Hi team, saya punya order ORD-2041 dah dua minggu still tak sampai. Tracking stuck dekat KUL Hub, no movement at all. Kalau tak boleh settle today, saya nak refund ya.",
+    "created_at": "2026-05-01T22:32:54.456279+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
@@ -156,201 +287,163 @@
         "currency": "MYR",
         "delivery_date": null
       },
-      "notes": "Order exists"
+      "notes": "Order SHIPPED but with no delivery date provided. Customer complaint about delivery delay in Manglish."
     },
     "reasoning": {
-      "decision": "RESHIP",
+      "decision": "REFUND",
       "confidence": 0.8,
-      "rationale": "Order exists but has a delivery delay",
+      "rationale": "Customer has experienced significant delay (2 weeks) with tracking showing no movement at KUL Hub. Customer explicitly requested refund if issue can't be resolved immediately.",
       "requires_human_review": false
     },
     "response": {
-      "english": "Sorry to hear that your order is missing. We've checked and found that your order exists but has been delayed. We'll reship your Baju Kurung Moden - Maroon XL as soon as possible.",
-      "bahasa_malaysia": "Maaf kerana order anda hilang. Kami telah semak dan mendapati order anda wujud tetapi tertangguh. Kami akan menghantar semula Baju Kurung Moden - Maroon XL anda secepat mungkin."
+      "english": "Dear Aina, we sincerely apologize for the delay with your order ORD-2041. Since the tracking has shown no movement for two weeks and you've requested a refund, we're processing a full refund of MYR 89.00 to your original payment method. Please allow 3-5 business days for the refund to appear in your account. We appreciate your patience and understanding.",
+      "bahasa_malaysia": "Wahai Aina, kami memohon maaf yang sebenar atas kelewatan pesanan anda ORD-2041. Oleh sejuk penjejakannya tidak bergerak selama dua minggu dan anda telah meminta pemulangan wang, kami sedang memproses pemulangan penuh MYR 89.00 kepada kaedah pembayaran asal anda. Sila tunggu 3-5 hari bank kerja untuk pemulangan wang itu muncul dalam akaun anda. Kami menghargai sabar dan pemahaman anda."
     },
     "supervisor": {
       "requires_human_review": false,
       "priority": "normal",
-      "supervisor_note": "Decision to reship aligns with order status"
+      "supervisor_note": "System correctly identified refund case due to significant delivery delay. Customer explicitly requested refund if issue not resolved immediately."
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 222,
-        "output_tokens": 46,
-        "duration": 0.66
+        "input_tokens": 232,
+        "output_tokens": 51,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.67
       },
       "context": {
         "agent": "context",
-        "input_tokens": 230,
-        "output_tokens": 17,
-        "duration": 0.55
+        "input_tokens": 249,
+        "output_tokens": 39,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.26
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 382,
-        "output_tokens": 41,
-        "duration": 0.69
+        "input_tokens": 408,
+        "output_tokens": 69,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.6
       },
       "response": {
         "agent": "response",
-        "input_tokens": 313,
-        "output_tokens": 112,
-        "duration": 1.0
+        "input_tokens": 362,
+        "output_tokens": 220,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.57
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 249,
-        "output_tokens": 34,
-        "duration": 0.55
+        "input_tokens": 307,
+        "output_tokens": 50,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.38
       }
     },
-    "total_latency": 3.45,
-    "total_tokens": 1646,
-    "estimated_cost_rm": 0.003292
+    "total_latency": 9.48,
+    "total_tokens": 1987,
+    "estimated_cost_rm": 0.003974
   },
   {
-    "id": "1fe6e124-8833-45b8-b600-579f19dceff2",
-    "complaint_text": "hello how are youy\n\nOrder ID: ORD-2041",
-    "created_at": "2026-05-01T02:21:37.448697+00:00",
+    "id": "620e79f4-a77d-4f63-be48-18befd219c56",
+    "complaint_text": "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
+    "created_at": "2026-05-01T22:33:21.104347+00:00",
     "status": "COMPLETED",
     "intake": {
       "customer_name": null,
-      "order_id": "ORD-2041",
-      "issue_type": "unknown",
-      "sentiment": "neutral",
+      "order_id": "KM-1003",
+      "issue_type": "wrong_item",
+      "sentiment": "negative",
       "language": "EN"
     },
     "context": {
       "order_found": true,
       "order_data": {
-        "order_id": "ORD-2041",
-        "customer_name": "Aina",
-        "item": "Baju Kurung Moden - Maroon XL",
-        "status": "SHIPPED",
+        "order_id": "KM-1003",
+        "customer_name": "Nurul",
+        "item": "Gaming Mouse",
+        "status": "DELIVERED",
         "total": 89.0,
         "currency": "MYR",
-        "delivery_date": null
+        "delivery_date": "2026-04-19"
       },
-      "notes": "Order located"
+      "notes": "Customer received Gaming Mouse order KM-1003 but reported wrong item"
     },
     "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.8,
-      "rationale": "Unclear complaint",
-      "requires_human_review": true
+      "decision": "RESHIP",
+      "confidence": 0.9,
+      "rationale": "Customer clearly received the wrong item (Gaming Mouse) for their order KM-1003 and has explicitly requested a replacement with the correct item.",
+      "requires_human_review": false
     },
     "response": {
-      "english": "Hello Aina, thank you for reaching out. We've located your order (ORD-2041) and see that it's been shipped. However, we need more information about your concern. Our team will be in touch soon to assist you further.",
-      "bahasa_malaysia": "Hai Aina, terima kasih kerana menghubungi kami. Kami telah menjumpai pesanan anda (ORD-2041) dan melihat bahawa ia telah dihantar. Walau bagaimanapun, kami perlukan maklumat lebih lanjut mengenai kebimbangan anda. Pasukan kami akan menghubungi anda tidak lama lagi untuk membantu anda."
+      "english": "Dear Nurul, we sincerely apologize for the inconvenience caused. We confirm that you received the wrong item for your order KM-1003. We will arrange to reship the correct Gaming Mouse to you immediately. Thank you for your patience.",
+      "bahasa_malaysia": "Salam hormat kepada Nurul, kami memohon maaf atas kemudaratan yang berlaku. Kami mengesahkan bahawa anda telah menerima item yang salah untuk pesanan KM-1003. Kami akan mengatur untuk menghantar semula Gaming Mouse yang betul kepada anda segera. Terima kasih atas sabaran anda."
     },
     "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Unclear complaint regarding shipped order"
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Case resolved with re-shipment decision, confident in the automated handling."
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 180,
+        "input_tokens": 214,
+        "output_tokens": 45,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.44
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 247,
+        "output_tokens": 33,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.22
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 382,
+        "output_tokens": 67,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.5
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 336,
+        "output_tokens": 143,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.84
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 299,
         "output_tokens": 43,
-        "duration": 0.62
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 227,
-        "output_tokens": 17,
-        "duration": 0.57
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 337,
-        "output_tokens": 38,
-        "duration": 0.52
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 268,
-        "output_tokens": 152,
-        "duration": 1.21
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 246,
-        "output_tokens": 31,
-        "duration": 0.54
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 1.4
       }
     },
-    "total_latency": 3.46,
-    "total_tokens": 1539,
-    "estimated_cost_rm": 0.003078
-  },
-  {
-    "id": "6e725655-a49d-4982-9ab1-135397953c93",
-    "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-05-01T02:22:06.412320+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": null,
-      "issue_type": "damaged_item",
-      "sentiment": "negative",
-      "language": "BM"
-    },
-    "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order data"
-    },
-    "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.8,
-      "rationale": "Order not found, unclear issue",
-      "requires_human_review": true
-    },
-    "response": {
-      "english": "Sorry to hear that your item is damaged. We're having trouble locating your order details. Our team will review your case and contact you soon.",
-      "bahasa_malaysia": "Sesiapa menyesal kerana barang anda rosak. Kami menghadapi masalah mencari butiran pesanan anda. Pasukan kami akan meninjau kes anda dan menghubungi anda tidak lama lagi."
-    },
-    "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Order not found, unclear issue"
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 176,
-        "output_tokens": 41,
-        "duration": 0.58
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 164,
-        "output_tokens": 18,
-        "duration": 0.52
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 261,
-        "output_tokens": 41,
-        "duration": 0.68
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 197,
-        "output_tokens": 92,
-        "duration": 1.17
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 180,
-        "output_tokens": 31,
-        "duration": 0.49
-      }
-    },
-    "total_latency": 3.44,
-    "total_tokens": 1201,
-    "estimated_cost_rm": 0.002402
+    "total_latency": 8.4,
+    "total_tokens": 1809,
+    "estimated_cost_rm": 0.003618
   }
 ]

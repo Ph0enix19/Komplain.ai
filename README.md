@@ -61,7 +61,7 @@ The MVP stores only the latest five complaints and related agent events in JSON 
 - **Frontend:** Static React 18 UMD app on Vercel.
 - **Storage:** JSON flat files for the MVP.
 - **Pipeline:** Intake -> Context -> Reasoning -> Response -> Supervisor.
-- **LLM:** Provider-agnostic OpenAI-compatible client. The project is designed for GLM / z.ai and currently uses Groq temporarily.
+- **LLM:** Provider-agnostic OpenAI-compatible client. Z.ai / GLM is the primary provider, with Groq retained as fallback.
 
 ---
 
@@ -128,9 +128,10 @@ The MVP does not send messages to customers automatically; approval is represent
 
 The LLM client in `backend/llm.py` is provider-agnostic and OpenAI-compatible.
 
+- `LLM_PROVIDER=zai` uses Z.ai / GLM with `ZAI_*` environment variables and reports the configured `ZAI_MODEL` to the frontend through `/api/health`.
 - `LLM_PROVIDER=groq` uses Groq with `GROQ_*` environment variables.
-- `LLM_PROVIDER=ilmu` uses the GLM-oriented ILMU configuration with `ILMU_*` environment variables.
-- The system is designed for GLM / z.ai, while the current temporary deployment uses Groq.
+- `LLM_PROVIDER=ilmu` remains available for the legacy GLM-oriented ILMU configuration with `ILMU_*` environment variables.
+- When Z.ai is selected, timeout, rate limit, provider, missing-key, or invalid-response failures fall back to Groq.
 - Structured output is requested with JSON mode where supported.
 - If JSON mode fails or returns unusable content, the client retries safer request shapes and can parse key-value fallback output.
 - Agents also include deterministic fallback logic for timeouts, invalid structured output, or provider failures.
@@ -143,7 +144,7 @@ This gives the MVP practical failover behavior at both the LLM request layer and
 
 - **Backend:** FastAPI, Uvicorn, Pydantic v2, HTTPX, Python 3.13.
 - **Frontend:** React 18 UMD, ReactDOM UMD, Babel Standalone, plain CSS.
-- **LLM:** OpenAI-compatible chat completions client; Groq currently, GLM-oriented provider path available.
+- **LLM:** OpenAI-compatible chat completions client; Z.ai / GLM primary, Groq fallback.
 - **Storage:** JSON files in `data/`.
 - **Testing:** pytest, pytest-asyncio.
 - **Quality / security:** ruff, pip-audit, detect-secrets.
@@ -155,7 +156,8 @@ This gives the MVP practical failover behavior at both the LLM request layer and
 ### Prerequisites
 
 - Python 3.13+
-- A Groq API key for the current default provider
+- A Z.ai API key for the primary GLM provider
+- A Groq API key for fallback
 - A modern browser
 
 ### 1. Clone the repository
@@ -195,7 +197,13 @@ pip install -r requirements-dev.txt
 Create a local `.env` file in the repository root:
 
 ```env
-LLM_PROVIDER=groq
+LLM_PROVIDER=zai
+ZAI_API_KEY=your_zai_key_here
+ZAI_BASE_URL=https://api.z.ai/api/coding/paas/v4
+ZAI_MODEL=your_current_glm_model_here
+ZAI_TIMEOUT=60
+ZAI_THINKING_TYPE=disabled
+
 GROQ_API_KEY=your_groq_key_here
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=llama-3.1-8b-instant
@@ -203,7 +211,7 @@ GROQ_TIMEOUT=180
 AGENT_LLM_TIMEOUT_SECONDS=180
 ```
 
-For GLM-oriented configuration, use the `ILMU_*` variables shown in `.env.example` and set `LLM_PROVIDER=ilmu`.
+No provider API keys should be committed. Use `.env` locally and hosting environment variables in deployment.
 
 ### 5. Start the backend
 
@@ -293,8 +301,9 @@ The security job is marked `continue-on-error: true`, so advisories are visible 
 Optional real-provider smoke testing:
 
 ```powershell
-$env:LLM_PROVIDER = "groq"
-$env:GROQ_API_KEY = "your_real_key"
+$env:LLM_PROVIDER = "zai"
+$env:ZAI_API_KEY = "your_real_zai_key"
+$env:GROQ_API_KEY = "your_real_groq_fallback_key"
 python -m pytest tests/ --llm -v
 ```
 
@@ -327,7 +336,11 @@ uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 Render environment variables:
 
 - `PYTHON_VERSION=3.13.2`
-- `LLM_PROVIDER=groq`
+- `LLM_PROVIDER=zai`
+- `ZAI_API_KEY`
+- `ZAI_BASE_URL`
+- `ZAI_MODEL`
+- `ZAI_TIMEOUT`
 - `GROQ_API_KEY`
 - `GROQ_BASE_URL`
 - `GROQ_MODEL`

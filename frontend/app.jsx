@@ -14,6 +14,7 @@ const API_BASES = (() => {
 })();
 
 let activeApiBase = API_BASES[0];
+const DEFAULT_MODEL_LABEL = 'configured model';
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
@@ -22,7 +23,39 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "traceStyle": "stepper"
 }/*EDITMODE-END*/;
 
-function adjustTone(text, tone) {
+function modelLabelFromHealth(payload) {
+  return payload?.llm_model || window.KOMPLAIN_MODEL_LABEL || DEFAULT_MODEL_LABEL;
+}
+
+function replaceModelToken(text, modelLabel) {
+  return String(text || '')
+    .replace(/\{model\}/g, modelLabel)
+    .replace(/\bGLM-5\.1\b/g, modelLabel);
+}
+
+function getDisplayAgents(modelLabel) {
+  return window.AGENTS.map((agent) => ({
+    ...agent,
+    role: replaceModelToken(agent.role, modelLabel),
+  }));
+}
+
+function materializeDemoPipeline(pipeline, modelLabel) {
+  if (!pipeline) return pipeline;
+  return {
+    ...pipeline,
+    events: pipeline.events.map((event) => ({
+      ...event,
+      message: replaceModelToken(event.message, modelLabel),
+    })),
+  };
+}
+
+function shouldWarnForConfidence(value) {
+  return Number(value || 0) < 0.8;
+}
+
+function adjustTone(text, tone, modelLabel = DEFAULT_MODEL_LABEL) {
   if (tone === 'formal') {
     return text
       .replace(/^Hi there,/, 'Dear Customer,')
@@ -31,8 +64,8 @@ function adjustTone(text, tone) {
   }
   if (tone === 'technical') {
     return text
-      .replace(/^Hi there,\n\n/, '[AUTO-DRAFT - GLM-5.1]\n\n')
-      .replace(/^Hi,\n\n/, '[AUTO-DRAFT - GLM-5.1]\n\n');
+      .replace(/^Hi there,\n\n/, `[AUTO-DRAFT - ${modelLabel}]\n\n`)
+      .replace(/^Hi,\n\n/, `[AUTO-DRAFT - ${modelLabel}]\n\n`);
   }
   return text;
 }
@@ -74,7 +107,7 @@ function inferLanguage(text) {
 
 function buildCaseStatus(record) {
   if (!record.context.order_found && !record.intake.order_id) return 'pending';
-  return record.reasoning.requires_human_review ? 'review' : 'resolved';
+  return record.reasoning.requires_human_review && shouldWarnForConfidence(record.reasoning.confidence) ? 'review' : 'resolved';
 }
 
 function buildAmount(record) {
@@ -107,6 +140,7 @@ function buildResolution(record) {
     response_bm: record.response.bahasa_malaysia,
     amount: buildAmount(record),
     requires_review: record.reasoning.requires_human_review,
+    review_warning: record.reasoning.requires_human_review && shouldWarnForConfidence(record.reasoning.confidence),
     total_latency: record.total_latency || 0,
     total_tokens: record.total_tokens || 0,
     estimated_cost_rm: record.estimated_cost_rm || 0,
@@ -133,7 +167,7 @@ function buildCaseFromRecord(record) {
   };
 }
 
-function buildTimelineEvents(apiEvents) {
+function buildTimelineEvents(apiEvents, modelLabel = DEFAULT_MODEL_LABEL) {
   const events = [];
   let cursor = 0;
 
@@ -148,6 +182,9 @@ function buildTimelineEvents(apiEvents) {
       input_tokens: event.input_tokens ?? event.payload?.input_tokens ?? 0,
       output_tokens: event.output_tokens ?? event.payload?.output_tokens ?? 0,
       execution_mode: event.execution_mode ?? event.payload?.execution_mode ?? 'unknown',
+      provider_used: event.provider_used ?? event.payload?.provider_used,
+      fallback_used: Boolean(event.fallback_used ?? event.payload?.fallback_used),
+      fallback_reason: event.fallback_reason ?? event.payload?.fallback_reason,
     };
 
     events.push({
@@ -156,7 +193,7 @@ function buildTimelineEvents(apiEvents) {
       endAt: finishedAt,
       agent: event.step,
       status: isContextFailure ? 'failed' : 'completed',
-      message: event.message,
+      message: replaceModelToken(event.message, modelLabel),
       output: event.payload,
       ...telemetry,
     });
@@ -190,7 +227,7 @@ async function apiFetch(path, options) {
   throw lastError || new Error('API request failed.');
 }
 
-async function pollForCompletion(complaintId, onEvents) {
+async function pollForCompletion(complaintId, onEvents, modelLabel = DEFAULT_MODEL_LABEL) {
   const pollIntervalMs = 1500;
   const maxWaitMs = 8 * 60 * 1000;
   const startedAt = Date.now();
@@ -208,7 +245,7 @@ async function pollForCompletion(complaintId, onEvents) {
       ]);
       record = next;
       if (typeof onEvents === 'function') {
-        onEvents(buildTimelineEvents(apiEvents));
+        onEvents(buildTimelineEvents(apiEvents, modelLabel));
       }
     } catch (error) {
       console.warn('Polling tick failed, retrying', error);
@@ -223,6 +260,8 @@ function App() {
   const [density, setDensity] = useState(TWEAK_DEFAULTS.density);
   const [tone, setTone] = useState(TWEAK_DEFAULTS.tone);
   const [traceStyle, setTraceStyle] = useState(TWEAK_DEFAULTS.traceStyle);
+  const [modelLabel, setModelLabel] = useState(window.KOMPLAIN_MODEL_LABEL || DEFAULT_MODEL_LABEL);
+  const agents = React.useMemo(() => getDisplayAgents(modelLabel), [modelLabel]);
 
   const [tweaksHostActive, setTweaksHostActive] = useState(false);
   const [tweaksUserOpen, setTweaksUserOpen] = useState(false);
@@ -279,6 +318,12 @@ function App() {
 
     async function loadComplaints() {
       try {
+        try {
+          const health = await apiFetch('/health');
+          if (!cancelled) setModelLabel(modelLabelFromHealth(health));
+        } catch (error) {
+          console.warn('Could not load model metadata', error);
+        }
         const records = await apiFetch('/complaints');
         if (cancelled) return;
         const completed = records.filter((record) => record && record.intake && record.context && record.reasoning && record.response);
@@ -354,19 +399,17 @@ function App() {
       });
 
       liveCaseId.current = created.id;
-      setScenarioKey(orderId ? 'clean' : scenarioKey);
-
       const final = await pollForCompletion(created.id, (liveEvents) => {
         setEvents(liveEvents);
         setCaseEvents((prev) => ({ ...prev, [created.id]: liveEvents }));
-      });
+      }, modelLabel);
 
       if (final.status === 'FAILED') {
         throw new Error(final.error || 'Pipeline failed');
       }
 
       const apiEvents = await apiFetch(`/complaints/${final.id}/events`);
-      const timelineEvents = buildTimelineEvents(apiEvents);
+      const timelineEvents = buildTimelineEvents(apiEvents, modelLabel);
       const nextResolution = buildResolution(final);
       const nextCase = buildCaseFromRecord(final);
       const lastTimelineEvent = timelineEvents[timelineEvents.length - 1];
@@ -388,7 +431,7 @@ function App() {
     } catch (error) {
       console.error(error);
       setRunning(false);
-      setErrorMessage('Could not resolve complaint. Start the local backend with a valid ILMU setup, or confirm the hosted API is reachable.');
+      setErrorMessage('Could not resolve complaint. Start the local backend with a valid LLM setup, or confirm the hosted API is reachable.');
       setEditingResolution(false);
       setEvents([{ at: 0, agent: 'supervisor', status: 'failed', message: 'Request to backend failed' }]);
     }
@@ -457,7 +500,7 @@ function App() {
 
     try {
       const apiEvents = await apiFetch(`/complaints/${caseItem.complaintId}/events`);
-      setCaseEvents((prev) => ({ ...prev, [caseItem.complaintId]: buildTimelineEvents(apiEvents) }));
+      setCaseEvents((prev) => ({ ...prev, [caseItem.complaintId]: buildTimelineEvents(apiEvents, modelLabel) }));
     } catch (error) {
       console.error(error);
     }
@@ -486,8 +529,8 @@ function App() {
       modalEvents = events;
       modalComplaint = complaint;
     } else {
-      const key = modalCase.resolution === 'REFUND' ? 'manglish' : modalCase.resolution === 'RESHIP' ? 'clean' : 'edge';
-      const pipeline = window.PIPELINES[key];
+      const key = modalCase.resolution === 'REFUND' ? 'manglish' : modalCase.resolution === 'RESHIP' ? 'wrong' : 'edge';
+      const pipeline = materializeDemoPipeline(window.PIPELINES[key], modelLabel);
       modalResolution = pipeline.resolution;
       modalEvents = pipeline.events;
       modalComplaint = modalCase.preview;
@@ -497,8 +540,8 @@ function App() {
 
   const approveReplies = resolution ? {
     ...resolution,
-    response_en: adjustTone(editingResolution ? resolutionDraft.response_en : resolution.response_en, tone),
-    response_bm: adjustTone(editingResolution ? resolutionDraft.response_bm : resolution.response_bm, tone),
+    response_en: adjustTone(editingResolution ? resolutionDraft.response_en : resolution.response_en, tone, modelLabel),
+    response_bm: adjustTone(editingResolution ? resolutionDraft.response_bm : resolution.response_bm, tone, modelLabel),
   } : null;
 
   return (
@@ -508,6 +551,7 @@ function App() {
         setTheme={wrap(setTheme, 'theme')}
         density={density}
         setDensity={wrap(setDensity, 'density')}
+        modelLabel={modelLabel}
       />
 
       <CommandCenter
@@ -522,6 +566,7 @@ function App() {
         setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
         onResolve={resolveComplaint}
         canResolve={Boolean(complaint.trim())}
+        agents={agents}
       />
 
       <div className="workspace">
@@ -535,6 +580,8 @@ function App() {
           scenarios={window.SCENARIOS}
           onScenario={loadScenario}
           activeScenario={scenarioKey}
+          modelLabel={modelLabel}
+          agents={agents}
         />
         <AgentTracePanel
           events={events}
@@ -542,6 +589,7 @@ function App() {
           scenario={scenarioKey}
           traceStyle={traceStyle}
           totalDuration={totalDuration}
+          agents={agents}
         />
         <ResolutionCard
           running={running}
@@ -575,6 +623,7 @@ function App() {
           resolution={modalResolution}
           scenarioComplaint={modalComplaint}
           orderData={modalOrderData}
+          agents={agents}
           onClose={() => setModalCase(null)}
         />
       )}
