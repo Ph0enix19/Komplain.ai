@@ -9,9 +9,10 @@ const API_BASES = (() => {
   if (window.KOMPLAIN_API_BASE) return [window.KOMPLAIN_API_BASE];
 
   const isLocalFrontend = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
-  return isLocalFrontend
-    ? [LOCAL_API_BASE, HOSTED_API_BASE]
-    : [HOSTED_API_BASE];
+  const isVercelFrontend = window.location.hostname.endsWith('.vercel.app');
+  if (isLocalFrontend) return [LOCAL_API_BASE, HOSTED_API_BASE];
+  if (isVercelFrontend) return [`${window.location.origin}/api`, HOSTED_API_BASE];
+  return [HOSTED_API_BASE];
 })();
 
 let activeApiBase = API_BASES[0];
