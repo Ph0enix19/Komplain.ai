@@ -417,8 +417,7 @@ Komplain.ai/
 |-- requirements.txt
 |-- requirements-dev.txt
 |-- pytest.ini
-|-- postman_collection.json
-|-- netlify.toml
+|-- postman_qatd_collection.json
 |-- .env.example
 |-- .github/
 |   `-- workflows/ci.yml
@@ -479,7 +478,7 @@ Komplain.ai/
 | Pitch deck | [docs/PitchDeck.pdf](./docs/PitchDeck.pdf) |
 | Pitch deck editable source | [docs/PitchDeck.pptx](./docs/PitchDeck.pptx) |
 | Dashboard screenshot | [docs/screenshots/dashboard.png](./docs/screenshots/dashboard.png) |
-| Postman collection | [postman_collection.json](./postman_collection.json) |
+| QATD Postman evidence collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
 
 ---
 

@@ -16,12 +16,14 @@ __pycache__/
 .tmp/
 .test-tmp/
 test-tmp/
+pytest-cache-files-*/
 
 # OS / Editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+.claude/
 
 # Build artifacts
 dist/

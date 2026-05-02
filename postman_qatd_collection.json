@@ -1,0 +1,555 @@
+{
+  "info": {
+    "name": "Komplain.ai QATD Evidence Tests",
+    "description": "Postman collection for QATD screenshot evidence. Validates the current FastAPI contract: complaint creation returns a PROCESSING placeholder, completed records are fetched by polling, and agent telemetry/events are exposed after the background pipeline completes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://komplaintest.onrender.com/api",
+      "type": "string"
+    },
+    {
+      "key": "complaintId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Health payload has operational fields\", function () {",
+              "  pm.expect(json).to.have.property(\"status\", \"ok\");",
+              "  pm.expect(json).to.have.property(\"time\");",
+              "  pm.expect(json).to.have.property(\"complaints_count\");",
+              "  pm.expect(json).to.have.property(\"llm_provider\");",
+              "  pm.expect(json).to.have.property(\"llm_model\");",
+              "});",
+              "",
+              "pm.test(\"Provider is one of supported values\", function () {",
+              "  pm.expect(json.llm_provider).to.be.oneOf([\"zai\", \"groq\", \"ilmu\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - LLM Smoke Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"LLM smoke response has provider metadata\", function () {",
+              "  pm.expect(json).to.have.property(\"model\");",
+              "  pm.expect(json).to.have.property(\"output\");",
+              "  pm.expect(json.output).to.be.a(\"string\").and.not.empty;",
+              "  pm.expect(json).to.have.property(\"provider_used\");",
+              "  pm.expect(json).to.have.property(\"fallback_used\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Reply with one short sentence confirming Komplain.ai is online.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/test-llm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "test-llm"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Reject Empty LLM Prompt",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422 validation error\", function () {",
+              "  pm.response.to.have.status(422);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/test-llm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "test-llm"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Create Complaint Placeholder",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Create complaint returns PROCESSING placeholder\", function () {",
+              "  pm.expect(json).to.have.property(\"id\");",
+              "  pm.expect(json).to.have.property(\"complaint_text\");",
+              "  pm.expect(json).to.have.property(\"created_at\");",
+              "  pm.expect(json).to.have.property(\"status\", \"PROCESSING\");",
+              "});",
+              "",
+              "pm.collectionVariables.set(\"complaintId\", json.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"complaint_text\": \"My Bluetooth speaker arrived with a broken screen and I want help with this order.\",\n  \"order_id\": \"KM-1001\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/complaints",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Fetch Complaint Until Completed",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = pm.collectionVariables.get(\"complaintId\");",
+              "if (!id) {",
+              "  throw new Error(\"Run request 04 first so complaintId is available.\");",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Complaint record has valid status\", function () {",
+              "  pm.expect(json.status).to.be.oneOf([\"PROCESSING\", \"COMPLETED\", \"FAILED\"]);",
+              "});",
+              "",
+              "pm.test(\"Completed complaint has current schema and telemetry\", function () {",
+              "  if (json.status !== \"COMPLETED\") {",
+              "    console.warn(\"Complaint is still processing. Wait a few seconds and rerun this request for QATD screenshot evidence.\");",
+              "    return;",
+              "  }",
+              "  pm.expect(json).to.have.property(\"intake\");",
+              "  pm.expect(json.intake).to.have.property(\"language\");",
+              "  pm.expect(json.intake.language).to.be.oneOf([\"EN\", \"BM\", \"Manglish\"]);",
+              "  pm.expect(json).to.have.property(\"context\");",
+              "  pm.expect(json.context).to.have.property(\"order_found\");",
+              "  pm.expect(json).to.have.property(\"reasoning\");",
+              "  pm.expect(json.reasoning.decision).to.be.oneOf([\"REFUND\", \"RESHIP\", \"ESCALATE\", \"DISMISS\"]);",
+              "  pm.expect(json.reasoning.confidence).to.be.within(0, 1);",
+              "  pm.expect(json).to.have.property(\"response\");",
+              "  pm.expect(json.response.english).to.be.a(\"string\").and.not.empty;",
+              "  pm.expect(json.response.bahasa_malaysia).to.be.a(\"string\").and.not.empty;",
+              "  pm.expect(json).to.have.property(\"supervisor\");",
+              "  pm.expect(json.supervisor).to.have.property(\"requires_human_review\");",
+              "  pm.expect(json.supervisor.priority).to.be.oneOf([\"normal\", \"high\"]);",
+              "  pm.expect(json).to.have.property(\"agent_metrics\");",
+              "  pm.expect(json).to.have.property(\"total_latency\");",
+              "  pm.expect(json).to.have.property(\"total_tokens\");",
+              "  pm.expect(json).to.have.property(\"estimated_cost_rm\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints/{{complaintId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints",
+            "{{complaintId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Fetch Agent Events",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = pm.collectionVariables.get(\"complaintId\");",
+              "if (!id) {",
+              "  throw new Error(\"Run request 04 first so complaintId is available.\");",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const events = pm.response.json();",
+              "",
+              "pm.test(\"Events response is an array\", function () {",
+              "  pm.expect(events).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"Completed pipeline exposes all five agent steps\", function () {",
+              "  if (events.length < 5) {",
+              "    console.warn(\"Fewer than 5 events returned. Pipeline may still be processing; rerun this request.\");",
+              "    return;",
+              "  }",
+              "  const steps = events.map((event) => event.step);",
+              "  pm.expect(steps).to.include.members([\"intake\", \"context\", \"reasoning\", \"response\", \"supervisor\"]);",
+              "});",
+              "",
+              "pm.test(\"Events include trace telemetry fields\", function () {",
+              "  events.forEach((event) => {",
+              "    pm.expect(event).to.have.property(\"id\");",
+              "    pm.expect(event).to.have.property(\"complaint_id\");",
+              "    pm.expect(event).to.have.property(\"step\");",
+              "    pm.expect(event).to.have.property(\"message\");",
+              "    pm.expect(event).to.have.property(\"created_at\");",
+              "    pm.expect(event).to.have.property(\"payload\");",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints/{{complaintId}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints",
+            "{{complaintId}}",
+            "events"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 - List Latest Complaints",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const complaints = pm.response.json();",
+              "",
+              "pm.test(\"Complaint list is capped to latest five records\", function () {",
+              "  pm.expect(complaints).to.be.an(\"array\");",
+              "  pm.expect(complaints.length).to.be.at.most(5);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 - Missing Complaint Returns 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () {",
+              "  pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"Error payload is returned\", function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"detail\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints/qatd-missing-complaint-id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints",
+            "qatd-missing-complaint-id"
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 - Reject Too-Short Complaint",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422 validation error\", function () {",
+              "  pm.response.to.have.status(422);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"complaint_text\": \"Hey\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/complaints",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10 - SSE Stream Smoke Check",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = pm.collectionVariables.get(\"complaintId\");",
+              "if (!id) {",
+              "  throw new Error(\"Run request 04 first so complaintId is available.\");",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"SSE response includes done event\", function () {",
+              "  pm.expect(pm.response.text()).to.include(\"event: done\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "text/event-stream"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints/{{complaintId}}/stream",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints",
+            "{{complaintId}}",
+            "stream"
+          ]
+        }
+      }
+    }
+  ]
+}

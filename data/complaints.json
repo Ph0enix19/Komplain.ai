@@ -1,197 +1,5 @@
 [
   {
-    "id": "08abcb80-cc56-4d1b-8261-78f91cd0589c",
-    "complaint_text": "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
-    "created_at": "2026-05-02T07:01:57.618343+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "KM-1003",
-      "issue_type": "wrong_item",
-      "sentiment": "negative",
-      "language": "EN"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "KM-1003",
-        "customer_name": "Nurul",
-        "item": "Gaming Mouse",
-        "status": "DELIVERED",
-        "total": 89.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-19"
-      },
-      "notes": "Order exists"
-    },
-    "reasoning": {
-      "decision": "RESHIP",
-      "confidence": 0.9,
-      "rationale": "wrong item delivered",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Nurul, sorry to hear that you received the wrong item. We are arranging for a replacement of the correct KM-1003 Gaming Mouse to be sent to you.",
-      "bahasa_malaysia": "Dear Nurul, minta maaf atas kesilapan penghantaran item yang salah. Kami sedang mengatur untuk menghantar semula item yang betul iaitu Tetikus Gaming KM-1003 kepada anda."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "Auto-reship decision due to wrong item"
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 195,
-        "output_tokens": 40,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 3.67
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 228,
-        "output_tokens": 17,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.94
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 352,
-        "output_tokens": 37,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 2.39
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 281,
-        "output_tokens": 100,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 5.19
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 245,
-        "output_tokens": 34,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 4.24
-      }
-    },
-    "total_latency": 17.43,
-    "total_tokens": 1529,
-    "estimated_cost_rm": 0.003058
-  },
-  {
-    "id": "04de0064-6460-46fd-882f-3bf5660ff262",
-    "complaint_text": "My order KM-1001 arrived with a broken screen. Please help me get a refund.",
-    "created_at": "2026-05-02T07:06:16.677488+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "KM-1001",
-      "issue_type": "damaged_item",
-      "sentiment": "negative",
-      "language": "EN"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "KM-1001",
-        "customer_name": "Aisyah",
-        "item": "Bluetooth Speaker",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-20"
-      },
-      "notes": "Order found, proceeding with complaint"
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.9,
-      "rationale": "Damaged item delivered",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Aisyah, sorry to hear that your Bluetooth Speaker (order KM-1001) arrived with a broken screen. We're happy to inform you that we're processing a refund of MYR 129.00. You will receive the refund within the next 7-10 working days.",
-      "bahasa_malaysia": "Dear Aisyah, kami minta maaf kerana Speaker Bluetooth (tempahan KM-1001) anda telah tiba dengan skrin pecah. Kami gembira mengumumkan bahawa kami sedang memproses bayaran balik MYR 129.00. Anda akan menerima bayaran balik dalam tempoh 7-10 hari bekerja akan datang."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "Refund approved for damaged item"
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 186,
-        "output_tokens": 45,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.11
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 228,
-        "output_tokens": 21,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.06
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 347,
-        "output_tokens": 38,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.01
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 276,
-        "output_tokens": 157,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.93
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 249,
-        "output_tokens": 31,
-        "execution_mode": "fallback",
-        "provider_used": "groq",
-        "fallback_used": true,
-        "fallback_reason": "rate_limit",
-        "duration": 1.31
-      }
-    },
-    "total_latency": 6.42,
-    "total_tokens": 1578,
-    "estimated_cost_rm": 0.003156
-  },
-  {
     "id": "f2af1d92-c6ee-4d58-b9d9-305d8320f55c",
     "complaint_text": "My order KM-1001 arrived with a broken screen. Please help me get a refund.",
     "created_at": "2026-05-02T07:09:16.673225+00:00",
@@ -464,5 +272,179 @@
     "total_latency": 21.23,
     "total_tokens": 1886,
     "estimated_cost_rm": 0.003772
+  },
+  {
+    "id": "1870c5d2-7d43-4a76-bf37-e441538b3fb2",
+    "complaint_text": "Saya nak refund. Barang rosak.",
+    "created_at": "2026-05-02T10:32:57.946005+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "damaged_item",
+      "sentiment": "negative",
+      "language": "BM"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order ID provided; order lookup returned null."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.95,
+      "rationale": "Customer claims item is damaged and requests a refund, but no order ID or customer name was provided and the order lookup failed.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "We are so sorry to hear that your item arrived damaged. We want to resolve this and process your request as quickly as possible, but we need a few more details. We have escalated your case to our customer support team, who will reach out to you shortly to help verify your order and assist you with the refund.",
+      "bahasa_malaysia": "Kita amat kesal mendengar bahawa barang anda telah rosak. Kami ingin menyelesaikan dan memproses permintaan anda secepat mungkin, tetapi kami memerlukan butiran lanjut. Kami telah menaiktaraf kes anda kepada pasukan sokongan pelanggan kami, dan mereka akan menghubungi anda tidak lama lagi untuk membantu mengesahkan pesanan dan membantu anda dengan proses bayaran balik."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Automated escalation with high confidence (0.95). Order lookup failed due to missing details (no order ID or customer name provided). Manual intervention required to locate the order and process the damage/refund claim."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 190,
+        "output_tokens": 50,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.23
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 178,
+        "output_tokens": 29,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.21
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 281,
+        "output_tokens": 64,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.62
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 235,
+        "output_tokens": 188,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 7.08
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 217,
+        "output_tokens": 71,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.0
+      }
+    },
+    "total_latency": 18.14,
+    "total_tokens": 1503,
+    "estimated_cost_rm": 0.003006
+  },
+  {
+    "id": "d05f0a2a-09bc-4b1c-a67a-f793a165a595",
+    "complaint_text": "Hi team, saya punya order ORD-2041 dah dua minggu still tak sampai. Tracking stuck dekat KUL Hub, no movement at all. Kalau tak boleh settle today, saya nak refund ya.",
+    "created_at": "2026-05-02T10:34:36.795324+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-2041",
+      "issue_type": "delivery_delay",
+      "sentiment": "negative",
+      "language": "Manglish"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-2041",
+        "customer_name": "Aina",
+        "item": "Baju Kurung Moden - Maroon XL",
+        "status": "SHIPPED",
+        "total": 89.0,
+        "currency": "MYR",
+        "delivery_date": null
+      },
+      "notes": "Order found for Aina. Issue: delivery_delay. Status: SHIPPED. No delivery date assigned. Negative sentiment."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.95,
+      "rationale": "Tracking is stuck and has been delayed for two weeks. The customer has explicitly threatened to request a refund if the issue is not resolved today. This requires manual intervention to investigate the carrier discrepancy and fulfill the customer's urgent ultimatum accurately.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "Hi Aina, I am so sorry that your Baju Kurung Moden has been delayed for two weeks. I understand how frustrating it is that the tracking is stuck. I have escalated your order (ORD-2041) to our dedicated support team right now. They will investigate this immediately and follow up with you today to ensure it is resolved or to process a refund for you.",
+      "bahasa_malaysia": "Hi Aina, saya amat minta maaf kerana Baju Kurung Moden anda telah tertangguh selama dua minggu. Saya faham betapa cynya apabila tracking stuck. Saya telah menaik taraf (escalate) order anda (ORD-2041) kepada pasukan sokongan khas kami sekarang. Mereka akan siasat serta hubungi anda hari ini untuk menyelesaikan masalah ini atau memproses bayaran balik (refund) buat anda."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Immediate attention required: Customer issued a refund ultimatum today due to a 2-week shipping delay with stuck tracking. Investigate carrier discrepancy and contact customer to prevent chargeback."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 227,
+        "output_tokens": 55,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 7.57
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 244,
+        "output_tokens": 44,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.03
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 408,
+        "output_tokens": 87,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.86
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 380,
+        "output_tokens": 212,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 9.02
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 325,
+        "output_tokens": 65,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 4.04
+      }
+    },
+    "total_latency": 27.52,
+    "total_tokens": 2047,
+    "estimated_cost_rm": 0.004094
   }
 ]
