@@ -195,12 +195,14 @@ function AISuggestion({ msg, config, approved }) {
         <span className="integration-ai-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
         </span>
-        <strong>Komplain.AI Suggestion</strong>
+        <div className="integration-ai-title">
+          <strong>Komplain.AI Suggestion</strong>
+          <div className="integration-policy-row">
+            <span>{msg.policy}</span>
+            <span>Action: {msg.action}</span>
+          </div>
+        </div>
         <span className="integration-confidence mono">{Math.round(msg.confidence * 100)}% conf</span>
-      </div>
-      <div className="integration-policy-row">
-        <span>{msg.policy}</span>
-        <span>Action: {msg.action}</span>
       </div>
       <div className="integration-suggestion-text">{msg.text}</div>
       {approved ? (

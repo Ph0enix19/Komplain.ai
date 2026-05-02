@@ -2316,9 +2316,9 @@
 
 .integration-ai-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
-  padding: 9px 10px;
+  padding: 9px 10px 10px;
   border-bottom: 1px solid #e5e7eb;
   background: #f8fafc;
   min-width: 0;
@@ -2343,6 +2343,13 @@
   stroke-width: 2.3;
 }
 
+.integration-ai-title {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 7px;
+}
+
 .integration-ai-head strong {
   min-width: 0;
   overflow: hidden;
@@ -2354,17 +2361,19 @@
 
 .integration-confidence {
   margin-left: auto;
+  padding-top: 2px;
   color: #64748b;
   font-size: 10px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .integration-policy-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 10px;
-  border-bottom: 1px solid #eef2f7;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
 }
 
 .integration-policy-row span {
@@ -2372,12 +2381,13 @@
   min-height: 22px;
   align-items: center;
   max-width: 100%;
-  padding: 0 8px;
+  padding: 4px 8px;
   border-radius: 999px;
   background: rgba(15, 118, 110, 0.1);
   color: #0f766e;
   font-size: 10px;
   font-weight: 800;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
