@@ -21,7 +21,7 @@ const INTEGRATION_DEMOS = {
         confidence: 0.94,
         policy: 'Refund Policy 3.2',
         action: 'REFUND',
-        text: "Hi Aina! I'm sorry about the delay with your order. I've checked the tracking and can confirm it has been stuck at the sorting center for 14 days, which exceeds our delivery promise.\n\nI've initiated a full refund of RM89.00 to your original payment method. You should see it within 3-5 business days.\n\nAgain, I apologize for the inconvenience. Is there anything else I can help with?",
+        text: "Hi Aina! Sorry for the delay. Tracking shows your parcel has been stuck at the sorting center for 14 days, beyond our delivery promise.\n\nRecommended action: issue a full RM89.00 refund to the original payment method.",
       },
       {
         id: 'lz-6',
@@ -53,7 +53,7 @@ const INTEGRATION_DEMOS = {
         confidence: 0.91,
         policy: 'Return Policy 2.1 - Damaged Item',
         action: 'RETURN_REFUND',
-        text: 'Hi Ahmad! Terima kasih kerana menghubungi kami. Saya minta maaf kerana barang yang diterima rosak.\n\nSaya telah menyemak gambar dan mengesahkan kerosakan. Sila ikut langkah berikut:\n1. Buka Shopee App > Orders > Return/Refund\n2. Pilih "Item damaged/defective"\n3. Upload gambar yang sama\n\nKami akan approve return request dalam masa 24 jam dan arrange pickup percuma.\n\nMaaf atas kesulitan ini!',
+        text: 'Hi Ahmad! Maaf kerana barang diterima rosak. Gambar menunjukkan koyak di bahagian lengan.\n\nRecommended action: approve return/refund request within 24 hours and arrange free pickup.',
       },
       {
         id: 'sh-5',
@@ -204,7 +204,6 @@ function AISuggestion({ msg, config, approved }) {
         </div>
         <span className="integration-confidence mono">{Math.round(msg.confidence * 100)}% conf</span>
       </div>
-      <div className="integration-suggestion-text">{msg.text}</div>
       {approved ? (
         <div className="integration-approved">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
@@ -309,6 +308,7 @@ function IntegrationChat({ platform, replayKey, onReplay }) {
   const [approved, setApproved] = React.useState(false);
   const [activeSuggestion, setActiveSuggestion] = React.useState(null);
   const scrollRef = React.useRef(null);
+  const suggestionRef = React.useRef(null);
   const timerRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -322,8 +322,13 @@ function IntegrationChat({ platform, replayKey, onReplay }) {
   }, [platform, replayKey]);
 
   React.useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, waiting, waitingApproval]);
+    if (!scrollRef.current) return;
+    if (waitingApproval && suggestionRef.current) {
+      suggestionRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      return;
+    }
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, waiting, waitingApproval, activeSuggestion]);
 
   React.useEffect(() => {
     if (!waiting) return undefined;
@@ -387,7 +392,13 @@ function IntegrationChat({ platform, replayKey, onReplay }) {
           if (msg.from === 'agent') return <AgentMessage key={msg.id} msg={msg} config={config} />;
           if (msg.from === 'system') return <SystemMessage key={msg.id} msg={msg} />;
           if (msg.from === 'repeat-alert') return <RepeatAlert key={msg.id} msg={msg} />;
-          if (msg.from === 'ai-suggestion') return <AISuggestion key={msg.id} msg={msg} config={config} approved={approved} />;
+          if (msg.from === 'ai-suggestion') {
+            return (
+              <div key={msg.id} ref={msg.id === activeSuggestion?.id ? suggestionRef : null}>
+                <AISuggestion msg={msg} config={config} approved={approved} />
+              </div>
+            );
+          }
           return null;
         })}
         {showTyping && (

@@ -6,11 +6,7 @@ function Topbar({ theme, setTheme, density, setDensity, modelLabel }) {
       <div className="topbar-left">
         <div className="logo" aria-label="Komplain.ai">
           <div className="logo-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-              <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.7" />
-              <path d="M7 9.5h10M7 13h6.5M9 16.5l-2 2.2v-2.2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="17" cy="8" r="2" fill="var(--color-accent)" />
-            </svg>
+            <img className="logo-img" src="assets/app-logo.jpeg" alt="" />
           </div>
           <div className="logo-text">
             <div className="logo-name">Komplain<span className="logo-dot">.ai</span></div>
