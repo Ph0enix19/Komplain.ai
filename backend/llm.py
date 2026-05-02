@@ -442,9 +442,7 @@ class ILMUClient:
             "temperature": self.temperature,
         }
         selected_thinking = (
-            thinking_type
-            if thinking_type is not None
-            else os.getenv("ZAI_VISION_THINKING_TYPE", self.thinking_type)
+            thinking_type if thinking_type is not None else os.getenv("ZAI_VISION_THINKING_TYPE", self.thinking_type)
         )
         if selected_thinking.strip().lower() not in {"", "none", "default"}:
             payload["thinking"] = {"type": selected_thinking.strip().lower()}

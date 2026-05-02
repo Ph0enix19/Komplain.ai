@@ -13,8 +13,11 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.llm import DEFAULT_ZAI_VISION_BASE_URL, DEFAULT_ZAI_VISION_MODEL, ILMUClient
-
+from backend.llm import (
+    DEFAULT_ZAI_VISION_BASE_URL,
+    DEFAULT_ZAI_VISION_MODEL,
+    ILMUClient,
+)
 
 DAMAGE_SYSTEM = """You are a visual quality inspection agent for e-commerce complaints.
 Inspect the customer image and decide whether the packaging or item is visibly damaged.

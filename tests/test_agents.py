@@ -10,8 +10,13 @@ from backend.agents import (
     response_agent,
     supervisor_logic,
 )
-from backend.models import ContextResult, Decision, IntakeResult, ReasoningResult
-from backend.models import ImageAnalysisResult
+from backend.models import (
+    ContextResult,
+    Decision,
+    ImageAnalysisResult,
+    IntakeResult,
+    ReasoningResult,
+)
 from backend.storage import DataManager
 
 
@@ -314,7 +319,10 @@ async def test_reasoning_requests_clarification_for_missing_claim_with_package_i
     assert result.decision == Decision.CLARIFY
     assert result.requires_human_review is True
     assert result.clarification_needed is True
-    assert result.clarification_message == "Please confirm whether you received the package or whether the order is still missing."
+    assert (
+        result.clarification_message
+        == "Please confirm whether you received the package or whether the order is still missing."
+    )
     assert "Contradiction detected" in result.rationale
 
 
@@ -516,6 +524,9 @@ async def test_supervisor_processes_bm_context_but_outputs_english_note(monkeypa
     result = await supervisor_logic(llm, reasoning, context)
 
     assert result["priority"] == "high"
-    assert result["supervisor_note"] == "Seller action: review the case manually because the order context or evidence is incomplete."
+    assert (
+        result["supervisor_note"]
+        == "Seller action: review the case manually because the order context or evidence is incomplete."
+    )
     assert "pelanggan" not in result["supervisor_note"].lower()
     assert "English only" in llm.systems[0]

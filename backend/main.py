@@ -4,10 +4,10 @@ import asyncio
 import json
 import re
 import time
-from email.parser import BytesParser
-from email.policy import default
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from email.parser import BytesParser
+from email.policy import default
 from pathlib import Path
 from typing import AsyncGenerator
 from uuid import uuid4
@@ -31,8 +31,8 @@ from backend.llm import COST_PER_1K_TOKENS_RM, ILMUClient
 from backend.models import (
     ComplaintCreate,
     ContextResult,
-    IntakeResult,
     ImageAnalysisResult,
+    IntakeResult,
     ReasoningResult,
     ResponseResult,
     TestLLMRequest,
@@ -418,7 +418,9 @@ def _parse_multipart_body(content_type: str, body: bytes) -> tuple[dict[str, str
     return fields, image
 
 
-async def _read_complaint_request(request: Request, complaint_id: str) -> tuple[ComplaintCreate, str | None, str | None]:
+async def _read_complaint_request(
+    request: Request, complaint_id: str
+) -> tuple[ComplaintCreate, str | None, str | None]:
     content_type = request.headers.get("content-type", "")
     image_path = None
     image_url = None

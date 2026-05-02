@@ -4,244 +4,200 @@
 
 [![CI](https://github.com/Ph0enix19/Komplain.AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Ph0enix19/Komplain.AI/actions/workflows/ci.yml)
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.136-009688?logo=fastapi&logoColor=white)
-![React 18](https://img.shields.io/badge/React-18_UMD-61DAFB?logo=react&logoColor=black)
+![FastAPI 0.136](https://img.shields.io/badge/FastAPI-0.136-009688?logo=fastapi&logoColor=white)
+![React 18.3](https://img.shields.io/badge/React-18.3_UMD-61DAFB?logo=react&logoColor=black)
+![Storage JSON MVP](https://img.shields.io/badge/Storage-JSON_MVP-f59e0b)
 
-### Agentic Customer Complaint Resolution
+### AI-powered complaint resolution for e-commerce support teams
 
-Komplain.ai is a hackathon MVP that turns raw customer complaints into structured, auditable, bilingual support resolutions through a five-agent workflow.
+Komplain.ai turns messy customer complaints into structured decisions, bilingual replies, visual evidence checks, and auditable agent traces.
 
-**Hackathon Track:** AI Systems & Agentic Workflow Automation
-
-[Live Frontend](https://komplain-test-xi2r.vercel.app) | [Backend Health](https://komplaintest.onrender.com/api/health) | [GitHub Repository](https://github.com/Ph0enix19/Komplain.AI)
+**UMHackathon 2026 Track:** AI Systems & Agentic Workflow Automation
 
 </div>
 
 ---
 
-## Current Project Summary
+<a id="quick-links"></a>
 
-Use this section as handoff context when starting a new AI chat:
+## Quick Links 🚀
 
-Komplain.ai is a Python/FastAPI + static React 18 UMD dashboard for AI-assisted e-commerce complaint handling. The backend exposes `/api` endpoints, stores orders, complaints, and agent events in JSON files under `data/`, and runs a five-step complaint pipeline: intake, context, reasoning, response, and supervisor. The LLM client in `backend/llm.py` is OpenAI-compatible and environment-driven: `LLM_PROVIDER=zai` uses Z.ai / GLM first, with automatic Groq fallback; `LLM_PROVIDER=groq` and legacy `LLM_PROVIDER=ilmu` are also supported. Agents request structured JSON, normalize/validate outputs with Pydantic, record token/latency/provider telemetry, and fall back to deterministic logic when the LLM fails or returns invalid data. The frontend in `frontend/` is a no-build static React app served by `Komplain.ai Dashboard.html`; `frontend/index.html` redirects to it. The dashboard submits complaints, polls the backend until processing completes, renders live agent trace telemetry, shows resolution details and bilingual replies, supports editing/copying replies, and displays the latest five cases. Tests are in `tests/`, are mocked by default, and cover API routes, agent behavior, LLM parsing/fallbacks, storage, and telemetry.
-
-Important files:
-
-- `backend/main.py`: FastAPI app, routes, background pipeline orchestration, SSE event stream.
-- `backend/agents.py`: five agent prompts, LLM/fallback agent logic, validation, event creation.
-- `backend/llm.py`: OpenAI-compatible provider client, Z.ai/Groq/ILMU config, JSON parsing, fallback, token usage.
-- `backend/storage.py`: JSON-backed `DataManager`, latest-five complaint cap, event pruning.
-- `backend/models.py`: Pydantic request/response and agent result models.
-- `frontend/app.jsx`: dashboard state, backend API integration, polling, case mapping, edit/copy/approve flows.
-- `frontend/data.js`: demo scenarios, seed cases, mock order context, simulated traces.
-- `frontend/components/`: dashboard UI components.
-- `data/orders.json`: sample order lookup data.
-- `tests/`: pytest suite with mocked LLM clients.
-
----
-
-## Live Links
-
-- **Live frontend:** <https://komplain-test-xi2r.vercel.app>
-- **Backend API health:** <https://komplaintest.onrender.com/api/health>
-- **GitHub repository:** <https://github.com/Ph0enix19/Komplain.AI>
-- **Pitch/demo video:** <https://drive.google.com/file/d/1IJ3Xe-SRWEcsv7_5ecS_KsFvllmv88rM/view?usp=sharing>
+| Link | Purpose |
+|---|---|
+| [Live Frontend](https://komplain-test-xi2r.vercel.app) | Vercel-hosted dashboard for the judging demo |
+| [Backend Health](https://komplaintest.onrender.com/api/health) | Render-hosted FastAPI health check |
+| [GitHub Repository](https://github.com/Ph0enix19/Komplain.AI) | Source code and CI history |
+| [Testing & CI](#testing-and-ci) | Local and GitHub Actions verification |
+| [Image Upload Test](#test-image-upload-and-damage-analysis) | Procedure for visual damage analysis |
+| [Judging Criteria Map](#judging-criteria-map) | How this project addresses UMHackathon scoring areas |
 
 Render may cold-start after idle periods, so the first backend request can take longer than normal.
 
 ---
 
-## What Komplain.ai Does
+<a id="finalist-deliverables"></a>
 
-Komplain.ai is an AI copilot for e-commerce support teams. It accepts unstructured complaints in English, Bahasa Malaysia, or Manglish and produces a structured resolution for human review.
+## Finalist Deliverables 🎯
 
-A support operator can:
+The UMHackathon finalist handbook asks teams to keep the repository and deliverables easy to reach from the first README section. Current links:
 
-- Submit a complaint with an optional order ID.
-- Run the five-agent workflow from the dashboard.
-- View agent trace telemetry with real backend timings.
-- Review decision, rationale, confidence, bilingual replies, latency, tokens, and estimated RM cost.
-- Edit and copy the generated English and Bahasa Malaysia replies.
-- Approve a case and reset the active workspace.
-- Search, filter, export, and inspect recent case history.
-
-The MVP does not send customer messages automatically. Approval is represented inside the dashboard workflow.
+| Deliverable | Status |
+|---|---|
+| Code Repository | [GitHub repo](https://github.com/Ph0enix19/Komplain.AI) |
+| Live Demo | [Frontend](https://komplain-test-xi2r.vercel.app) and [backend health](https://komplaintest.onrender.com/api/health) |
+| Core Postman API Collection | [postman_collection.json](./postman_collection.json) |
+| QATD Postman Evidence Collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
+| Quality Assurance Notes | See [Testing and CI](#testing-and-ci) |
+| Deployment Plan Summary | See [Deployment](#deployment) |
+| Architecture Summary | See [Architecture](#architecture) |
 
 ---
 
-## Architecture
+<a id="introduction"></a>
+
+## Introduction 👋
+
+Support teams often receive complaints that are short, emotional, mixed-language, or missing order context:
+
+> "Hi team, saya punya order sampai tapi box koyak and item cracked. Can help refund?"
+
+Komplain.ai is an MVP copilot that helps an operator resolve that case without losing accountability. It accepts English, Bahasa Malaysia, and Manglish complaint text, optionally accepts an uploaded product/package image, checks order context, reasons through the next action, drafts English and Bahasa Malaysia replies, and shows each agent step for human review.
+
+The product does **not** auto-send messages to customers. It keeps the human operator in control, which is important for risky refunds, unclear evidence, and escalation cases.
+
+---
+
+<a id="demo-flow"></a>
+
+## Demo Flow 🎬
+
+1. Open the [live frontend](https://komplain-test-xi2r.vercel.app).
+2. Enter a complaint in English, Bahasa Malaysia, or Manglish.
+3. Optionally attach a JPG, PNG, or WebP image as visual evidence.
+4. Click **Resolve Complaint**.
+5. Watch the agent trace progress through intake, context, optional vision, reasoning, response, and supervisor review.
+6. Review the decision, confidence, rationale, bilingual replies, token usage, latency, and estimated RM cost.
+7. Edit or copy the drafted replies before approval.
+
+Useful demo order IDs from [data/orders.json](./data/orders.json):
+
+| Order ID | Demo angle |
+|---|---|
+| `KM-1001` | Damaged or refund-oriented cases |
+| `KM-1002` | Delivery delay / reship flow |
+| `KM-1003` | Missing or unclear order context |
+| `ORD-2041` | Additional order lookup scenario |
+| `ORD-1887` | Additional order lookup scenario |
+
+---
+
+<a id="key-features"></a>
+
+## Key Features ✨
+
+| Feature | What it does | Why judges should care |
+|---|---|---|
+| Text complaint intake | Extracts customer name, order ID, issue type, sentiment, and language from raw complaints. | Shows practical NLP on real support text, including Manglish. |
+| Image upload and damage analysis | Accepts JPG, PNG, and WebP evidence up to 5MB, then uses GLM vision when enabled. | Adds multimodal AI rather than text-only automation. |
+| Order-aware reasoning | Looks up JSON order records before deciding refund, reship, clarification, escalation, or dismissal. | Grounds AI output in business context. |
+| Bilingual response drafting | Generates English and Bahasa Malaysia replies for operator review. | Fits Malaysian e-commerce support realities. |
+| Human review and escalation | Supervisor agent flags review priority and keeps the operator in the approval loop. | Reduces risk from fully automated refunds or mistaken denials. |
+| Agent telemetry | Stores per-agent latency, token usage, provider, fallback status, and estimated RM cost. | Demonstrates observability, cost awareness, and auditability. |
+| Provider fallback | Z.ai / GLM is primary; Groq can be used as fallback for missing keys, rate limits, provider errors, invalid output, or timeouts. | Improves demo resilience and production realism. |
+
+---
+
+<a id="architecture"></a>
+
+## Architecture 🏗️
 
 ```text
-Static React dashboard
+Static React 18 UMD dashboard
         |
         v
 FastAPI backend (/api)
         |
         v
-Five-agent complaint pipeline
+Multi-agent complaint pipeline
         |
         +--> JSON storage in data/
         |
-        +--> OpenAI-compatible LLM provider
-             Z.ai / GLM primary, Groq fallback
+        +--> OpenAI-compatible LLM client
+             Z.ai / GLM 5.1 primary
+             GLM vision for image evidence
+             Groq fallback when configured
 ```
 
-- **Backend:** FastAPI, Uvicorn, Pydantic v2, HTTPX, Python 3.13.
-- **Frontend:** Static React 18 UMD, ReactDOM UMD, Babel Standalone, plain CSS.
-- **Storage:** JSON files for hackathon MVP persistence.
-- **LLM:** OpenAI-compatible chat completions client.
-- **Testing:** pytest and pytest-asyncio.
-- **Quality/security:** ruff, pip-audit, detect-secrets.
+### Tech Stack
 
----
+| Layer | Implementation |
+|---|---|
+| Backend | FastAPI, Uvicorn, Pydantic v2, HTTPX, Python 3.13 |
+| Frontend | Static React 18.3 UMD, ReactDOM UMD, Babel Standalone, plain CSS |
+| AI integration | OpenAI-compatible `/chat/completions` client in [backend/llm.py](./backend/llm.py) |
+| Primary LLM | Z.ai / GLM 5.1 via `LLM_PROVIDER=zai` |
+| Vision model | Z.ai / GLM vision via `ZAI_VISION_MODEL` |
+| Fallback LLM | Groq via `GROQ_*` variables |
+| Storage | JSON files under [data/](./data/) |
+| Quality | pytest, ruff, pip-audit, detect-secrets, GitHub Actions |
 
-## Multi-Agent Pipeline
+### Multi-Agent Pipeline
 
 | Step | Agent | Responsibility |
 |---|---|---|
-| 1 | Intake | Extracts customer name, order ID, issue type, sentiment, and language. |
-| 2 | Context | Looks up matching order data from JSON storage and summarizes context. |
-| 3 | Reasoning | Chooses `REFUND`, `RESHIP`, `ESCALATE`, or `DISMISS` with confidence and rationale. |
-| 4 | Response | Drafts concise English and Bahasa Malaysia replies. |
-| 5 | Supervisor | Validates the outcome and flags review priority. |
+| 1 | Intake | Parses customer name, order ID, issue type, sentiment, and language. |
+| 2 | Context | Looks up matching order data from JSON storage and summarizes relevant facts. |
+| 3 | Vision, optional | Inspects uploaded image evidence for visible damage or contradiction. |
+| 4 | Reasoning | Produces `REFUND`, `RESHIP`, `CLARIFY`, `ESCALATE`, or `DISMISS`. |
+| 5 | Response | Drafts English and Bahasa Malaysia replies. |
+| 6 | Supervisor | Validates the result, sets review priority, and flags risky cases. |
 
-The backend records each agent step as an event. Intake, context, and reasoning run sequentially. Response and supervisor run in parallel after reasoning. The completed complaint record is saved with agent metrics and pipeline totals.
-
----
-
-## LLM Behavior
-
-The provider is selected with `LLM_PROVIDER`:
-
-- `zai`: primary Z.ai / GLM provider using `ZAI_*` environment variables.
-- `groq`: Groq provider using `GROQ_*` environment variables.
-- `ilmu`: legacy ILMU-compatible provider using `ILMU_*` environment variables.
-
-When Z.ai is selected, provider failures can fall back to Groq. Fallback reasons include timeout, rate limit, provider error, missing key, or invalid response.
-
-The client:
-
-- Calls OpenAI-compatible `/chat/completions` endpoints.
-- Requests JSON mode where supported.
-- Retries without JSON mode when needed.
-- Falls back to key-value parsing if structured JSON fails.
-- Estimates tokens when provider usage data is unavailable.
-- Adds provider and fallback metadata to agent metrics.
-
-Agents also have deterministic fallback logic, so local tests and demo flows can complete without real provider calls when mocked or when `USE_LLM_AGENTS=false`.
+Intake, context, vision, and reasoning run in order. Response and supervisor run after reasoning, with the backend saving events as each step completes. The frontend polls and renders those events as a live trace.
 
 ---
 
-## Telemetry
+<a id="important-files"></a>
 
-Each completed complaint stores:
+## Important Files
 
-- Per-agent duration.
-- Per-agent input and output tokens.
-- Execution mode: `llm`, `fallback`, or `unknown`.
-- Provider metadata when available.
-- Total latency.
-- Total tokens.
-- Estimated cost in RM.
-
-Cost calculation lives in `backend/llm.py`:
-
-```text
-COST_PER_1K_TOKENS_RM = 0.002
-estimated_cost_rm = (total_tokens / 1000) * COST_PER_1K_TOKENS_RM
-```
-
-Telemetry appears through the API and in the frontend agent trace, command center, resolution card, and case detail modal.
+| File | Why it matters |
+|---|---|
+| [backend/main.py](./backend/main.py) | FastAPI app, API routes, upload validation, background pipeline orchestration, SSE event stream, telemetry totals. |
+| [frontend/app.jsx](./frontend/app.jsx) | Dashboard state, API integration, hosted/local API fallback, polling, agent trace mapping, image submission flow. |
+| [backend/llm.py](./backend/llm.py) | Z.ai / GLM and Groq provider integration, JSON parsing, image input handling, fallback metadata, token estimation. |
+| [backend/storage.py](./backend/storage.py) | JSON-backed `DataManager`, complaint persistence, latest-five complaint cap, event pruning. |
+| [backend/agents.py](./backend/agents.py) | Agent prompts, deterministic fallback logic, validation, image-aware reasoning, bilingual response generation. |
+| [backend/models.py](./backend/models.py) | Pydantic schemas for complaints, image analysis, decisions, responses, and agent events. |
+| [tests/](./tests/) | Mocked API, agent, LLM, storage, fallback, telemetry, and image upload tests. |
 
 ---
+
+<a id="api-overview"></a>
 
 ## API Overview
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/health` | Returns backend status, UTC time, stored complaint count, active provider/model, and fallback provider. |
-| `POST` | `/api/test-llm` | Sends a prompt to the configured LLM client. |
-| `POST` | `/api/complaints` | Creates a `PROCESSING` placeholder and starts the pipeline. Accepts JSON for text-only complaints or multipart form data with optional `image`. |
+| `GET` | `/api/health` | Returns backend status, UTC time, complaint count, active provider/model, and fallback provider. |
+| `POST` | `/api/test-llm` | Sends a direct test prompt to the configured LLM client. |
+| `POST` | `/api/complaints` | Creates a complaint and starts the pipeline. Accepts JSON or multipart form data with optional `image`. |
 | `GET` | `/api/complaints` | Lists stored complaints, capped to the latest five records. |
 | `GET` | `/api/complaints/{id}` | Returns one complaint record. |
-| `GET` | `/api/complaints/{id}/events` | Returns agent events for one complaint. |
+| `GET` | `/api/complaints/{id}/events` | Returns stored agent events for one complaint. |
 | `GET` | `/api/complaints/{id}/stream` | Streams agent events with server-sent events. |
-| `GET` | `/api/uploads/{filename}` | Serves stored MVP evidence images by safe generated filename. |
-
-Example completed complaint telemetry:
-
-```json
-{
-  "status": "COMPLETED",
-  "agent_metrics": {
-    "intake": {
-      "agent": "intake",
-      "duration": 0.73,
-      "input_tokens": 184,
-      "output_tokens": 37,
-      "execution_mode": "llm"
-    }
-  },
-  "total_latency": 4.42,
-  "total_tokens": 891,
-  "estimated_cost_rm": 0.001782
-}
-```
+| `GET` | `/api/uploads/{filename}` | Serves safely named uploaded MVP evidence images. |
 
 ---
 
-## Frontend
+<a id="installation"></a>
 
-The frontend is a static React app with no package install or build step.
-
-Current capabilities:
-
-- Complaint intake form with optional order ID.
-- Quick-load demo scenarios for delivery delay, damaged item, wrong item, and missing order ID.
-- Backend API fallback: local frontend tries `http://127.0.0.1:8000/api` first, then the hosted Render API.
-- Agent trace display modes: stepper, cards, and timeline.
-- Resolution card with decision, confidence, rationale, bilingual replies, latency, tokens, and RM cost.
-- Reply editing before approval.
-- Copy buttons for generated replies.
-- Approval flow that clears the active workspace.
-- Recent case log with search, status filters, CSV export, and case detail modal.
-- Optional tweak panel support for embedded edit-mode hosts.
-
-Main entry points:
-
-- `frontend/index.html`: redirects to the dashboard HTML file.
-- `frontend/Komplain.ai Dashboard.html`: loads React UMD, styles, data, components, and `app.jsx`.
-- `frontend/app.jsx`: application state and backend integration.
-
----
-
-## Storage
-
-Data is stored in JSON files under `data/`:
-
-- `orders.json`: sample order records used by the context agent.
-- `complaints.json`: latest complaint records.
-- `agent_events.json`: agent events linked to retained complaints.
-
-`DataManager.MAX_COMPLAINTS` is currently `5`. When a new complaint is added, old complaints beyond the cap are removed and events for removed complaints are pruned.
-
-Sample order IDs currently include:
-
-- `KM-1001`
-- `KM-1002`
-- `KM-1003`
-- `ORD-2041`
-- `ORD-1887`
-
----
-
-## Run Locally
+## Installation 🛠️
 
 ### Prerequisites
 
 - Python 3.13+
 - A modern browser
-- Optional real-provider API keys for Z.ai and Groq
+- Optional Z.ai and Groq API keys for real-provider demos
 
 ### 1. Clone the repository
 
@@ -256,16 +212,16 @@ cd Komplain.AI
 python -m venv .venv
 ```
 
-macOS / Linux:
-
-```bash
-source .venv/bin/activate
-```
-
 Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
 ```
 
 ### 3. Install dependencies
@@ -274,11 +230,11 @@ Windows PowerShell:
 python -m pip install -r requirements.txt -r requirements-dev.txt
 ```
 
-`backend/requirements.txt` is also present for Render and currently mirrors the runtime dependencies.
+`backend/requirements.txt` is present for Render and currently mirrors runtime dependencies.
 
 ### 4. Configure environment variables
 
-Create `.env` in the repository root. Use `.env.example` as the template:
+Create `.env` in the repository root using [.env.example](./.env.example) as the template:
 
 ```env
 LLM_PROVIDER=zai
@@ -298,8 +254,6 @@ GROQ_API_KEY=your_groq_api_key_here
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=llama-3.3-70b-versatile
 GROQ_TIMEOUT=180
-
-AGENT_LLM_TIMEOUT_SECONDS=180
 ```
 
 Useful local option:
@@ -308,9 +262,7 @@ Useful local option:
 USE_LLM_AGENTS=false
 ```
 
-That forces deterministic fallback agent logic instead of calling an LLM.
-
-Vision is optional. Set `VISION_ENABLED=false` to accept uploaded images but skip GLM visual inspection and fall back to text/order reasoning.
+That forces deterministic fallback agent logic instead of real LLM calls. Vision remains optional; set `VISION_ENABLED=false` to accept uploads but skip GLM visual inspection.
 
 Never commit `.env` or provider API keys.
 
@@ -324,8 +276,6 @@ Open API docs at <http://127.0.0.1:8000/docs>.
 
 ### 6. Start the frontend
 
-From the repository root:
-
 ```bash
 python -m http.server 3000 --directory frontend --bind 127.0.0.1
 ```
@@ -334,7 +284,111 @@ Open <http://127.0.0.1:3000/>.
 
 ---
 
-## Testing and CI
+<a id="usage"></a>
+
+## Usage 🧭
+
+### Submit a Text Complaint
+
+Use the dashboard form or call the API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/complaints \
+  -H "Content-Type: application/json" \
+  -d "{\"complaint_text\":\"Hi, saya punya order KM-1001 arrived damaged. Can refund?\"}"
+```
+
+The API returns a `PROCESSING` placeholder immediately, then the background pipeline updates the stored complaint and event trace.
+
+### Review the Agent Trace
+
+The dashboard shows each agent step with:
+
+- Status and timing.
+- Input/output token counts.
+- Execution mode: `llm`, `fallback`, or `unknown`.
+- Provider metadata and fallback reason where available.
+- The final decision, rationale, bilingual replies, confidence, and supervisor note.
+
+---
+
+<a id="test-image-upload-and-damage-analysis"></a>
+
+## Test Image Upload and Damage Analysis 🖼️
+
+### Dashboard Procedure
+
+1. Start the backend and frontend locally, or use the live demo.
+2. Enter a complaint that mentions visible damage.
+3. Attach a JPG, PNG, or WebP image in the visual evidence field.
+4. Submit the complaint.
+5. Confirm the trace includes the **Visual Evidence** step.
+6. Open the resolution card and check `image_analysis`, `visual_evidence_used`, decision, rationale, and supervisor review status.
+
+### API Procedure
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/complaints \
+  -F "complaint_text=Order KM-1001 arrived with a torn box and cracked item. Please help refund." \
+  -F "order_id=KM-1001" \
+  -F "image=@data/images/damaged-box.jpg;type=image/jpeg"
+```
+
+The backend validates file type and size, stores the file under `data/uploads/`, and records image analysis in the complaint payload. Supported upload types are `jpg`, `jpeg`, `png`, and `webp`; the MVP size limit is 5MB.
+
+### Real GLM Vision Smoke Test
+
+```powershell
+$env:LLM_PROVIDER = "zai"
+$env:ZAI_API_KEY = "your_real_zai_key"
+$env:ZAI_VISION_MODEL = "glm-4.5v"
+$env:ZAI_VISION_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
+python tests/smoke_test_glm_vision.py "path\to\normal-box.jpg" "path\to\damaged-box.jpg"
+```
+
+The regular test suite mocks vision by default, so CI does not require real provider keys.
+
+---
+
+<a id="telemetry-and-cost-tracking"></a>
+
+## Telemetry and Cost Tracking 📊
+
+Each completed complaint stores:
+
+- Per-agent duration.
+- Per-agent input and output tokens.
+- Execution mode.
+- Provider and fallback metadata.
+- Total latency.
+- Total tokens.
+- Estimated cost in RM.
+
+Cost calculation lives in [backend/llm.py](./backend/llm.py):
+
+```text
+COST_PER_1K_TOKENS_RM = 0.002
+estimated_cost_rm = (total_tokens / 1000) * COST_PER_1K_TOKENS_RM
+```
+
+Current metrics from this workspace's JSON snapshot:
+
+| Metric | Observed value |
+|---|---|
+| Completed complaints in snapshot | 5 |
+| Total pipeline latency | 15.77 s - 33.88 s across 5 recorded complaints |
+| Total tokens per resolution | 2,133 - 2,896 tokens, combined input and output |
+| Estimated cost per resolution | RM 0.004266 - RM 0.005792 |
+| Languages observed in stored complaints | English (`EN`) |
+| Decisions observed in stored complaints | `CLARIFY`, `REFUND`, `RESHIP` |
+| Decision types supported by backend | `REFUND`, `RESHIP`, `CLARIFY`, `ESCALATE`, `DISMISS` |
+| Provider fallback observed in stored events | No fallback events in the current local snapshot |
+
+---
+
+<a id="testing-and-ci"></a>
+
+## Testing and CI ✅
 
 Run the mocked test suite:
 
@@ -342,34 +396,21 @@ Run the mocked test suite:
 python -m pytest -q
 ```
 
-The default suite does not call real LLM providers. It covers:
+Run lint and format checks:
+
+```bash
+ruff check backend/ tests/
+ruff format --check backend/ tests/
+```
+
+The tests cover:
 
 - API health, LLM smoke route, complaint creation, retrieval, and events.
-- Agent extraction, language detection, context lookup, reasoning validation, bilingual response output, supervisor behavior, and fallback paths.
-- LLM JSON parsing, markdown JSON extraction, key-value fallback, provider switching, and token estimation.
-- Optional image upload, local upload validation, visual evidence fallback, and reasoning integration with mocked vision results.
-- JSON storage, order lookup, complaint FIFO cap, and event pruning.
-
-Optional real-provider smoke testing:
-
-```powershell
-$env:LLM_PROVIDER = "zai"
-$env:ZAI_API_KEY = "your_real_zai_key"
-$env:GROQ_API_KEY = "your_real_groq_fallback_key"
-python -m pytest tests/ --llm -v
-```
-
-Manual GLM vision smoke test with local images:
-
-```powershell
-$env:LLM_PROVIDER = "zai"
-$env:ZAI_API_KEY = "your_real_zai_key"
-$env:ZAI_VISION_MODEL = "glm-4.5v"
-$env:ZAI_VISION_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
-python tests/smoke_test_glm_vision.py "data/images/normal box.jpg" "data/images/damaged box.jpg"
-```
-
-The dashboard sends `POST /api/complaints` as JSON for text-only complaints and `multipart/form-data` when an image is attached. Uploaded MVP evidence is stored under `data/uploads/`, limited to jpg/jpeg/png/webp files up to 5MB.
+- Text complaint pipeline decisions, confidence, rationale, and bilingual responses.
+- Image upload validation, mocked visual evidence analysis, and safe fallback when vision fails.
+- Agent extraction, language detection, Manglish handling, order lookup, reasoning validation, supervisor behavior, and fallback paths.
+- LLM JSON parsing, markdown JSON extraction, key-value fallback, provider switching, Z.ai to Groq fallback, and token estimation.
+- JSON storage persistence, latest-five complaint cap, and agent event pruning.
 
 GitHub Actions runs on pushes to `main`, pull requests to `main`, and manual `workflow_dispatch`.
 
@@ -379,11 +420,35 @@ GitHub Actions runs on pushes to `main`, pull requests to `main`, and manual `wo
 | `test` | Installs runtime/dev dependencies and runs `pytest tests/ -v --tb=short` on Python 3.13. |
 | `security` | Runs `pip-audit -r requirements.txt --strict` and `detect-secrets scan --baseline .secrets.baseline`. |
 
-The security job is `continue-on-error: true`, so advisories are visible without blocking demo iteration.
+The security job is currently `continue-on-error: true`, so advisories are visible without blocking hackathon demo iteration.
 
 ---
 
-## Deployment
+<a id="judging-criteria-map"></a>
+
+## Judging Criteria Map 🏆
+
+The UMHackathon 2026 judging criteria emphasize product viability, architecture, CI/CD, security, QA, code maturity, token cost control, real-world validation, live demo quality, and communication. Komplain.ai maps to those areas as follows:
+
+| Judging area | How Komplain.ai addresses it |
+|---|---|
+| Product and business viability | Targets a clear e-commerce support pain point: slow, inconsistent complaint handling across languages and evidence types. |
+| Technical stack and scalability | Uses FastAPI, Pydantic, React, modular agents, and a documented path from JSON MVP storage to a managed database. |
+| CI/CD and automation | GitHub Actions runs lint, tests, and security checks on push and pull request. |
+| Integration security and credential management | Uses environment variables, `.env.example`, secret scanning, and avoids committing provider keys. |
+| QA and reliability | Mocked tests exercise API routes, agent behavior, provider fallback, storage, telemetry, and image upload handling. |
+| Architectural tradeoffs | README explicitly documents JSON storage, no auth, external LLM dependency, and production next steps. |
+| Production code maturity | Typed Pydantic models, upload validation, safe filenames, deterministic fallbacks, provider metadata, and structured events. |
+| Token efficiency and cost management | Tracks total tokens and estimates RM cost per resolution. |
+| Real-world impact | Supports English, Bahasa Malaysia, Manglish, order context, bilingual replies, and human review workflows. |
+| Live technical demonstration | Public frontend and backend health endpoints are available for judges. |
+| Presentation quality | README keeps demo links, setup, architecture, usage, testing, and judging map easy to scan. |
+
+---
+
+<a id="deployment"></a>
+
+## Deployment 🌐
 
 ### Frontend - Vercel
 
@@ -409,27 +474,73 @@ uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 
 Typical Render environment variables:
 
-- `PYTHON_VERSION=3.13.2`
-- `LLM_PROVIDER=zai`
-- `ZAI_API_KEY`
-- `ZAI_BASE_URL`
-- `ZAI_MODEL`
-- `ZAI_TIMEOUT`
-- `ZAI_THINKING_TYPE`
-- `ZAI_TEMPERATURE`
-- `ZAI_VISION_BASE_URL`
-- `ZAI_VISION_MODEL`
-- `ZAI_VISION_THINKING_TYPE`
-- `VISION_ENABLED`
-- `GROQ_API_KEY`
-- `GROQ_BASE_URL`
-- `GROQ_MODEL`
-- `GROQ_TIMEOUT`
-- `AGENT_LLM_TIMEOUT_SECONDS`
+```env
+PYTHON_VERSION=3.13.2
+LLM_PROVIDER=zai
+ZAI_API_KEY=...
+ZAI_BASE_URL=https://api.z.ai/api/coding/paas/v4
+ZAI_MODEL=glm-5.1
+ZAI_TIMEOUT=60
+ZAI_THINKING_TYPE=disabled
+ZAI_TEMPERATURE=0.1
+ZAI_VISION_BASE_URL=https://api.z.ai/api/coding/paas/v4
+ZAI_VISION_MODEL=glm-4.5v
+ZAI_VISION_THINKING_TYPE=disabled
+VISION_ENABLED=true
+GROQ_API_KEY=...
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_TIMEOUT=180
+AGENT_LLM_TIMEOUT_SECONDS=180
+```
 
 `app.py` exists as a root ASGI shim for platforms that scan the repository root.
 
 ---
+
+<a id="storage-model"></a>
+
+## Storage Model
+
+Data is stored in JSON files under [data/](./data/):
+
+| File | Purpose |
+|---|---|
+| [data/orders.json](./data/orders.json) | Sample order records used by the context agent. |
+| [data/complaints.json](./data/complaints.json) | Latest complaint records and final resolutions. |
+| [data/agent_events.json](./data/agent_events.json) | Agent events linked to retained complaints. |
+
+[backend/storage.py](./backend/storage.py) currently keeps the latest five complaints. When a new complaint is added beyond that cap, old complaints are removed and their events are pruned.
+
+---
+
+<a id="known-limitations"></a>
+
+## Known Limitations ⚠️
+
+Current MVP tradeoffs:
+
+- JSON storage is simple and demo-friendly but not scalable or concurrent-write safe.
+- There is no authentication, authorization, tenant isolation, or audit identity yet.
+- There is no API rate limiting.
+- The frontend does not yet have automated component or end-to-end tests.
+- Customer replies are drafted only; no messaging or email integration sends them.
+- Real LLM quality and latency depend on external provider availability.
+- Vision analysis depends on Z.ai / GLM vision configuration; safe fallback is used when unavailable.
+- The dashboard approval flow does not yet persist an explicit `APPROVED` status to the backend.
+
+Likely production next steps:
+
+- Move JSON storage to PostgreSQL or another managed database.
+- Add operator login, role-based access, and tenant-aware audit logs.
+- Add API rate limiting and request-level observability.
+- Persist approval and review actions through backend endpoints.
+- Add Playwright or component tests for frontend workflows.
+- Add deployment health checks that exercise a short mocked or deterministic pipeline.
+
+---
+
+<a id="project-structure"></a>
 
 ## Project Structure
 
@@ -479,58 +590,36 @@ Komplain.ai/
     |-- test_agents.py
     |-- test_llm.py
     |-- test_storage.py
-    `-- smoke_test_glm.py
+    `-- smoke_test_glm_vision.py
 ```
 
 ---
 
-## Submission Deliverables
+<a id="contributing"></a>
 
-The previous document set has been removed. Updated final-round documents will be added here later.
+## Contributing 🤝
 
-| Deliverable | Status |
-|---|---|
-| Product Requirements Document | Pending replacement |
-| System Architecture Document | Pending replacement |
-| Quality Assurance and Testing Document | Pending replacement |
-| Pitch deck | Pending replacement |
-| Core Postman API collection | [postman_collection.json](./postman_collection.json) |
-| QATD Postman evidence collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
+This is a hackathon project, so changes should stay focused and demo-safe:
 
----
-
-## Known Limitations and Roadmap
-
-Current MVP tradeoffs:
-
-- JSON storage is not scalable or concurrent-write safe; migrate to PostgreSQL or another managed database.
-- There is no authentication, authorization, tenant isolation, or audit identity.
-- There is no API rate limiting.
-- The frontend has no automated component or end-to-end tests yet.
-- The dashboard approval flow does not persist an explicit `APPROVED` status to the backend.
-- Customer replies are drafted only; no messaging/email integration sends them.
-- LLM output quality depends on provider availability and structured-output reliability.
-
-Likely next steps:
-
-- Add operator login and role-based access.
-- Persist approval/review actions through API endpoints.
-- Move storage to PostgreSQL.
-- Add retry queues and stronger provider failover controls.
-- Add frontend tests and Playwright coverage for the main workflow.
-- Add deployment health checks that exercise a short mocked or deterministic pipeline.
+1. Create a feature branch.
+2. Keep provider secrets in local environment variables only.
+3. Run `ruff check backend/ tests/`, `ruff format --check backend/ tests/`, and `python -m pytest -q`.
+4. Include tests for backend behavior, agent logic, or storage changes.
+5. Document any new setup steps or environment variables in this README and [.env.example](./.env.example).
 
 ---
+
+<a id="license"></a>
 
 ## License
 
-This project is a hackathon submission. All rights reserved by the authors.
+This repository is a UMHackathon 2026 submission. All intellectual property remains with the project authors unless a separate license is added later.
 
 ---
 
 <div align="center">
 
-**Komplain.ai** - Hackathon Submission - AI Systems & Agentic Workflow Automation
+**Komplain.ai** - built for practical, reviewable, multilingual complaint resolution.
 
 [Live Frontend](https://komplain-test-xi2r.vercel.app) | [Backend Health](https://komplaintest.onrender.com/api/health) | [GitHub Repository](https://github.com/Ph0enix19/Komplain.AI)
 

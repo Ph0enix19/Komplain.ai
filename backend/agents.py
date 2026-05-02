@@ -472,7 +472,9 @@ async def vision_inspection_agent(
     fallback_payload = fallback_image_analysis(image_provided=True)
     if os.getenv("VISION_ENABLED", "true").lower() not in {"1", "true", "yes", "on"}:
         _mark_execution_mode(metrics, "fallback")
-        fallback_payload["evidence"] = "Vision analysis is disabled. Decision should rely on complaint text and order context."
+        fallback_payload["evidence"] = (
+            "Vision analysis is disabled. Decision should rely on complaint text and order context."
+        )
         return _validated(ImageAnalysisResult, fallback_payload, "Fallback image analysis returned invalid data.")
 
     order = context.order_data or {}
@@ -642,7 +644,9 @@ async def reasoning_agent(
                 payload["decision"] = "REFUND"
             evidence = image_analysis.evidence.strip()
             if evidence and "visual" not in str(payload.get("rationale", "")).lower():
-                payload["rationale"] = f"{payload.get('rationale', '').strip()} Visual evidence supports damage: {evidence}".strip()
+                payload["rationale"] = (
+                    f"{payload.get('rationale', '').strip()} Visual evidence supports damage: {evidence}".strip()
+                )
         elif image_analysis.damage_detected is False and intake.issue_type == "damaged_item":
             payload["decision"] = "CLARIFY"
             payload["requires_human_review"] = True
@@ -657,7 +661,9 @@ async def reasoning_agent(
             payload["requires_human_review"] = True
     if isinstance(payload.get("rationale"), str):
         payload["rationale"] = payload["rationale"].strip()
-    if _contains_malay_markers(payload.get("rationale")) or _contains_malay_markers(payload.get("clarification_message")):
+    if _contains_malay_markers(payload.get("rationale")) or _contains_malay_markers(
+        payload.get("clarification_message")
+    ):
         _mark_execution_mode(metrics, "fallback")
         payload = fallback_reasoning(complaint_text, intake, context, image_analysis)
     try:
