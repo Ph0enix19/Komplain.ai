@@ -19,7 +19,7 @@
 ### AI-powered complaint resolution for e-commerce support teams
 
 Komplain.ai turns messy customer complaints into structured decisions, bilingual replies, visual evidence checks, and auditable agent traces.
-Try it here <link href = "https://komplain-test-xi2r.vercel.app">
+Try it <link href = "https://komplain-test-xi2r.vercel.app">here</link>
 
 **UMHackathon 2026 Track:** AI Systems & Agentic Workflow Automation
 
