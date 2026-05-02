@@ -125,7 +125,15 @@ function buildPolicy(record) {
   if (!record.context.order_found) return 'Supervisor review - order lookup failed';
   if (record.reasoning.decision === 'REFUND') return 'Order policy - refund path selected';
   if (record.reasoning.decision === 'RESHIP') return 'Order policy - replacement path selected';
+  if (record.reasoning.decision === 'DISMISS') return 'Seller return policy - dismissal path selected';
   return 'Supervisor logic - manual review';
+}
+
+function pipelineKeyForResolution(resolution) {
+  if (resolution === 'REFUND') return 'manglish';
+  if (resolution === 'RESHIP') return 'wrong';
+  if (resolution === 'DISMISS') return 'dismiss';
+  return 'edge';
 }
 
 function buildResolution(record) {
@@ -256,6 +264,7 @@ async function pollForCompletion(complaintId, onEvents, modelLabel = DEFAULT_MOD
 }
 
 function App() {
+  const [page, setPage] = useState('dashboard');
   const [theme, setTheme] = useState(TWEAK_DEFAULTS.theme);
   const [density, setDensity] = useState(TWEAK_DEFAULTS.density);
   const [tone, setTone] = useState(TWEAK_DEFAULTS.tone);
@@ -529,7 +538,7 @@ function App() {
       modalEvents = events;
       modalComplaint = complaint;
     } else {
-      const key = modalCase.resolution === 'REFUND' ? 'manglish' : modalCase.resolution === 'RESHIP' ? 'wrong' : 'edge';
+      const key = pipelineKeyForResolution(modalCase.resolution);
       const pipeline = materializeDemoPipeline(window.PIPELINES[key], modelLabel);
       modalResolution = pipeline.resolution;
       modalEvents = pipeline.events;
@@ -543,6 +552,8 @@ function App() {
     response_en: adjustTone(editingResolution ? resolutionDraft.response_en : resolution.response_en, tone, modelLabel),
     response_bm: adjustTone(editingResolution ? resolutionDraft.response_bm : resolution.response_bm, tone, modelLabel),
   } : null;
+
+  if (page === 'integration') return <IntegrationDemo onBack={() => setPage('dashboard')} />;
 
   return (
     <div className="app">
@@ -566,6 +577,7 @@ function App() {
         setTraceStyle={wrap(setTraceStyle, 'traceStyle')}
         onResolve={resolveComplaint}
         canResolve={Boolean(complaint.trim())}
+        onIntegrationDemo={() => setPage('integration')}
         agents={agents}
       />
 

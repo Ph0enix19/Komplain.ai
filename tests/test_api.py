@@ -18,6 +18,12 @@ class FakeLLMClient:
     async def chat(self, prompt: str, *_args, **_kwargs) -> str:
         return f"mocked response for: {prompt}"
 
+    async def chat_with_usage(self, prompt: str, *_args, **_kwargs) -> tuple[str, dict]:
+        return f"mocked response for: {prompt}", {
+            "provider_used": self.provider,
+            "fallback_used": False,
+        }
+
     async def chat_json(self, _prompt: str, system: str, **_kwargs) -> dict:
         if "intake agent" in system:
             return {
@@ -88,7 +94,13 @@ def test_test_llm_returns_valid_response(tmp_path, monkeypatch) -> None:
         response = client.post("/api/test-llm", json={"prompt": "hello"})
 
     assert response.status_code == 200
-    assert response.json() == {"model": "fake-groq", "output": "mocked response for: hello"}
+    assert response.json() == {
+        "model": "fake-groq",
+        "output": "mocked response for: hello",
+        "provider_used": "groq",
+        "fallback_used": False,
+        "fallback_reason": None,
+    }
 
 
 def test_test_llm_rejects_empty_prompt(tmp_path, monkeypatch) -> None:

@@ -70,7 +70,7 @@ def test_provider_switching_selects_zai_primary(monkeypatch: pytest.MonkeyPatch)
     assert client.provider == "zai"
     assert client.api_key_env_var == "ZAI_API_KEY"
     assert client.model == "glm-current-test"
-    assert client.base_url == "https://api.z.ai/api/paas/v4"
+    assert client.base_url == "https://api.z.ai/api/coding/paas/v4"
     assert client.fallback_client is not None
     assert client.fallback_client.provider == "groq"
 
@@ -91,6 +91,32 @@ async def test_zai_payload_uses_low_temperature(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(client, "_create_chat_completion", fake_completion)
 
     assert await client.chat_json("Return status.", "Return JSON.") == {"status": "ok"}
+
+
+@pytest.mark.asyncio
+async def test_zai_json_retries_without_response_format_on_provider_rejection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("LLM_PROVIDER", "zai")
+    monkeypatch.setenv("ZAI_API_KEY", "zai-key")
+    client = ILMUClient(enable_fallback=False)
+    calls = []
+
+    request = httpx.Request("POST", f"{client.base_url}/chat/completions")
+    response = httpx.Response(429, request=request)
+
+    async def fake_completion(payload: dict) -> dict:
+        calls.append(payload)
+        if "response_format" in payload:
+            raise httpx.HTTPStatusError("rate limited", request=request, response=response)
+        return {"choices": [{"message": {"content": '{"status": "ok"}'}}]}
+
+    monkeypatch.setattr(client, "_create_chat_completion", fake_completion)
+
+    assert await client.chat_json("Return status.", "Return JSON.") == {"status": "ok"}
+    assert len(calls) == 2
+    assert "response_format" in calls[0]
+    assert "response_format" not in calls[1]
 
 
 def test_provider_switching_selects_groq(monkeypatch: pytest.MonkeyPatch) -> None:

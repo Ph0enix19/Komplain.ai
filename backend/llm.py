@@ -10,7 +10,7 @@ from typing import Any
 import httpx
 
 _REASONING_DEFAULT = object()
-DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/paas/v4"
+DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
 DEFAULT_ZAI_MODEL = "glm-5.1"
 COST_PER_1K_TOKENS_RM = 0.002
 logger = logging.getLogger(__name__)
@@ -286,7 +286,12 @@ class ILMUClient:
         last_usage = {"input_tokens": self._estimate_payload_input_tokens(payload), "output_tokens": 0}
         for variant in variants:
             for attempt in range(self.MAX_NULL_CONTENT_RETRIES + 1):
-                data = await self._create_chat_completion(variant)
+                try:
+                    data = await self._create_chat_completion(variant)
+                except httpx.HTTPStatusError as exc:
+                    if self._should_retry_without_response_format(exc, variant, expected_json=expected_json):
+                        break
+                    raise
                 message = self._message_content(data)
                 last_usage = self._usage_from_response(data, variant, message)
                 if isinstance(message, (str, list)):
@@ -298,6 +303,20 @@ class ILMUClient:
         if include_usage:
             return None, last_usage
         return None
+
+    def _should_retry_without_response_format(
+        self,
+        exc: httpx.HTTPStatusError,
+        payload: dict[str, Any],
+        *,
+        expected_json: bool,
+    ) -> bool:
+        return bool(
+            expected_json
+            and self.provider == "zai"
+            and "response_format" in payload
+            and exc.response.status_code in {400, 404, 422, 429}
+        )
 
     @staticmethod
     def _message_content(data: dict[str, Any]) -> Any:

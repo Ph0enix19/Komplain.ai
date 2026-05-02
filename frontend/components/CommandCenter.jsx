@@ -12,6 +12,7 @@ function CommandCenter({
   setTraceStyle,
   onResolve,
   canResolve,
+  onIntegrationDemo,
   agents = window.AGENTS,
 }) {
   const resolvedCount = cases.filter((caseItem) => caseItem.status === 'resolved').length;
@@ -49,6 +50,14 @@ function CommandCenter({
                 </svg>
               </>
             )}
+          </button>
+          <button className="btn btn-secondary command-demo-btn" type="button" onClick={onIntegrationDemo}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="7" y="2" width="10" height="20" rx="2" />
+              <path d="M11 18h2" />
+              <path d="M9 6h6" />
+            </svg>
+            Integration Demo
           </button>
           <span className="command-meta mono">{running ? `${completion}% pipeline complete` : `${cases.length} cases in view`}</span>
         </div>

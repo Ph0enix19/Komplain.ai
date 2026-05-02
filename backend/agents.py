@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import re
+from datetime import date, datetime
 from uuid import uuid4
 
 from pydantic import ValidationError
@@ -101,6 +102,51 @@ def extract_order_id(text: str) -> str | None:
 
 def _should_auto_reship_wrong_item(intake: IntakeResult, context: ContextResult) -> bool:
     return bool(context.order_found and intake.issue_type == "wrong_item")
+
+
+def _days_since_delivery(order: dict) -> int | None:
+    raw_date = order.get("delivery_date")
+    if not raw_date:
+        return None
+    try:
+        delivered_at = datetime.fromisoformat(str(raw_date)).date()
+    except ValueError:
+        return None
+    return (date.today() - delivered_at).days
+
+
+def _should_dismiss_refund_request(complaint_text: str, intake: IntakeResult, context: ContextResult) -> bool:
+    if not context.order_found or not context.order_data:
+        return False
+    lowered = complaint_text.lower()
+    order = context.order_data
+    refund_window = int(order.get("seller_policy_refund_days") or 30)
+    days_since_delivery = _days_since_delivery(order)
+    outside_window = days_since_delivery is not None and days_since_delivery > refund_window
+    change_of_mind = any(
+        phrase in lowered
+        for phrase in (
+            "changed my mind",
+            "change of mind",
+            "don't want it",
+            "do not want it",
+            "used them",
+            "used it",
+            "45 days",
+            "outside return window",
+        )
+    )
+    no_defect_claimed = any(
+        phrase in lowered
+        for phrase in (
+            "nothing wrong",
+            "not damaged",
+            "fit fine",
+            "works fine",
+            "no issue",
+        )
+    )
+    return bool(intake.issue_type == "refund_request" and outside_window and (change_of_mind or no_defect_claimed))
 
 
 def _is_high_confidence_automated_resolution(reasoning: ReasoningResult, context: ContextResult) -> bool:
@@ -284,6 +330,11 @@ async def reasoning_agent(
         payload["confidence"] = max(payload["confidence"], 0.82)
         if not payload.get("rationale") or "manual" in str(payload.get("rationale")).lower():
             payload["rationale"] = "Wrong item reported for an order found in the system; replacement is the preferred policy path."
+    if _should_dismiss_refund_request(complaint_text, intake, context):
+        payload["decision"] = "DISMISS"
+        payload["requires_human_review"] = False
+        payload["confidence"] = max(payload["confidence"], 0.9)
+        payload["rationale"] = "Change-of-mind refund request is outside the seller refund window and no damage or fulfillment issue is claimed."
     if isinstance(payload.get("rationale"), str):
         payload["rationale"] = payload["rationale"].strip()
     try:
@@ -478,6 +529,13 @@ def fallback_reasoning(
             "rationale": "The issue can likely be resolved by arranging a replacement or delivery follow-up.",
             "requires_human_review": False,
         }
+    if _should_dismiss_refund_request(complaint_text, intake, context):
+        return {
+            "decision": "DISMISS",
+            "confidence": 0.9,
+            "rationale": "The customer is requesting a change-of-mind refund outside the seller refund window, with no damage or fulfillment issue claimed.",
+            "requires_human_review": False,
+        }
     return {
         "decision": "ESCALATE",
         "confidence": 0.65,
@@ -513,6 +571,17 @@ def fallback_response(reasoning: ReasoningResult, context: ContextResult) -> dic
         bahasa = (
             f"Hai {name}, kami mohon maaf atas isu berkaitan {item}. "
             "Kami akan mengatur penggantian atau semakan penghantaran dan mengemas kini anda tidak lama lagi."
+        )
+    elif reasoning.decision == "DISMISS":
+        english = (
+            f"Hi {name}, thanks for contacting us about {item}. "
+            "We checked the order and this refund request is outside the seller return window. "
+            "Because no damage or fulfillment issue was reported, we are unable to approve a refund for this order."
+        )
+        bahasa = (
+            f"Hai {name}, terima kasih kerana menghubungi kami tentang {item}. "
+            "Kami telah menyemak pesanan ini dan permintaan bayaran balik berada di luar tempoh pemulangan penjual. "
+            "Memandangkan tiada kerosakan atau isu penghantaran dilaporkan, kami tidak dapat meluluskan bayaran balik untuk pesanan ini."
         )
     else:
         english = (

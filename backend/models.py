@@ -77,3 +77,6 @@ class TestLLMRequest(BaseModel):
 class TestLLMResponse(BaseModel):
     model: str
     output: str
+    provider_used: str | None = None
+    fallback_used: bool = False
+    fallback_reason: str | None = None

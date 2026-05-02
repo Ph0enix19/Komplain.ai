@@ -283,7 +283,7 @@ Create `.env` in the repository root. Use `.env.example` as the template:
 LLM_PROVIDER=zai
 
 ZAI_API_KEY=your_zai_api_key_here
-ZAI_BASE_URL=https://api.z.ai/api/paas/v4
+ZAI_BASE_URL=https://api.z.ai/api/coding/paas/v4
 ZAI_MODEL=glm-5.1
 ZAI_TIMEOUT=60
 ZAI_THINKING_TYPE=disabled

@@ -267,7 +267,7 @@ def health() -> dict:
 @app.post("/api/test-llm", response_model=TestLLMResponse)
 async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
     try:
-        output = await ilmu_client.chat(req.prompt, system="You are Komplain.ai assistant.")
+        output, usage = await ilmu_client.chat_with_usage(req.prompt, system="You are Komplain.ai assistant.")
     except httpx.TimeoutException as exc:
         raise HTTPException(status_code=504, detail="LLM provider request timed out.") from exc
     except httpx.HTTPStatusError as exc:
@@ -282,7 +282,13 @@ async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    return TestLLMResponse(model=ilmu_client.model, output=output)
+    return TestLLMResponse(
+        model=ilmu_client.model,
+        output=output,
+        provider_used=usage.get("provider_used"),
+        fallback_used=bool(usage.get("fallback_used")),
+        fallback_reason=usage.get("fallback_reason"),
+    )
 
 
 @app.post("/api/complaints")

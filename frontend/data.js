@@ -29,6 +29,13 @@ window.SCENARIOS = [
     complaint: "Saya nak refund. Barang rosak.",
     orderId: '',
   },
+  {
+    key: 'dismiss',
+    label: 'Outside policy',
+    blurb: 'EN, return window expired',
+    complaint: "Hi, I want a refund for order ORD-1912. The shoes fit fine and there is nothing wrong with them, but I changed my mind after using them for 45 days.",
+    orderId: 'ORD-1912',
+  },
 ];
 
 window.MOCK_ORDERS = {
@@ -64,6 +71,17 @@ window.MOCK_ORDERS = {
     seller_policy_reship_allowed: true,
     courier: 'DHL eCommerce',
     tracking: 'DHL55291003MY',
+  },
+  'ORD-1912': {
+    id: 'ORD-1912',
+    product_name: 'Running Shoes - Black 42',
+    order_date: '2026-03-03',
+    delivery_status: 'delivered',
+    days_since_order: 45,
+    seller_policy_refund_days: 30,
+    seller_policy_reship_allowed: false,
+    courier: 'Ninja Van',
+    tracking: 'NV191245MY',
   },
 };
 
@@ -307,6 +325,50 @@ window.PIPELINES = {
       { at: 2480, agent: 'response', status: 'started', message: 'Drafting clarification - BM + EN' },
       { at: 2980, agent: 'response', status: 'completed', message: 'Clarification ready - requires review' },
       { at: 3120, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - status PENDING_INFO' },
+    ],
+  },
+  dismiss: {
+    resolution: {
+      type: 'DISMISS',
+      confidence: 0.94,
+      reason: 'Order ORD-1912 was delivered 45 days ago. The customer says the item is not damaged and the request is a change-of-mind refund, which is outside the 30-day refund window.',
+      policy: 'Seller return policy - change-of-mind refund window expired',
+      response_en: "Hi,\n\nThanks for contacting us about order ORD-1912. I checked the order and can see it was delivered 45 days ago.\n\nBecause the item is not damaged and this is a change-of-mind request after use, it falls outside our 30-day return and refund window. We are not able to approve a refund for this order.\n\n-- Komplain.ai Support",
+      response_bm: "Hai,\n\nTerima kasih kerana menghubungi kami tentang pesanan ORD-1912. Kami telah menyemak pesanan ini dan mendapati ia telah dihantar 45 hari yang lalu.\n\nMemandangkan barang tidak rosak dan permintaan ini dibuat kerana tukar fikiran selepas digunakan, ia berada di luar tempoh 30 hari untuk pemulangan dan bayaran balik. Kami tidak dapat meluluskan bayaran balik untuk pesanan ini.\n\n-- Komplain.ai Support",
+      amount: '-',
+      requires_review: false,
+    },
+    events: [
+      { at: 120, agent: 'supervisor', status: 'running', message: 'Pipeline initialised - {model}' },
+      { at: 240, agent: 'intake', status: 'started', message: 'Reading complaint - 142 chars' },
+      { at: 620, agent: 'intake', status: 'completed', message: 'Intake complete - refund request', output: {
+        complaint_type: 'refund_request',
+        sentiment: 'neutral',
+        urgency_score: 2,
+        extracted_order_id: 'ORD-1912',
+        language_detected: 'English',
+        summary_en: 'Customer requests refund after using an undamaged item for 45 days.',
+      }},
+      { at: 780, agent: 'context', status: 'started', message: 'Fetching order ORD-1912' },
+      { at: 1180, agent: 'context', status: 'completed', message: 'Order found - delivered 45d ago', output: {
+        order_id: 'ORD-1912',
+        product: 'Running Shoes - Black 42',
+        delivery_status: 'delivered',
+        days_since_order: 45,
+        refund_window_days: 30,
+        within_policy: false,
+      }},
+      { at: 1360, agent: 'reasoning', status: 'started', message: 'Applying {model} policy reasoning' },
+      { at: 1820, agent: 'reasoning', status: 'running', message: 'Checking damage, use, and refund-window rules' },
+      { at: 2280, agent: 'reasoning', status: 'completed', message: 'Decision - DISMISS - conf 0.94', output: {
+        resolution_type: 'DISMISS',
+        confidence_score: 0.94,
+        policy_reference: 'Seller return policy Section 4.4',
+        reason: 'Change-of-mind request after use; refund window expired.',
+      }},
+      { at: 2460, agent: 'response', status: 'started', message: 'Drafting polite decline reply' },
+      { at: 3020, agent: 'response', status: 'completed', message: 'EN + BM decline drafts ready' },
+      { at: 3180, agent: 'supervisor', status: 'completed', message: 'Pipeline resolved - DISMISS approved' },
     ],
   },
 };
