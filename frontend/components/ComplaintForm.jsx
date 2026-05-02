@@ -12,9 +12,13 @@ function ComplaintForm({
   activeScenario,
   modelLabel,
   agents,
+  selectedImage,
+  imagePreviewUrl,
+  onImageChange,
 }) {
   const hasComplaint = Boolean(complaint.trim());
   const agentCount = agents?.length || window.AGENTS.length;
+  const fileInputRef = React.useRef(null);
 
   return (
     <aside className={'panel form-panel ' + (!hasComplaint ? 'form-panel-needs-input' : '')} aria-labelledby="complaint-form-title">
@@ -52,7 +56,7 @@ function ComplaintForm({
         <textarea
           id="complaint-text"
           className="textarea"
-          rows={8}
+          rows={11}
           placeholder="Paste or type the customer's complaint in any language."
           value={complaint}
           onChange={(event) => setComplaint(event.target.value)}
@@ -75,12 +79,63 @@ function ComplaintForm({
         <input
           id="order-id"
           className="input mono"
-          placeholder="ORD-2041"
+          placeholder="ORD-15"
           value={orderId}
           onChange={(event) => setOrderId(event.target.value)}
           disabled={running}
         />
         <div className="helper-text mono">Leave blank when the complaint already includes the order ID.</div>
+      </div>
+
+      <div className="field">
+        <label className="control-label" htmlFor="evidence-image">
+          Visual evidence <span className="optional-label">optional</span>
+        </label>
+        <div className={'upload-box ' + (selectedImage ? 'upload-box-ready' : '')}>
+          <input
+            ref={fileInputRef}
+            id="evidence-image"
+            className="sr-only"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            disabled={running}
+            onChange={(event) => onImageChange(event.target.files?.[0] || null)}
+          />
+          {imagePreviewUrl ? (
+            <div className="upload-preview">
+              <img src={imagePreviewUrl} alt="Selected visual evidence preview" />
+              <div className="upload-preview-meta">
+                <span className="mono">{selectedImage?.name}</span>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  type="button"
+                  disabled={running}
+                  onClick={() => {
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                    onImageChange(null);
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              className="upload-empty"
+              type="button"
+              disabled={running}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+              <span>Add product or package photo</span>
+              <span className="mono">jpg, png, webp - max 5MB</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="form-foot">
@@ -107,8 +162,8 @@ function ComplaintForm({
 
 function ScenarioIcon({ name }) {
   const props = { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' };
-  if (name === 'clean') return <svg {...props}><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z" /><path d="m3.3 7 8.7 5 8.7-5M12 22V12" /></svg>;
-  if (name === 'edge') return <svg {...props}><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>;
+  if (name === 'english') return <svg {...props}><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z" /><path d="m3.3 7 8.7 5 8.7-5M12 22V12" /></svg>;
+  if (name === 'malay') return <svg {...props}><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>;
   return <svg {...props}><path d="M3 12h18M5 8h14M7 16h10" /><path d="M17 4l4 4-4 4" /></svg>;
 }
 

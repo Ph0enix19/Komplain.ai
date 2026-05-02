@@ -40,6 +40,14 @@ function getDisplayAgents(modelLabel) {
   }));
 }
 
+function withVisionAgent(agents) {
+  if (agents.some((agent) => agent.key === 'vision')) return agents;
+  const visionAgent = window.VISION_AGENT || { key: 'vision', name: 'Visual Evidence', role: 'Inspects uploaded image' };
+  const reasoningIndex = agents.findIndex((agent) => agent.key === 'reasoning');
+  const insertAt = reasoningIndex === -1 ? agents.length : reasoningIndex;
+  return [...agents.slice(0, insertAt), visionAgent, ...agents.slice(insertAt)];
+}
+
 function materializeDemoPipeline(pipeline, modelLabel) {
   if (!pipeline) return pipeline;
   return {
@@ -123,6 +131,7 @@ function buildAmount(record) {
 function buildPolicy(record) {
   if (!record.context.order_found && !record.intake.order_id) return 'Supervisor review - missing order ID';
   if (!record.context.order_found) return 'Supervisor review - order lookup failed';
+  if (record.reasoning.decision === 'CLARIFY') return 'Clarification required - customer input needed';
   if (record.reasoning.decision === 'REFUND') return 'Order policy - refund path selected';
   if (record.reasoning.decision === 'RESHIP') return 'Order policy - replacement path selected';
   if (record.reasoning.decision === 'DISMISS') return 'Seller return policy - dismissal path selected';
@@ -130,28 +139,31 @@ function buildPolicy(record) {
 }
 
 function pipelineKeyForResolution(resolution) {
-  if (resolution === 'REFUND') return 'manglish';
-  if (resolution === 'RESHIP') return 'wrong';
-  if (resolution === 'DISMISS') return 'dismiss';
-  return 'edge';
+  if (resolution === 'RESHIP') return 'manglish';
+  if (resolution === 'REFUND') return 'malay';
+  return 'english';
 }
 
 function buildResolution(record) {
   const needsClarification = !record.intake.order_id;
-  const decision = needsClarification ? 'CLARIFY' : record.reasoning.decision;
+  const decision = needsClarification || record.reasoning.clarification_needed ? 'CLARIFY' : record.reasoning.decision;
   return {
     type: decision,
     confidence: record.reasoning.confidence,
     reason: record.reasoning.rationale,
-    policy: buildPolicy(record),
+    policy: record.reasoning.clarification_needed ? 'Clarification required - conflicting customer evidence' : buildPolicy(record),
     response_en: record.response.english,
     response_bm: record.response.bahasa_malaysia,
     amount: buildAmount(record),
     requires_review: record.reasoning.requires_human_review,
     review_warning: record.reasoning.requires_human_review && shouldWarnForConfidence(record.reasoning.confidence),
+    clarification_needed: Boolean(record.reasoning.clarification_needed),
+    clarification_message: record.reasoning.clarification_message || null,
     total_latency: record.total_latency || 0,
     total_tokens: record.total_tokens || 0,
     estimated_cost_rm: record.estimated_cost_rm || 0,
+    image_analysis: record.image_analysis || null,
+    visual_evidence_used: Boolean(record.visual_evidence_used),
   };
 }
 
@@ -275,9 +287,11 @@ function App() {
   const [tweaksHostActive, setTweaksHostActive] = useState(false);
   const [tweaksUserOpen, setTweaksUserOpen] = useState(false);
 
-  const [complaint, setComplaint] = useState(window.SCENARIOS[0].complaint);
-  const [orderId, setOrderId] = useState(window.SCENARIOS[0].orderId);
-  const [scenarioKey, setScenarioKey] = useState('manglish');
+  const [complaint, setComplaint] = useState('');
+  const [orderId, setOrderId] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [scenarioKey, setScenarioKey] = useState('');
 
   const [events, setEvents] = useState([]);
   const [running, setRunning] = useState(false);
@@ -293,6 +307,10 @@ function App() {
   const [modalCase, setModalCase] = useState(null);
   const [activeCaseId, setActiveCaseId] = useState(null);
   const liveCaseId = useRef(null);
+  const agentsForTrace = React.useMemo(() => {
+    const hasVision = Boolean(selectedImage || events.some((event) => event.agent === 'vision') || resolution?.image_analysis);
+    return hasVision ? withVisionAgent(agents) : agents;
+  }, [agents, selectedImage, events, resolution]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -362,6 +380,9 @@ function App() {
     if (running) return;
     setComplaint(scenario.complaint);
     setOrderId(scenario.orderId);
+    setSelectedImage(null);
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setImagePreviewUrl('');
     setScenarioKey(scenario.key);
     setEvents([]);
     setResolution(null);
@@ -375,6 +396,9 @@ function App() {
     // Clear the live workspace after the final approval so the next case starts fresh.
     setComplaint('');
     setOrderId('');
+    setSelectedImage(null);
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setImagePreviewUrl('');
     setScenarioKey('');
     setEvents([]);
     setResolution(null);
@@ -388,6 +412,12 @@ function App() {
     liveCaseId.current = null;
   };
 
+  const handleImageChange = (file) => {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setSelectedImage(file || null);
+    setImagePreviewUrl(file ? URL.createObjectURL(file) : '');
+  };
+
   const resolveComplaint = async () => {
     if (running) return;
 
@@ -398,14 +428,24 @@ function App() {
     setTotalDuration(0);
 
     try {
-      const created = await apiFetch('/complaints', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          complaint_text: complaint,
-          order_id: orderId || null,
-        }),
-      });
+      const requestOptions = selectedImage
+        ? (() => {
+            const form = new FormData();
+            form.append('complaint_text', complaint);
+            if (orderId) form.append('order_id', orderId);
+            form.append('image', selectedImage);
+            return { method: 'POST', body: form };
+          })()
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              complaint_text: complaint,
+              order_id: orderId || null,
+            }),
+          };
+
+      const created = await apiFetch('/complaints', requestOptions);
 
       liveCaseId.current = created.id;
       const final = await pollForCompletion(created.id, (liveEvents) => {
@@ -546,6 +586,7 @@ function App() {
       modalOrderData = window.MOCK_ORDERS[modalCase.order] || null;
     }
   }
+  const modalAgents = modalEvents.some((event) => event.agent === 'vision') ? withVisionAgent(agents) : agents;
 
   const approveReplies = resolution ? {
     ...resolution,
@@ -578,7 +619,7 @@ function App() {
         onResolve={resolveComplaint}
         canResolve={Boolean(complaint.trim())}
         onIntegrationDemo={() => setPage('integration')}
-        agents={agents}
+        agents={agentsForTrace}
       />
 
       <div className="workspace">
@@ -593,7 +634,10 @@ function App() {
           onScenario={loadScenario}
           activeScenario={scenarioKey}
           modelLabel={modelLabel}
-          agents={agents}
+          agents={agentsForTrace}
+          selectedImage={selectedImage}
+          imagePreviewUrl={imagePreviewUrl}
+          onImageChange={handleImageChange}
         />
         <AgentTracePanel
           events={events}
@@ -601,7 +645,7 @@ function App() {
           scenario={scenarioKey}
           traceStyle={traceStyle}
           totalDuration={totalDuration}
-          agents={agents}
+          agents={agentsForTrace}
         />
         <ResolutionCard
           running={running}
@@ -635,7 +679,7 @@ function App() {
           resolution={modalResolution}
           scenarioComplaint={modalComplaint}
           orderData={modalOrderData}
-          agents={agents}
+          agents={modalAgents}
           onClose={() => setModalCase(null)}
         />
       )}

@@ -196,7 +196,7 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
             <section className="modal-section">
               <div className="section-label mono">COMPLAINT - RAW INPUT</div>
               <blockquote className="complaint-quote">
-                {scenarioComplaint || 'My order ORD-2041 has not arrived after two weeks. Please help me get a refund.'}
+                {scenarioComplaint || 'My order ORD-15 arrived and the T-shirt looks damaged. I uploaded a photo for review.'}
               </blockquote>
               <div className="complaint-meta mono">
                 <span>{caseData.lang}</span>
@@ -256,6 +256,12 @@ function CaseDetailModal({ caseData, events, resolution, onClose, scenarioCompla
           </div>
 
           <aside className="modal-side">
+            {resolution?.image_analysis && (
+              <div className="side-block">
+                <VisualEvidenceSummary visual={resolution.image_analysis} />
+              </div>
+            )}
+
             <div className="side-block">
               <div className="section-label mono">STATUS TIMELINE</div>
               <ol className="timeline">

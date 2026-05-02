@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
+import mimetypes
 import os
 import re
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -12,6 +15,8 @@ import httpx
 _REASONING_DEFAULT = object()
 DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
 DEFAULT_ZAI_MODEL = "glm-5.1"
+DEFAULT_ZAI_VISION_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
+DEFAULT_ZAI_VISION_MODEL = "glm-4.5v"
 COST_PER_1K_TOKENS_RM = 0.002
 logger = logging.getLogger(__name__)
 
@@ -404,6 +409,55 @@ class ILMUClient:
         )
         return payload, self._usage_with_provider_metadata(usage)
 
+    async def chat_json_with_image(
+        self,
+        image: str | Path,
+        prompt: str,
+        system: str,
+        *,
+        max_tokens: int | None = None,
+        model: str | None = None,
+        base_url: str | None = None,
+        thinking_type: str | None = None,
+    ) -> dict[str, Any]:
+        if self.provider != "zai":
+            raise RuntimeError("Image analysis is currently configured for the Z.ai / GLM vision provider only.")
+        if not self.api_key:
+            raise RuntimeError(f"{self.api_key_env_var} is not configured.")
+
+        payload = {
+            "model": model or os.getenv("ZAI_VISION_MODEL", DEFAULT_ZAI_VISION_MODEL),
+            "messages": [
+                {"role": "system", "content": system},
+                {
+                    "role": "user",
+                    "content": [
+                        self._image_content_part(image),
+                        {"type": "text", "text": prompt},
+                    ],
+                },
+            ],
+            "max_tokens": max_tokens or self.MAX_TOKENS,
+            "response_format": {"type": "json_object"},
+            "temperature": self.temperature,
+        }
+        selected_thinking = (
+            thinking_type
+            if thinking_type is not None
+            else os.getenv("ZAI_VISION_THINKING_TYPE", self.thinking_type)
+        )
+        if selected_thinking.strip().lower() not in {"", "none", "default"}:
+            payload["thinking"] = {"type": selected_thinking.strip().lower()}
+
+        raw_text = await self._create_chat_completion_for_url(
+            self._chat_completions_url_for(base_url or os.getenv("ZAI_VISION_BASE_URL", DEFAULT_ZAI_VISION_BASE_URL)),
+            payload,
+        )
+        message = self._message_content(raw_text)
+        if not isinstance(message, str):
+            raise RuntimeError("GLM vision provider did not return text content.")
+        return self._extract_structured_object(message)
+
     async def _chat_json_with_usage_once(
         self,
         prompt: str,
@@ -436,6 +490,40 @@ class ILMUClient:
             )
             usage = self._merge_usage(usage, fallback_usage)
         return self._extract_structured_object(raw_text), usage
+
+    async def _create_chat_completion_for_url(self, url: str, payload: dict[str, Any]) -> dict[str, Any]:
+        headers = {
+            "Authorization": f"Bearer {self.api_key or ''}",
+            "Content-Type": "application/json",
+        }
+
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+
+        return data
+
+    @classmethod
+    def _image_content_part(cls, image: str | Path) -> dict[str, Any]:
+        value = str(image)
+        if re.match(r"^https?://", value, flags=re.IGNORECASE) or value.startswith("data:"):
+            return {"type": "image_url", "image_url": {"url": value}}
+
+        path = Path(value)
+        if not path.exists():
+            raise RuntimeError(f"Image file does not exist: {path}")
+
+        mime_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        return {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}}
+
+    @staticmethod
+    def _chat_completions_url_for(base_url: str) -> str:
+        root = base_url.rstrip("/")
+        if root.endswith("/chat/completions"):
+            return root
+        return f"{root}/chat/completions"
 
     @staticmethod
     def _extract_key_value_object(text: str) -> dict[str, Any]:

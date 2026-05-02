@@ -90,6 +90,7 @@ function ResolutionCard({
 
   const meta = RESOLUTION_META[resolution.type] || RESOLUTION_META.REFUND;
   const hasAmount = resolution.amount && resolution.amount !== '-';
+  const visual = resolution.image_analysis;
 
   return (
     <aside className="panel resolution-panel" aria-labelledby="resolution-title">
@@ -137,6 +138,19 @@ function ResolutionCard({
         </div>
       )}
 
+      {resolution.clarification_needed && (
+        <div className="review-flag clarification-flag" role="alert">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" />
+          </svg>
+          <div>
+            <div className="review-flag-title">Clarification needed</div>
+            <div className="review-flag-sub">{resolution.clarification_message || 'Ask the customer to confirm the conflicting evidence before resolving.'}</div>
+          </div>
+        </div>
+      )}
+
       <div className="res-reason">
         <span className="label">Reasoning</span>
         <p>{resolution.reason}</p>
@@ -148,6 +162,10 @@ function ResolutionCard({
           {resolution.policy}
         </div>
       </div>
+
+      {visual && (
+        <VisualEvidenceSummary visual={visual} />
+      )}
 
       <div className="res-replies">
         <ReplyBlock
@@ -195,6 +213,33 @@ function ResolutionCard({
         )}
       </div>
     </aside>
+  );
+}
+
+function VisualEvidenceSummary({ visual }) {
+  const damageLabel = visual.damage_detected === true ? 'Yes' : visual.damage_detected === false ? 'No' : 'Unknown';
+  const matchLabel = visual.matches_order_item === true ? 'Match' : visual.matches_order_item === false ? 'Mismatch' : 'Unknown';
+  const confidence = Math.round(Number(visual.confidence || 0) * 100);
+
+  return (
+    <div className="visual-card">
+      <div className="visual-head">
+        <div>
+          <span className="label">Visual Evidence</span>
+          <div className="visual-title">Damage inspection</div>
+        </div>
+        <span className={'badge ' + (visual.image_analyzed ? 'badge-accent' : 'badge-warn')}>
+          {visual.image_analyzed ? 'Analyzed' : 'Fallback'}
+        </span>
+      </div>
+      <div className="visual-grid mono">
+        <div><span>damage</span><strong>{damageLabel}</strong></div>
+        <div><span>level</span><strong>{visual.damage_level || 'unknown'}</strong></div>
+        <div><span>order</span><strong>{matchLabel}</strong></div>
+        <div><span>conf.</span><strong>{confidence}%</strong></div>
+      </div>
+      <p>{visual.evidence}</p>
+    </div>
   );
 }
 
@@ -287,4 +332,4 @@ function ResIllustration() {
   );
 }
 
-Object.assign(window, { ResolutionCard, RESOLUTION_META, ReplyBlock });
+Object.assign(window, { ResolutionCard, RESOLUTION_META, ReplyBlock, VisualEvidenceSummary });

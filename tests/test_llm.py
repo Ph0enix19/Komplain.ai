@@ -76,6 +76,35 @@ def test_provider_switching_selects_zai_primary(monkeypatch: pytest.MonkeyPatch)
 
 
 @pytest.mark.asyncio
+async def test_zai_vision_json_uses_vision_model_and_image_content(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("LLM_PROVIDER", "zai")
+    monkeypatch.setenv("ZAI_API_KEY", "zai-key")
+    monkeypatch.setenv("ZAI_VISION_MODEL", "glm-vision-test")
+    monkeypatch.setenv("ZAI_VISION_BASE_URL", "https://vision.example.test/v4")
+    monkeypatch.setenv("ZAI_TEMPERATURE", "0.1")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-key")
+    client = ILMUClient(enable_fallback=False)
+
+    async def fake_completion(url: str, payload: dict) -> dict:
+        assert url == "https://vision.example.test/v4/chat/completions"
+        assert payload["model"] == "glm-vision-test"
+        assert payload["temperature"] == 0.1
+        assert payload["response_format"] == {"type": "json_object"}
+        content = payload["messages"][1]["content"]
+        assert content[0] == {"type": "image_url", "image_url": {"url": "https://example.test/box.jpg"}}
+        assert content[1]["type"] == "text"
+        return {"choices": [{"message": {"content": '{"damage_detected": true}'}}]}
+
+    monkeypatch.setattr(client, "_create_chat_completion_for_url", fake_completion)
+
+    assert await client.chat_json_with_image(
+        "https://example.test/box.jpg",
+        "Inspect damage.",
+        "Return JSON.",
+    ) == {"damage_detected": True}
+
+
+@pytest.mark.asyncio
 async def test_zai_payload_uses_low_temperature(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LLM_PROVIDER", "zai")
     monkeypatch.setenv("ZAI_API_KEY", "zai-key")

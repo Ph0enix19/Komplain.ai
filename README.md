@@ -161,11 +161,12 @@ Telemetry appears through the API and in the frontend agent trace, command cente
 |---|---|---|
 | `GET` | `/api/health` | Returns backend status, UTC time, stored complaint count, active provider/model, and fallback provider. |
 | `POST` | `/api/test-llm` | Sends a prompt to the configured LLM client. |
-| `POST` | `/api/complaints` | Creates a `PROCESSING` placeholder and starts the pipeline in the background. |
+| `POST` | `/api/complaints` | Creates a `PROCESSING` placeholder and starts the pipeline. Accepts JSON for text-only complaints or multipart form data with optional `image`. |
 | `GET` | `/api/complaints` | Lists stored complaints, capped to the latest five records. |
 | `GET` | `/api/complaints/{id}` | Returns one complaint record. |
 | `GET` | `/api/complaints/{id}/events` | Returns agent events for one complaint. |
 | `GET` | `/api/complaints/{id}/stream` | Streams agent events with server-sent events. |
+| `GET` | `/api/uploads/{filename}` | Serves stored MVP evidence images by safe generated filename. |
 
 Example completed complaint telemetry:
 
@@ -288,6 +289,10 @@ ZAI_MODEL=glm-5.1
 ZAI_TIMEOUT=60
 ZAI_THINKING_TYPE=disabled
 ZAI_TEMPERATURE=0.1
+ZAI_VISION_BASE_URL=https://api.z.ai/api/coding/paas/v4
+ZAI_VISION_MODEL=glm-4.5v
+ZAI_VISION_THINKING_TYPE=disabled
+VISION_ENABLED=true
 
 GROQ_API_KEY=your_groq_api_key_here
 GROQ_BASE_URL=https://api.groq.com/openai/v1
@@ -304,6 +309,8 @@ USE_LLM_AGENTS=false
 ```
 
 That forces deterministic fallback agent logic instead of calling an LLM.
+
+Vision is optional. Set `VISION_ENABLED=false` to accept uploaded images but skip GLM visual inspection and fall back to text/order reasoning.
 
 Never commit `.env` or provider API keys.
 
@@ -340,6 +347,7 @@ The default suite does not call real LLM providers. It covers:
 - API health, LLM smoke route, complaint creation, retrieval, and events.
 - Agent extraction, language detection, context lookup, reasoning validation, bilingual response output, supervisor behavior, and fallback paths.
 - LLM JSON parsing, markdown JSON extraction, key-value fallback, provider switching, and token estimation.
+- Optional image upload, local upload validation, visual evidence fallback, and reasoning integration with mocked vision results.
 - JSON storage, order lookup, complaint FIFO cap, and event pruning.
 
 Optional real-provider smoke testing:
@@ -350,6 +358,18 @@ $env:ZAI_API_KEY = "your_real_zai_key"
 $env:GROQ_API_KEY = "your_real_groq_fallback_key"
 python -m pytest tests/ --llm -v
 ```
+
+Manual GLM vision smoke test with local images:
+
+```powershell
+$env:LLM_PROVIDER = "zai"
+$env:ZAI_API_KEY = "your_real_zai_key"
+$env:ZAI_VISION_MODEL = "glm-4.5v"
+$env:ZAI_VISION_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
+python tests/smoke_test_glm_vision.py "data/images/normal box.jpg" "data/images/damaged box.jpg"
+```
+
+The dashboard sends `POST /api/complaints` as JSON for text-only complaints and `multipart/form-data` when an image is attached. Uploaded MVP evidence is stored under `data/uploads/`, limited to jpg/jpeg/png/webp files up to 5MB.
 
 GitHub Actions runs on pushes to `main`, pull requests to `main`, and manual `workflow_dispatch`.
 
@@ -397,6 +417,10 @@ Typical Render environment variables:
 - `ZAI_TIMEOUT`
 - `ZAI_THINKING_TYPE`
 - `ZAI_TEMPERATURE`
+- `ZAI_VISION_BASE_URL`
+- `ZAI_VISION_MODEL`
+- `ZAI_VISION_THINKING_TYPE`
+- `VISION_ENABLED`
 - `GROQ_API_KEY`
 - `GROQ_BASE_URL`
 - `GROQ_MODEL`
@@ -417,6 +441,7 @@ Komplain.ai/
 |-- requirements.txt
 |-- requirements-dev.txt
 |-- pytest.ini
+|-- postman_collection.json
 |-- postman_qatd_collection.json
 |-- .env.example
 |-- .github/
@@ -448,14 +473,6 @@ Komplain.ai/
 |   |-- orders.json
 |   |-- complaints.json
 |   `-- agent_events.json
-|-- docs/
-|   |-- PRD.pdf
-|   |-- SAD.pdf
-|   |-- QATD.pdf
-|   |-- QATD.docx
-|   |-- PitchDeck.pdf
-|   |-- PitchDeck.pptx
-|   `-- screenshots/dashboard.png
 `-- tests/
     |-- conftest.py
     |-- test_api.py
@@ -469,15 +486,15 @@ Komplain.ai/
 
 ## Submission Deliverables
 
-| Deliverable | File |
+The previous document set has been removed. Updated final-round documents will be added here later.
+
+| Deliverable | Status |
 |---|---|
-| Product Requirements Document | [docs/PRD.pdf](./docs/PRD.pdf) |
-| System Architecture Document | [docs/SAD.pdf](./docs/SAD.pdf) |
-| Quality Assurance and Testing Document | [docs/QATD.pdf](./docs/QATD.pdf) |
-| QATD editable source | [docs/QATD.docx](./docs/QATD.docx) |
-| Pitch deck | [docs/PitchDeck.pdf](./docs/PitchDeck.pdf) |
-| Pitch deck editable source | [docs/PitchDeck.pptx](./docs/PitchDeck.pptx) |
-| Dashboard screenshot | [docs/screenshots/dashboard.png](./docs/screenshots/dashboard.png) |
+| Product Requirements Document | Pending replacement |
+| System Architecture Document | Pending replacement |
+| Quality Assurance and Testing Document | Pending replacement |
+| Pitch deck | Pending replacement |
+| Core Postman API collection | [postman_collection.json](./postman_collection.json) |
 | QATD Postman evidence collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
 
 ---

@@ -1,57 +1,79 @@
 [
   {
-    "order_id": "KM-1001",
-    "customer_name": "Aisyah",
-    "item": "Bluetooth Speaker",
+    "order_id": "ORD-15",
+    "customer_name": "Nadia Rahman",
+    "item": "Classic Cotton T-Shirt - White M",
     "status": "DELIVERED",
-    "total": 129.0,
+    "total": 45.0,
     "currency": "MYR",
-    "delivery_date": "2026-04-20"
+    "delivery_date": "2026-05-01",
+    "seller_policy_refund_days": 7,
+    "seller_policy_reship_allowed": true
   },
   {
-    "order_id": "KM-1002",
-    "customer_name": "Ravi",
-    "item": "Phone Case",
-    "status": "SHIPPED",
-    "total": 39.0,
-    "currency": "MYR",
-    "delivery_date": null
-  },
-  {
-    "order_id": "KM-1003",
-    "customer_name": "Nurul",
-    "item": "Gaming Mouse",
+    "order_id": "ORD-26",
+    "customer_name": "Farid Lim",
+    "item": "Everyday Denim Jacket - Blue L",
     "status": "DELIVERED",
-    "total": 89.0,
+    "total": 129.9,
     "currency": "MYR",
-    "delivery_date": "2026-04-19"
+    "delivery_date": "2026-05-02",
+    "seller_policy_refund_days": 7,
+    "seller_policy_reship_allowed": true
   },
   {
-    "order_id": "ORD-2041",
-    "customer_name": "Aina",
-    "item": "Baju Kurung Moden - Maroon XL",
-    "status": "SHIPPED",
-    "total": 89.0,
-    "currency": "MYR",
-    "delivery_date": null
-  },
-  {
-    "order_id": "ORD-1887",
-    "customer_name": "Hannah",
-    "item": "Linen Midi Dress - Sage M",
+    "order_id": "ORD-37",
+    "customer_name": "Siti Amani",
+    "item": "Kids Rain Boots - Yellow EU 30",
     "status": "DELIVERED",
-    "total": 129.0,
+    "total": 68.0,
     "currency": "MYR",
-    "delivery_date": "2026-04-19"
+    "delivery_date": "2026-05-02",
+    "seller_policy_refund_days": 7,
+    "seller_policy_reship_allowed": true
   },
   {
-    "order_id": "ORD-1912",
-    "customer_name": "Farah",
-    "item": "Running Shoes - Black 42",
-    "status": "DELIVERED",
+    "order_id": "ORD-48",
+    "customer_name": "Jason Tan",
+    "item": "Bluetooth Speaker - Graphite",
+    "status": "IN_TRANSIT",
     "total": 159.0,
     "currency": "MYR",
+    "delivery_date": null,
+    "seller_policy_refund_days": 14,
+    "seller_policy_reship_allowed": true
+  },
+  {
+    "order_id": "ORD-59",
+    "customer_name": "Aisyah Noor",
+    "item": "Ceramic Dinner Plate Set - Sage",
+    "status": "DELIVERED",
+    "total": 92.5,
+    "currency": "MYR",
+    "delivery_date": "2026-04-29",
+    "seller_policy_refund_days": 7,
+    "seller_policy_reship_allowed": true
+  },
+  {
+    "order_id": "ORD-70",
+    "customer_name": "Marcus Lee",
+    "item": "Running Shoes - Black UK 9",
+    "status": "DELIVERED",
+    "total": 214.0,
+    "currency": "MYR",
     "delivery_date": "2026-03-18",
-    "seller_policy_refund_days": 30
+    "seller_policy_refund_days": 14,
+    "seller_policy_reship_allowed": false
+  },
+  {
+    "order_id": "ORD-104",
+    "customer_name": "Maya Chen",
+    "item": "White Sport Shoes",
+    "status": "DELIVERED",
+    "total": 38.9,
+    "currency": "MYR",
+    "delivery_date": "2026-05-04",
+    "seller_policy_refund_days": 7,
+    "seller_policy_reship_allowed": true
   }
 ]

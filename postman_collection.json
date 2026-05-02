@@ -1,0 +1,244 @@
+{
+  "info": {
+    "name": "Komplain.ai Core API Smoke Tests",
+    "description": "Core Postman collection for the main Komplain.ai API flow. The QATD-specific collection with expanded evidence checks lives in postman_qatd_collection.json.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://komplaintest.onrender.com/api",
+      "type": "string"
+    },
+    {
+      "key": "complaintId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Health response has operational fields\", function () {",
+              "  pm.expect(json).to.have.property(\"status\", \"ok\");",
+              "  pm.expect(json).to.have.property(\"time\");",
+              "  pm.expect(json).to.have.property(\"complaints_count\");",
+              "  pm.expect(json).to.have.property(\"llm_provider\");",
+              "  pm.expect(json).to.have.property(\"llm_model\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - LLM Smoke Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"LLM response includes output and provider metadata\", function () {",
+              "  pm.expect(json).to.have.property(\"model\");",
+              "  pm.expect(json).to.have.property(\"output\");",
+              "  pm.expect(json.output).to.be.a(\"string\").and.not.empty;",
+              "  pm.expect(json).to.have.property(\"provider_used\");",
+              "  pm.expect(json).to.have.property(\"fallback_used\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Reply with pong in one short sentence.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/test-llm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "test-llm"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Create Complaint",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Complaint create returns processing placeholder\", function () {",
+              "  pm.expect(json).to.have.property(\"id\");",
+              "  pm.expect(json).to.have.property(\"complaint_text\");",
+              "  pm.expect(json).to.have.property(\"created_at\");",
+              "  pm.expect(json).to.have.property(\"status\", \"PROCESSING\");",
+              "});",
+              "",
+              "pm.collectionVariables.set(\"complaintId\", json.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"complaint_text\": \"Order KM-1001 arrived with a broken screen.\",\n  \"order_id\": \"KM-1001\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/complaints",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Fetch Complaint",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id = pm.collectionVariables.get(\"complaintId\");",
+              "if (!id) {",
+              "  throw new Error(\"Run request 03 first so complaintId is available.\");",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const json = pm.response.json();",
+              "",
+              "pm.test(\"Complaint response has current status\", function () {",
+              "  pm.expect(json.status).to.be.oneOf([\"PROCESSING\", \"COMPLETED\", \"FAILED\"]);",
+              "});",
+              "",
+              "pm.test(\"Completed complaint exposes decision and bilingual reply\", function () {",
+              "  if (json.status !== \"COMPLETED\") {",
+              "    console.warn(\"Complaint is still processing. Wait a few seconds and rerun this request.\");",
+              "    return;",
+              "  }",
+              "  pm.expect(json.reasoning.decision).to.be.oneOf([\"REFUND\", \"RESHIP\", \"ESCALATE\", \"DISMISS\"]);",
+              "  pm.expect(json.reasoning.confidence).to.be.within(0, 1);",
+              "  pm.expect(json.response.english).to.be.a(\"string\").and.not.empty;",
+              "  pm.expect(json.response.bahasa_malaysia).to.be.a(\"string\").and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/complaints/{{complaintId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "complaints",
+            "{{complaintId}}"
+          ]
+        }
+      }
+    }
+  ]
+}

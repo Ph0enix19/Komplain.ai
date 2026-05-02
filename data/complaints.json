@@ -1,442 +1,562 @@
 [
   {
-    "id": "521a45fa-5047-4669-98e5-bd248e191f2e",
-    "complaint_text": "Hi, I want a refund for order ORD-1912. The shoes fit fine and there is nothing wrong with them, but I changed my mind after using them for 45 days.",
-    "created_at": "2026-05-02T07:12:47.681845+00:00",
+    "id": "e83fe2a7-d08d-42c3-844d-2b47b3fe2764",
+    "complaint_text": "Hi, I ordered ORD-15 in size M, but the T-shirt I received is size S. The item is not damaged, but it does not match my order. Please arrange the correct size.",
+    "created_at": "2026-05-02T16:51:06.740037+00:00",
     "status": "COMPLETED",
+    "image_path": null,
+    "image_url": null,
+    "image_analysis": null,
+    "visual_evidence_used": false,
     "intake": {
       "customer_name": null,
-      "order_id": "ORD-1912",
-      "issue_type": "refund_request",
+      "order_id": "ORD-15",
+      "issue_type": "wrong_item",
       "sentiment": "neutral",
       "language": "EN"
     },
     "context": {
       "order_found": true,
       "order_data": {
-        "order_id": "ORD-1912",
-        "customer_name": "Farah",
-        "item": "Running Shoes - Black 42",
+        "order_id": "ORD-15",
+        "customer_name": "Nadia Rahman",
+        "item": "Classic Cotton T-Shirt - White M",
         "status": "DELIVERED",
-        "total": 159.0,
+        "total": 45.0,
         "currency": "MYR",
-        "delivery_date": "2026-03-18",
-        "seller_policy_refund_days": 30
+        "delivery_date": "2026-05-01",
+        "seller_policy_refund_days": 7,
+        "seller_policy_reship_allowed": true
       },
-      "notes": "Customer Farah is requesting a refund for DELIVERED order ORD-1912 (Running Shoes - Black 42, 159.0 MYR). Item delivered on 2026-03-18."
+      "notes": "Order ORD-15 found. Customer received 'Classic Cotton T-Shirt - White M' but reported a wrong item issue."
     },
     "reasoning": {
-      "decision": "DISMISS",
-      "confidence": 0.98,
-      "rationale": "Change-of-mind refund request is outside the seller refund window and no damage or fulfillment issue is claimed.",
-      "requires_human_review": false
+      "decision": "RESHIP",
+      "confidence": 0.95,
+      "rationale": "Customer received the wrong size (S instead of M). The item is not damaged and reshipping is allowed per seller policy. A replacement with the correct size is appropriate.",
+      "requires_human_review": false,
+      "clarification_needed": false,
+      "clarification_message": null
     },
     "response": {
-      "english": "Dear Farah, Thank you for reaching out regarding your order ORD-1912. We understand that you have changed your mind about the Running Shoes. However, we are unable to process a refund as our seller's return policy covers change-of-mind requests within 30 days of delivery, and your order was delivered 45 days ago. We apologize for any inconvenience this may cause and appreciate your understanding.",
-      "bahasa_malaysia": "Kehadapan Farah, Terima kasih kerana menghubungi kami mengenai pesanan anda ORD-1912. Kami faham bahawa anda telah berubah hati mengenai kasut Running tersebut. Walau bagaimanapun, kami tidak dapat memproses bayaran balik kerana dasar pemulangan penjual kami hanya merangkumi permintaan berubah hati dalam tempoh 30 hari selepas penghantaran, dan pesanan anda telah dihantar 45 hari yang lalu. Kami memohon maaf atas sebarang kesulitan ini dan menghargai kefahaman anda."
+      "english": "Dear Nadia Rahman, we sincerely apologize for the mix-up with your order ORD-15. We understand you received a size S instead of the size M you ordered. We are more than happy to help! As per our policy, we will arrange a reshipment of the correct size (Classic Cotton T-Shirt - White M) to you immediately. Thank you for your patience and understanding.",
+      "bahasa_malaysia": "Kehadapan Nadia Rahman, kami memohon maaf atas kesilapan pada pesanan anda ORD-15. Kami faham anda telah menerima saiz S berbanding saiz M yang dipesan. Kami sedia membantu! Mengikut polisi kami, kami akan menyusun semula penghantaran saiz yang betul (Classic Cotton T-Shirt - White M) dengan segera. Terima kasih atas kesabaran dan kefahaman anda."
     },
     "supervisor": {
       "requires_human_review": false,
       "priority": "normal",
-      "supervisor_note": "Automated dismissal confirmed. High confidence decision based on policy (change-of-mind outside 30-day refund window)."
+      "supervisor_note": "System approved a reship for order ORD-15. Customer received wrong size (S instead of M). Verify stock for 'Classic Cotton T-Shirt - White M' and ship immediately."
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 220,
-        "output_tokens": 49,
+        "input_tokens": 222,
+        "output_tokens": 52,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.24
+        "duration": 2.78
       },
       "context": {
         "agent": "context",
-        "input_tokens": 256,
+        "input_tokens": 262,
+        "output_tokens": 43,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.74
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 578,
+        "output_tokens": 89,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.63
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 435,
+        "output_tokens": 202,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 7.79
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 379,
         "output_tokens": 66,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.48
+        "duration": 2.89
+      }
+    },
+    "total_latency": 19.83,
+    "total_tokens": 2328,
+    "estimated_cost_rm": 0.004656
+  },
+  {
+    "id": "65e2c678-a82a-4d8e-bf43-d157075dd0bc",
+    "complaint_text": "Hi, I ordered ORD-15 in size M, but the T-shirt I received is size S. The item is not damaged, but it does not match my order. Please arrange the correct size.",
+    "created_at": "2026-05-02T16:55:29.487765+00:00",
+    "status": "COMPLETED",
+    "image_path": null,
+    "image_url": null,
+    "image_analysis": null,
+    "visual_evidence_used": false,
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-15",
+      "issue_type": "wrong_item",
+      "sentiment": "neutral",
+      "language": "EN"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-15",
+        "customer_name": "Nadia Rahman",
+        "item": "Classic Cotton T-Shirt - White M",
+        "status": "DELIVERED",
+        "total": 45.0,
+        "currency": "MYR",
+        "delivery_date": "2026-05-01",
+        "seller_policy_refund_days": 7,
+        "seller_policy_reship_allowed": true
+      },
+      "notes": "Order ORD-15 for Nadia Rahman found. Status: DELIVERED. Issue reported: wrong_item."
+    },
+    "reasoning": {
+      "decision": "RESHIP",
+      "confidence": 0.95,
+      "rationale": "Customer received wrong size (S instead of M). Item is not damaged and reship is allowed per seller policy.",
+      "requires_human_review": false,
+      "clarification_needed": false,
+      "clarification_message": null
+    },
+    "response": {
+      "english": "Hi Nadia Rahman,\n\nThank you for reaching out to us. We sincerely apologize for the mix-up with your order. We understand that you received a size S instead of the size M Classic Cotton T-Shirt you ordered.\nWe are more than happy to arrange a reshipment for the correct size to you as soon as possible. We will send you a follow-up email shortly with the tracking details for your new shipment.\nWe appreciate your patience and understanding!\n\nBest regards,\nCustomer Support Team",
+      "bahasa_malaysia": "Salam Nadia Rahman,\n\nTerima kasih kerana menghubungi kami. Kami memohon maaf atas kesilapan dalam pesanan anda. Kami faham bahawa anda telah menerima saiz S dan bukannya saiz M untuk T-Shirt Classic Cotton yang anda pesan.\nKami dengan sukacitanya akan menyusun semula penghantaran untuk saiz yang betul kepada anda secepat mungkin. Kami akan menghantar e-mel susulan kepada anda tidak lama lagi berserta butiran penjejakan untuk penghantaran baharu anda.\nKami menghargai kesabaran dan kefahaman anda!\n\nSalam hormat,\nJabatan Sokongan Pelanggan"
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "Approve reship for correct size. Customer received size S instead of M."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 222,
+        "output_tokens": 52,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 6.6
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 263,
+        "output_tokens": 41,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.89
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 432,
-        "output_tokens": 61,
+        "input_tokens": 577,
+        "output_tokens": 77,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 4.32
+        "duration": 7.75
       },
       "response": {
         "agent": "response",
-        "input_tokens": 377,
-        "output_tokens": 243,
+        "input_tokens": 475,
+        "output_tokens": 286,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 8.72
+        "duration": 11.35
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 329,
-        "output_tokens": 53,
+        "input_tokens": 366,
+        "output_tokens": 45,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 2.94
+        "duration": 4.29
       }
     },
-    "total_latency": 22.7,
-    "total_tokens": 2086,
-    "estimated_cost_rm": 0.004172
+    "total_latency": 33.88,
+    "total_tokens": 2404,
+    "estimated_cost_rm": 0.004808
   },
   {
-    "id": "f7d99e1e-2874-4b26-abb4-3232b68b71d5",
-    "complaint_text": "Hi, I ordered KM-1003 Gaming Mouse but received the wrong item in the parcel. Please arrange a replacement with the correct item.",
-    "created_at": "2026-05-02T07:20:18.878199+00:00",
+    "id": "de890bea-3b89-407d-be5b-13ca47c1ef78",
+    "complaint_text": "My white sneakers arrived torn today i want a refund ASAP!\n\nOrder ID: ORD-104",
+    "created_at": "2026-05-02T17:01:24.894280+00:00",
     "status": "COMPLETED",
+    "image_path": "data\\uploads\\de890bea-3b89-407d-be5b-13ca47c1ef78-shoe.jpg",
+    "image_url": "/api/uploads/de890bea-3b89-407d-be5b-13ca47c1ef78-shoe.jpg",
+    "image_analysis": {
+      "image_provided": true,
+      "image_analyzed": true,
+      "item_visible": true,
+      "package_visible": false,
+      "damage_detected": false,
+      "damage_level": "none",
+      "damage_type": null,
+      "matches_order_item": false,
+      "matched_order_item": "white sneakers (not matching order item)",
+      "confidence": 0.95,
+      "evidence": "Image shows white sneakers on pavement; no tears/damage visible",
+      "human_review_required": true
+    },
+    "visual_evidence_used": true,
     "intake": {
       "customer_name": null,
-      "order_id": "KM-1003",
-      "issue_type": "wrong_item",
+      "order_id": "ORD-104",
+      "issue_type": "damaged_item",
       "sentiment": "negative",
       "language": "EN"
     },
     "context": {
       "order_found": true,
       "order_data": {
-        "order_id": "KM-1003",
-        "customer_name": "Nurul",
-        "item": "Gaming Mouse",
+        "order_id": "ORD-104",
+        "customer_name": "Maya Chen",
+        "item": "Stainless Steel Water Bottle - 750ml Teal",
         "status": "DELIVERED",
-        "total": 89.0,
+        "total": 38.9,
         "currency": "MYR",
-        "delivery_date": "2026-04-19"
+        "delivery_date": "2026-05-04",
+        "seller_policy_refund_days": 7,
+        "seller_policy_reship_allowed": true
       },
-      "notes": "Customer received the wrong item. Order KM-1003 for a Gaming Mouse was delivered on 2026-04-19. Customer sentiment is negative."
+      "notes": "Order ORD-104 for Maya Chen found. Status: DELIVERED. Issue: damaged_item. Sentiment: negative."
     },
     "reasoning": {
-      "decision": "RESHIP",
-      "confidence": 0.95,
-      "rationale": "Customer received the wrong item and explicitly requested a replacement for the correct Gaming Mouse.",
-      "requires_human_review": false
+      "decision": "CLARIFY",
+      "confidence": 0.74,
+      "rationale": "The complaint reports damage, but uploaded visual evidence does not show clear damage. Seller review and customer clarification are needed before refund or reship.",
+      "requires_human_review": true,
+      "clarification_needed": true,
+      "clarification_message": "Please confirm the issue and upload a clear photo of the damaged item or packaging if available."
     },
     "response": {
-      "english": "Dear Nurul, I am so sorry to hear that you received the wrong item in your parcel. We sincerely apologize for this mistake. As requested, we are arranging a reshipment of the correct KM-1003 Gaming Mouse to you right away. You will receive an email with the new tracking details shortly. Thank you for your patience and understanding.",
-      "bahasa_malaysia": "Kehadapan Nurul, saya amat kesal kerana anda menerima barang yang salah dalam pesanan anda. Kami memohon maaf atas kesilapan ini. Atas permintaan anda, kami akan mengatur penghantaran semula Gaming Mouse KM-1003 yang betul dengan segera. Anda akan menerima e-mel yang mengandungi maklumat penjejakan baru tidak lama lagi. Terima kasih atas kesabaran dan kefahaman anda."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "High-confidence decision to reship the correct Gaming Mouse for order KM-1003. No human intervention required."
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 209,
-        "output_tokens": 49,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 3.09
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 242,
-        "output_tokens": 54,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.83
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 394,
-        "output_tokens": 54,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.31
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 335,
-        "output_tokens": 200,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 9.46
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 298,
-        "output_tokens": 51,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 3.54
-      }
-    },
-    "total_latency": 21.23,
-    "total_tokens": 1886,
-    "estimated_cost_rm": 0.003772
-  },
-  {
-    "id": "1870c5d2-7d43-4a76-bf37-e441538b3fb2",
-    "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-05-02T10:32:57.946005+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": null,
-      "issue_type": "damaged_item",
-      "sentiment": "negative",
-      "language": "BM"
-    },
-    "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order ID provided; order lookup returned null."
-    },
-    "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.95,
-      "rationale": "Customer claims item is damaged and requests a refund, but no order ID or customer name was provided and the order lookup failed.",
-      "requires_human_review": true
-    },
-    "response": {
-      "english": "We are so sorry to hear that your item arrived damaged. We want to resolve this and process your request as quickly as possible, but we need a few more details. We have escalated your case to our customer support team, who will reach out to you shortly to help verify your order and assist you with the refund.",
-      "bahasa_malaysia": "Kita amat kesal mendengar bahawa barang anda telah rosak. Kami ingin menyelesaikan dan memproses permintaan anda secepat mungkin, tetapi kami memerlukan butiran lanjut. Kami telah menaiktaraf kes anda kepada pasukan sokongan pelanggan kami, dan mereka akan menghubungi anda tidak lama lagi untuk membantu mengesahkan pesanan dan membantu anda dengan proses bayaran balik."
+      "english": "Hi Maya Chen, thanks for sharing the details. We need one quick clarification before the seller can review the correct next step. Please confirm the issue and upload a clear photo of the damaged item or packaging if available. Once confirmed, we will review the correct next step.",
+      "bahasa_malaysia": "Hai Maya Chen, terima kasih kerana berkongsi maklumat ini. Kami perlukan satu pengesahan ringkas sebelum penjual boleh menyemak tindakan seterusnya. Sila sahkan isu tersebut dan, jika ada, muat naik gambar yang jelas untuk barang atau bungkusan yang rosak. Selepas disahkan, kami akan semak tindakan seterusnya."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Automated escalation with high confidence (0.95). Order lookup failed due to missing details (no order ID or customer name provided). Manual intervention required to locate the order and process the damage/refund claim."
+      "supervisor_note": "Please verify the uploaded evidence for order ORD-104. The customer claims the water bottle was delivered damaged, but the current photos do not clearly show the damage. Manual review is required to validate the claim before any refund or reship is authorized."
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 190,
-        "output_tokens": 50,
+        "input_tokens": 199,
+        "output_tokens": 53,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.23
+        "duration": 2.44
       },
       "context": {
         "agent": "context",
-        "input_tokens": 178,
-        "output_tokens": 29,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.21
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 281,
-        "output_tokens": 64,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.62
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 235,
-        "output_tokens": 188,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 7.08
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 217,
-        "output_tokens": 71,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 3.0
-      }
-    },
-    "total_latency": 18.14,
-    "total_tokens": 1503,
-    "estimated_cost_rm": 0.003006
-  },
-  {
-    "id": "d05f0a2a-09bc-4b1c-a67a-f793a165a595",
-    "complaint_text": "Hi team, saya punya order ORD-2041 dah dua minggu still tak sampai. Tracking stuck dekat KUL Hub, no movement at all. Kalau tak boleh settle today, saya nak refund ya.",
-    "created_at": "2026-05-02T10:34:36.795324+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "ORD-2041",
-      "issue_type": "delivery_delay",
-      "sentiment": "negative",
-      "language": "Manglish"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "ORD-2041",
-        "customer_name": "Aina",
-        "item": "Baju Kurung Moden - Maroon XL",
-        "status": "SHIPPED",
-        "total": 89.0,
-        "currency": "MYR",
-        "delivery_date": null
-      },
-      "notes": "Order found for Aina. Issue: delivery_delay. Status: SHIPPED. No delivery date assigned. Negative sentiment."
-    },
-    "reasoning": {
-      "decision": "ESCALATE",
-      "confidence": 0.95,
-      "rationale": "Tracking is stuck and has been delayed for two weeks. The customer has explicitly threatened to request a refund if the issue is not resolved today. This requires manual intervention to investigate the carrier discrepancy and fulfill the customer's urgent ultimatum accurately.",
-      "requires_human_review": true
-    },
-    "response": {
-      "english": "Hi Aina, I am so sorry that your Baju Kurung Moden has been delayed for two weeks. I understand how frustrating it is that the tracking is stuck. I have escalated your order (ORD-2041) to our dedicated support team right now. They will investigate this immediately and follow up with you today to ensure it is resolved or to process a refund for you.",
-      "bahasa_malaysia": "Hi Aina, saya amat minta maaf kerana Baju Kurung Moden anda telah tertangguh selama dua minggu. Saya faham betapa cynya apabila tracking stuck. Saya telah menaik taraf (escalate) order anda (ORD-2041) kepada pasukan sokongan khas kami sekarang. Mereka akan siasat serta hubungi anda hari ini untuk menyelesaikan masalah ini atau memproses bayaran balik (refund) buat anda."
-    },
-    "supervisor": {
-      "requires_human_review": true,
-      "priority": "high",
-      "supervisor_note": "Immediate attention required: Customer issued a refund ultimatum today due to a 2-week shipping delay with stuck tracking. Investigate carrier discrepancy and contact customer to prevent chargeback."
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 227,
-        "output_tokens": 55,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 7.57
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 244,
+        "input_tokens": 268,
         "output_tokens": 44,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.03
+        "duration": 2.14
+      },
+      "vision": {
+        "agent": "vision",
+        "input_tokens": 228,
+        "output_tokens": 48,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "model": "glm-4.5v",
+        "duration": 2.5
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 408,
-        "output_tokens": 87,
+        "input_tokens": 675,
+        "output_tokens": 144,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.86
+        "duration": 5.09
       },
       "response": {
         "agent": "response",
-        "input_tokens": 380,
-        "output_tokens": 212,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 9.02
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "execution_mode": "fallback",
+        "duration": 0.0
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 325,
-        "output_tokens": 65,
+        "input_tokens": 396,
+        "output_tokens": 78,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 4.04
+        "duration": 3.6
       }
     },
-    "total_latency": 27.52,
-    "total_tokens": 2047,
-    "estimated_cost_rm": 0.004094
+    "total_latency": 15.77,
+    "total_tokens": 2133,
+    "estimated_cost_rm": 0.004266
   },
   {
-    "id": "c16f694a-e128-49c9-bba0-e793f25305a9",
-    "complaint_text": "Saya nak refund. Barang rosak.",
-    "created_at": "2026-05-02T11:05:21.413328+00:00",
+    "id": "7ef5a581-439d-40f8-a836-21fdd486f1b2",
+    "complaint_text": "My white sneakers arrived torn today i want a refund ASAP!\n\nOrder ID: ORD-104",
+    "created_at": "2026-05-02T17:03:02.514468+00:00",
     "status": "COMPLETED",
+    "image_path": "data\\uploads\\7ef5a581-439d-40f8-a836-21fdd486f1b2-shoe2.jpg",
+    "image_url": "/api/uploads/7ef5a581-439d-40f8-a836-21fdd486f1b2-shoe2.jpg",
+    "image_analysis": {
+      "image_provided": true,
+      "image_analyzed": true,
+      "item_visible": true,
+      "package_visible": false,
+      "damage_detected": true,
+      "damage_level": "major",
+      "damage_type": "torn/holed",
+      "matches_order_item": false,
+      "matched_order_item": null,
+      "confidence": 0.95,
+      "evidence": "Image shows two heavily damaged white sneakers with large holes and worn soles on grass; does not match ordered water bottle.",
+      "human_review_required": true
+    },
+    "visual_evidence_used": true,
     "intake": {
       "customer_name": null,
-      "order_id": null,
+      "order_id": "ORD-104",
       "issue_type": "damaged_item",
       "sentiment": "negative",
-      "language": "BM"
+      "language": "EN"
     },
     "context": {
-      "order_found": false,
-      "order_data": null,
-      "notes": "No order ID provided and lookup failed."
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-104",
+        "customer_name": "Maya Chen",
+        "item": "Stainless Steel Water Bottle - 750ml Teal",
+        "status": "DELIVERED",
+        "total": 38.9,
+        "currency": "MYR",
+        "delivery_date": "2026-05-04",
+        "seller_policy_refund_days": 7,
+        "seller_policy_reship_allowed": true
+      },
+      "notes": "Order ORD-104 for Maya Chen delivered on 2026-05-04. Issue reported: damaged_item."
     },
     "reasoning": {
-      "decision": "ESCALATE",
+      "decision": "CLARIFY",
       "confidence": 0.95,
-      "rationale": "Order ID is missing and order lookup failed; unable to verify purchase or process refund for the reported damaged item.",
-      "requires_human_review": true
+      "rationale": "Customer complains about damaged white sneakers, but order ORD-104 is for a Stainless Steel Water Bottle. Visual evidence confirms torn sneakers but they do not match the ordered item. Conflict between complaint and order context requires manual verification.",
+      "requires_human_review": true,
+      "clarification_needed": true,
+      "clarification_message": "Could you please confirm the details of your order? Our records show that order ORD-104 is for a Stainless Steel Water Bottle (750ml Teal), but your complaint and attached photo concern a pair of white sneakers. Please verify if you are referring to a different order or if there was an issue with the item received."
     },
     "response": {
-      "english": "We are so sorry to hear that your item arrived damaged. We want to help resolve this and process your request, but we need your Order ID to verify the purchase. Could you please provide your Order ID? Once received, we will escalate this immediately to our support team to assist you further.",
-      "bahasa_malaysia": "Kami amat minta maaf mendengar bahawa barang anda telah rosak. Kami ingin membantu menyelesaikan isu ini, tetapi kami memerlukan ID Pesanan anda untuk mengesahkan pembelian. Bolehkah anda berikan ID Pesanan anda? Sebaik sahaja diterima, kami akan menaikkan isu ini kepada pasukan sokongan kami untuk membantu anda dengan segera."
+      "english": "Hi Maya Chen, thanks for sharing the details. We need one quick clarification before the seller can review the correct next step. Could you please confirm the details of your order? Our records show that order ORD-104 is for a Stainless Steel Water Bottle (750ml Teal), but your complaint and attached photo concern a pair of white sneakers. Please verify if you are referring to a different order or if there was an issue with the item received. Once confirmed, we will review the correct next step.",
+      "bahasa_malaysia": "Hai Maya Chen, terima kasih kerana berkongsi maklumat ini. Kami perlukan satu pengesahan ringkas sebelum penjual boleh menyemak tindakan seterusnya. Sila sahkan isu tersebut dan, jika ada, muat naik gambar yang jelas untuk barang atau bungkusan yang rosak. Selepas disahkan, kami akan semak tindakan seterusnya."
     },
     "supervisor": {
       "requires_human_review": true,
       "priority": "high",
-      "supervisor_note": "Order lookup failed due to missing order ID; unable to verify purchase for damaged item claim."
+      "supervisor_note": "Item mismatch detected. Order ORD-104 is for a Water Bottle, but the customer provided visual evidence of damaged sneakers. Please verify if the customer is referencing the wrong order number or if there is a separate unreported issue."
     },
     "agent_metrics": {
       "intake": {
         "agent": "intake",
-        "input_tokens": 190,
+        "input_tokens": 199,
+        "output_tokens": 53,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.55
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 268,
         "output_tokens": 46,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.0
+        "duration": 4.1
       },
-      "context": {
-        "agent": "context",
-        "input_tokens": 178,
-        "output_tokens": 27,
+      "vision": {
+        "agent": "vision",
+        "input_tokens": 228,
+        "output_tokens": 57,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 2.91
+        "model": "glm-4.5v",
+        "duration": 3.0
       },
       "reasoning": {
         "agent": "reasoning",
-        "input_tokens": 279,
-        "output_tokens": 61,
+        "input_tokens": 682,
+        "output_tokens": 163,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 4.48
+        "duration": 5.11
       },
       "response": {
         "agent": "response",
-        "input_tokens": 230,
-        "output_tokens": 174,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 8.15
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "execution_mode": "fallback",
+        "duration": 0.0
       },
       "supervisor": {
         "agent": "supervisor",
-        "input_tokens": 212,
-        "output_tokens": 47,
+        "input_tokens": 457,
+        "output_tokens": 74,
         "execution_mode": "llm",
         "provider_used": "zai",
         "fallback_used": false,
-        "duration": 3.37
+        "duration": 3.89
       }
     },
-    "total_latency": 21.91,
-    "total_tokens": 1444,
-    "estimated_cost_rm": 0.002888
+    "total_latency": 18.65,
+    "total_tokens": 2227,
+    "estimated_cost_rm": 0.004454
+  },
+  {
+    "id": "556f469b-35ac-4c06-a664-281ee23a72ad",
+    "complaint_text": "My order arrived today and the shoes are torn and i want a refund.\n\nOrder ID: ORD-104",
+    "created_at": "2026-05-02T17:05:40.874450+00:00",
+    "status": "COMPLETED",
+    "image_path": "data\\uploads\\556f469b-35ac-4c06-a664-281ee23a72ad-shoe2.jpg",
+    "image_url": "/api/uploads/556f469b-35ac-4c06-a664-281ee23a72ad-shoe2.jpg",
+    "image_analysis": {
+      "image_provided": true,
+      "image_analyzed": true,
+      "item_visible": true,
+      "package_visible": false,
+      "damage_detected": true,
+      "damage_level": "major",
+      "damage_type": "torn/holed",
+      "matches_order_item": false,
+      "matched_order_item": null,
+      "confidence": 0.95,
+      "evidence": "Image shows two heavily damaged shoes with large holes in soles and upper material; does not match order's water bottle.",
+      "human_review_required": true
+    },
+    "visual_evidence_used": true,
+    "intake": {
+      "customer_name": null,
+      "order_id": "ORD-104",
+      "issue_type": "damaged_item",
+      "sentiment": "negative",
+      "language": "EN"
+    },
+    "context": {
+      "order_found": true,
+      "order_data": {
+        "order_id": "ORD-104",
+        "customer_name": "Maya Chen",
+        "item": "Stainless Steel Water Bottle - 750ml Teal",
+        "status": "DELIVERED",
+        "total": 38.9,
+        "currency": "MYR",
+        "delivery_date": "2026-05-04",
+        "seller_policy_refund_days": 7,
+        "seller_policy_reship_allowed": true
+      },
+      "notes": "Order ORD-104 found for Maya Chen. Status: DELIVERED. Issue: damaged_item. Sentiment: negative."
+    },
+    "reasoning": {
+      "decision": "REFUND",
+      "confidence": 0.95,
+      "rationale": "The customer reports a damaged item for an order that exists in the system. Uploaded visual evidence also supports visible damage.",
+      "requires_human_review": false,
+      "clarification_needed": false,
+      "clarification_message": null
+    },
+    "response": {
+      "english": "Hi Maya Chen,\n\nI am so sorry to hear that your recent order (ORD-104) arrived torn and damaged. We completely understand how frustrating this must be.\n\nWe have reviewed your case and approved your request for a full refund of MYR 38.90. The amount will be processed back to your original payment method shortly.\n\nWe sincerely apologize for the inconvenience this has caused and appreciate you bringing this to our attention.\n\nBest regards,\nCustomer Support Team",
+      "bahasa_malaysia": "Hai Maya Chen,\n\nSaya amat kesal kerana order anda yang terkini (ORD-104) tiba dalam keadaan koyak dan rosak. Kami amat memahami kekecewaan anda mengenai perkara ini.\n\nKami telah menyemak kes anda dan meluluskan permintaan bayaran balik penuh sebanyak MYR 38.90. Amaun ini akan diproses kembali ke kaedah pembayaran asal anda tidak lama lagi.\n\nKami memohon maaf yang ikhlas atas kesulitan yang dialami dan menghargai maklum balas daripada anda.\n\nSalam hormat,\nPasukan Sokongan Pelanggan"
+    },
+    "supervisor": {
+      "requires_human_review": false,
+      "priority": "normal",
+      "supervisor_note": "The system has auto-approved a refund for this damaged item due to strong visual evidence and high confidence (95%). No operator escalation is needed, but please be aware of the customer's negative sentiment regarding the delivered order."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 202,
+        "output_tokens": 53,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.72
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 268,
+        "output_tokens": 44,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.46
+      },
+      "vision": {
+        "agent": "vision",
+        "input_tokens": 232,
+        "output_tokens": 55,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "model": "glm-4.5v",
+        "duration": 2.97
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 687,
+        "output_tokens": 165,
+        "execution_mode": "fallback",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 5.82
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 463,
+        "output_tokens": 282,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 10.84
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 373,
+        "output_tokens": 72,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 5.15
+      }
+    },
+    "total_latency": 29.96,
+    "total_tokens": 2896,
+    "estimated_cost_rm": 0.005792
   }
 ]

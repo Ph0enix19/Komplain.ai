@@ -2,17 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import time
+from email.parser import BytesParser
+from email.policy import default
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import AsyncGenerator
 from uuid import uuid4
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from backend.agents import (
     build_event,
@@ -21,12 +25,14 @@ from backend.agents import (
     reasoning_agent,
     response_agent,
     supervisor_logic,
+    vision_inspection_agent,
 )
 from backend.llm import COST_PER_1K_TOKENS_RM, ILMUClient
 from backend.models import (
     ComplaintCreate,
     ContextResult,
     IntakeResult,
+    ImageAnalysisResult,
     ReasoningResult,
     ResponseResult,
     TestLLMRequest,
@@ -38,6 +44,11 @@ load_dotenv(override=True)
 
 data_manager = DataManager(data_dir="data")
 ilmu_client = ILMUClient()
+
+UPLOAD_DIR = Path("data/uploads")
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_IMAGE_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
 @asynccontextmanager
@@ -69,6 +80,7 @@ async def run_reasoning_agent(
     complaint_text: str,
     intake: dict,
     context: dict,
+    image_analysis: dict | None = None,
     metrics: dict | None = None,
 ) -> dict:
     return (
@@ -77,6 +89,24 @@ async def run_reasoning_agent(
             complaint_text,
             IntakeResult(**intake),
             ContextResult(**context),
+            ImageAnalysisResult(**image_analysis) if image_analysis else None,
+            metrics=metrics,
+        )
+    ).model_dump()
+
+
+async def run_vision_inspection(
+    complaint_text: str,
+    context: dict,
+    image_path: str | None,
+    metrics: dict | None = None,
+) -> dict:
+    return (
+        await vision_inspection_agent(
+            ilmu_client,
+            complaint_text,
+            ContextResult(**context),
+            image_path,
             metrics=metrics,
         )
     ).model_dump()
@@ -129,6 +159,8 @@ def _payload_with_metrics(payload: dict, metrics: dict) -> dict:
     for key in ("provider_used", "fallback_used", "fallback_reason"):
         if key in metrics:
             enriched[key] = metrics[key]
+    if "model" in metrics:
+        enriched["model"] = metrics["model"]
     return enriched
 
 
@@ -141,7 +173,13 @@ def _pipeline_totals(metrics_list: list[dict]) -> dict:
     }
 
 
-async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created_at: str) -> dict:
+async def run_complaint_pipeline(
+    complaint_id: str,
+    complaint_text: str,
+    created_at: str,
+    image_path: str | None = None,
+    image_url: str | None = None,
+) -> dict:
     intake_payload, intake_metrics = await _run_timed_agent(
         "intake",
         lambda metrics: run_intake_agent(complaint_text, metrics),
@@ -172,9 +210,32 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created
         )
     )
 
+    image_analysis_payload = None
+    vision_metrics = None
+    if image_path:
+        image_analysis_payload, vision_metrics = await _run_timed_agent(
+            "vision",
+            lambda metrics: run_vision_inspection(complaint_text, context_payload, image_path, metrics),
+        )
+        data_manager.add_event(
+            build_event(
+                complaint_id,
+                "vision",
+                "Visual evidence inspected",
+                _payload_with_metrics(image_analysis_payload, vision_metrics),
+                vision_metrics,
+            )
+        )
+
     reasoning_payload, reasoning_metrics = await _run_timed_agent(
         "reasoning",
-        lambda metrics: run_reasoning_agent(complaint_text, intake_payload, context_payload, metrics),
+        lambda metrics: run_reasoning_agent(
+            complaint_text,
+            intake_payload,
+            context_payload,
+            image_analysis_payload,
+            metrics,
+        ),
     )
     reasoning = ReasoningResult(**reasoning_payload)
     data_manager.add_event(
@@ -219,7 +280,14 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created
 
     agent_metrics = {
         item["agent"]: item
-        for item in [intake_metrics, context_metrics, reasoning_metrics, response_metrics, supervisor_metrics]
+        for item in [
+            intake_metrics,
+            context_metrics,
+            *([vision_metrics] if vision_metrics else []),
+            reasoning_metrics,
+            response_metrics,
+            supervisor_metrics,
+        ]
     }
     totals = _pipeline_totals(list(agent_metrics.values()))
 
@@ -228,6 +296,10 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created
         "complaint_text": complaint_text,
         "created_at": created_at,
         "status": "COMPLETED",
+        "image_path": image_path,
+        "image_url": image_url,
+        "image_analysis": image_analysis_payload,
+        "visual_evidence_used": bool(image_analysis_payload and image_analysis_payload.get("image_analyzed")),
         "intake": intake.model_dump(),
         "context": context.model_dump(),
         "reasoning": reasoning.model_dump(),
@@ -240,9 +312,15 @@ async def run_complaint_pipeline(complaint_id: str, complaint_text: str, created
     return complaint
 
 
-async def _run_pipeline_in_background(complaint_id: str, complaint_text: str, created_at: str) -> None:
+async def _run_pipeline_in_background(
+    complaint_id: str,
+    complaint_text: str,
+    created_at: str,
+    image_path: str | None = None,
+    image_url: str | None = None,
+) -> None:
     try:
-        await run_complaint_pipeline(complaint_id, complaint_text, created_at)
+        await run_complaint_pipeline(complaint_id, complaint_text, created_at, image_path, image_url)
     except Exception as exc:
         data_manager.add_complaint(
             {
@@ -294,9 +372,80 @@ async def test_llm(req: TestLLMRequest) -> TestLLMResponse:
     )
 
 
+def _safe_upload_filename(original_name: str, complaint_id: str) -> str:
+    suffix = Path(original_name or "").suffix.lower()
+    stem = Path(original_name or "upload").stem.lower()
+    stem = re.sub(r"[^a-z0-9]+", "-", stem).strip("-")[:36] or "evidence"
+    return f"{complaint_id}-{stem}{suffix}"
+
+
+def _validate_image_upload(filename: str, content_type: str | None, content: bytes) -> None:
+    suffix = Path(filename or "").suffix.lower()
+    if suffix not in ALLOWED_IMAGE_EXTENSIONS:
+        raise HTTPException(status_code=415, detail="Image must be a jpg, jpeg, png, or webp file.")
+    if content_type and content_type.lower() not in ALLOWED_IMAGE_CONTENT_TYPES:
+        raise HTTPException(status_code=415, detail="Unsupported image content type.")
+    if not content:
+        raise HTTPException(status_code=400, detail="Uploaded image is empty.")
+    if len(content) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Uploaded image must be 5MB or smaller.")
+
+
+def _parse_multipart_body(content_type: str, body: bytes) -> tuple[dict[str, str], dict | None]:
+    message = BytesParser(policy=default).parsebytes(
+        f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + body
+    )
+    fields: dict[str, str] = {}
+    image: dict | None = None
+    if not message.is_multipart():
+        raise HTTPException(status_code=400, detail="Invalid multipart request.")
+    for part in message.iter_parts():
+        disposition = part.get("Content-Disposition", "")
+        if "form-data" not in disposition:
+            continue
+        name = part.get_param("name", header="content-disposition")
+        filename = part.get_filename()
+        payload = part.get_payload(decode=True) or b""
+        if filename:
+            if name == "image":
+                image = {
+                    "filename": filename,
+                    "content_type": part.get_content_type(),
+                    "content": payload,
+                }
+        elif name:
+            fields[str(name)] = payload.decode(part.get_content_charset() or "utf-8", errors="replace")
+    return fields, image
+
+
+async def _read_complaint_request(request: Request, complaint_id: str) -> tuple[ComplaintCreate, str | None, str | None]:
+    content_type = request.headers.get("content-type", "")
+    image_path = None
+    image_url = None
+    if content_type.lower().startswith("multipart/form-data"):
+        fields, image = _parse_multipart_body(content_type, await request.body())
+        payload = ComplaintCreate(
+            complaint_text=(fields.get("complaint_text") or "").strip(),
+            order_id=(fields.get("order_id") or None),
+        )
+        if image:
+            _validate_image_upload(image["filename"], image["content_type"], image["content"])
+            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+            filename = _safe_upload_filename(image["filename"], complaint_id)
+            stored_path = UPLOAD_DIR / filename
+            stored_path.write_bytes(image["content"])
+            image_path = str(stored_path)
+            image_url = f"/api/uploads/{filename}"
+        return payload, image_path, image_url
+
+    data = await request.json()
+    return ComplaintCreate(**data), image_path, image_url
+
+
 @app.post("/api/complaints")
-async def create_complaint(payload: ComplaintCreate) -> dict:
+async def create_complaint(request: Request) -> dict:
     complaint_id = str(uuid4())
+    payload, image_path, image_url = await _read_complaint_request(request, complaint_id)
     complaint_text = payload.complaint_text.strip()
     if payload.order_id and payload.order_id not in complaint_text:
         complaint_text = f"{complaint_text}\n\nOrder ID: {payload.order_id}"
@@ -307,12 +456,25 @@ async def create_complaint(payload: ComplaintCreate) -> dict:
         "complaint_text": complaint_text,
         "created_at": created_at,
         "status": "PROCESSING",
+        "image_path": image_path,
+        "image_url": image_url,
     }
     data_manager.add_complaint(placeholder)
 
-    asyncio.create_task(_run_pipeline_in_background(complaint_id, complaint_text, created_at))
+    asyncio.create_task(_run_pipeline_in_background(complaint_id, complaint_text, created_at, image_path, image_url))
 
     return placeholder
+
+
+@app.get("/api/uploads/{filename}")
+def get_uploaded_image(filename: str) -> FileResponse:
+    safe_name = Path(filename).name
+    if safe_name != filename:
+        raise HTTPException(status_code=404, detail="Image not found")
+    path = UPLOAD_DIR / safe_name
+    if not path.exists() or path.suffix.lower() not in ALLOWED_IMAGE_EXTENSIONS:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(path)
 
 
 @app.get("/api/complaints")
