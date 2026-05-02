@@ -1,96 +1,5 @@
 [
   {
-    "id": "f2af1d92-c6ee-4d58-b9d9-305d8320f55c",
-    "complaint_text": "My order KM-1001 arrived with a broken screen. Please help me get a refund.",
-    "created_at": "2026-05-02T07:09:16.673225+00:00",
-    "status": "COMPLETED",
-    "intake": {
-      "customer_name": null,
-      "order_id": "KM-1001",
-      "issue_type": "damaged_item",
-      "sentiment": "negative",
-      "language": "EN"
-    },
-    "context": {
-      "order_found": true,
-      "order_data": {
-        "order_id": "KM-1001",
-        "customer_name": "Aisyah",
-        "item": "Bluetooth Speaker",
-        "status": "DELIVERED",
-        "total": 129.0,
-        "currency": "MYR",
-        "delivery_date": "2026-04-20"
-      },
-      "notes": "Order KM-1001 found for Aisyah. Item: Bluetooth Speaker (MYR 129.0). Status: DELIVERED on 2026-04-20. Issue: damaged_item. Sentiment: negative."
-    },
-    "reasoning": {
-      "decision": "REFUND",
-      "confidence": 0.95,
-      "rationale": "Order was delivered and the customer reported a damaged item (broken screen), explicitly requesting a refund.",
-      "requires_human_review": false
-    },
-    "response": {
-      "english": "Dear Aisyah, we are so sorry to hear that your Bluetooth Speaker arrived with a broken screen. We understand how frustrating this must be. To make things right, we have approved a full refund of MYR 129.0 for your order (KM-1001). You can expect the funds to be processed back to your original payment method shortly. Thank you for your patience and understanding.",
-      "bahasa_malaysia": "Salam Aisyah, kami amat kesal kerana Speaker Bluetooth anda tiba dengan skrin yang pecah. Kami faham betapa kecewanya situasi ini. Sebagai penyelesaian, kami telah meluluskan bayaran balik penuh sebanyak MYR 129.0 untuk pesanan anda (KM-1001). Anda boleh menjangkakan wang tersebut akan diproses kembali ke kaedah pembayaran asal anda tidak lama lagi. Terima kasih atas kesabaran dan kefahaman anda."
-    },
-    "supervisor": {
-      "requires_human_review": false,
-      "priority": "normal",
-      "supervisor_note": "Automated refund approved for damaged item. High confidence decision based on delivered order and valid complaint."
-    },
-    "agent_metrics": {
-      "intake": {
-        "agent": "intake",
-        "input_tokens": 200,
-        "output_tokens": 49,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.14
-      },
-      "context": {
-        "agent": "context",
-        "input_tokens": 242,
-        "output_tokens": 66,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.59
-      },
-      "reasoning": {
-        "agent": "reasoning",
-        "input_tokens": 401,
-        "output_tokens": 57,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.08
-      },
-      "response": {
-        "agent": "response",
-        "input_tokens": 344,
-        "output_tokens": 226,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 6.01
-      },
-      "supervisor": {
-        "agent": "supervisor",
-        "input_tokens": 316,
-        "output_tokens": 48,
-        "execution_mode": "llm",
-        "provider_used": "zai",
-        "fallback_used": false,
-        "duration": 2.79
-      }
-    },
-    "total_latency": 15.61,
-    "total_tokens": 1949,
-    "estimated_cost_rm": 0.003898
-  },
-  {
     "id": "521a45fa-5047-4669-98e5-bd248e191f2e",
     "complaint_text": "Hi, I want a refund for order ORD-1912. The shoes fit fine and there is nothing wrong with them, but I changed my mind after using them for 45 days.",
     "created_at": "2026-05-02T07:12:47.681845+00:00",
@@ -446,5 +355,88 @@
     "total_latency": 27.52,
     "total_tokens": 2047,
     "estimated_cost_rm": 0.004094
+  },
+  {
+    "id": "c16f694a-e128-49c9-bba0-e793f25305a9",
+    "complaint_text": "Saya nak refund. Barang rosak.",
+    "created_at": "2026-05-02T11:05:21.413328+00:00",
+    "status": "COMPLETED",
+    "intake": {
+      "customer_name": null,
+      "order_id": null,
+      "issue_type": "damaged_item",
+      "sentiment": "negative",
+      "language": "BM"
+    },
+    "context": {
+      "order_found": false,
+      "order_data": null,
+      "notes": "No order ID provided and lookup failed."
+    },
+    "reasoning": {
+      "decision": "ESCALATE",
+      "confidence": 0.95,
+      "rationale": "Order ID is missing and order lookup failed; unable to verify purchase or process refund for the reported damaged item.",
+      "requires_human_review": true
+    },
+    "response": {
+      "english": "We are so sorry to hear that your item arrived damaged. We want to help resolve this and process your request, but we need your Order ID to verify the purchase. Could you please provide your Order ID? Once received, we will escalate this immediately to our support team to assist you further.",
+      "bahasa_malaysia": "Kami amat minta maaf mendengar bahawa barang anda telah rosak. Kami ingin membantu menyelesaikan isu ini, tetapi kami memerlukan ID Pesanan anda untuk mengesahkan pembelian. Bolehkah anda berikan ID Pesanan anda? Sebaik sahaja diterima, kami akan menaikkan isu ini kepada pasukan sokongan kami untuk membantu anda dengan segera."
+    },
+    "supervisor": {
+      "requires_human_review": true,
+      "priority": "high",
+      "supervisor_note": "Order lookup failed due to missing order ID; unable to verify purchase for damaged item claim."
+    },
+    "agent_metrics": {
+      "intake": {
+        "agent": "intake",
+        "input_tokens": 190,
+        "output_tokens": 46,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.0
+      },
+      "context": {
+        "agent": "context",
+        "input_tokens": 178,
+        "output_tokens": 27,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 2.91
+      },
+      "reasoning": {
+        "agent": "reasoning",
+        "input_tokens": 279,
+        "output_tokens": 61,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 4.48
+      },
+      "response": {
+        "agent": "response",
+        "input_tokens": 230,
+        "output_tokens": 174,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 8.15
+      },
+      "supervisor": {
+        "agent": "supervisor",
+        "input_tokens": 212,
+        "output_tokens": 47,
+        "execution_mode": "llm",
+        "provider_used": "zai",
+        "fallback_used": false,
+        "duration": 3.37
+      }
+    },
+    "total_latency": 21.91,
+    "total_tokens": 1444,
+    "estimated_cost_rm": 0.002888
   }
 ]
