@@ -42,6 +42,8 @@ Komplain.ai turns messy customer complaints into structured decisions, bilingual
 | Logo Assets | [docs/logos](./docs/logos) |
 | Canva Pitch Link | [https://canva.link/kwqw7albmm8g9ap](https://canva.link/kwqw7albmm8g9ap) |
 
+**Try the full working app here:** [https://komplain-test-xi2r.vercel.app/](https://komplain-test-xi2r.vercel.app/)
+
 ---
 
 <a id="quick-links"></a>
