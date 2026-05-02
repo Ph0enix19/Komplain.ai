@@ -164,6 +164,13 @@ def test_create_complaint_returns_processing_placeholder(tmp_path, monkeypatch) 
     assert "id" in payload
 
 
+def test_create_complaint_rejects_too_short_text(tmp_path, monkeypatch) -> None:
+    with make_client(tmp_path, monkeypatch) as client:
+        response = client.post("/api/complaints", json={"complaint_text": "Hey"})
+
+    assert response.status_code == 422
+
+
 def test_create_complaint_with_image_returns_placeholder_and_stores_upload(tmp_path, monkeypatch) -> None:
     with make_client(tmp_path, monkeypatch) as client:
         response = client.post(

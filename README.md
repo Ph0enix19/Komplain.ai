@@ -26,15 +26,37 @@ Komplain.ai turns messy customer complaints into structured decisions, bilingual
 
 ---
 
+<a id="final-submission-documents"></a>
+
+## Important: Final Submission Documents in `docs/` 🎯
+
+**Very important:** These are the main judging deliverables. Start here first; the files below are the final documentation assets stored in the repository `docs/` folder.
+
+| Document | File |
+|---|---|
+| Business Proposal | [docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission-1.pdf](./docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission-1.pdf) |
+| Deployment Plan | [docs/Group_AS_Id_178_Komplain_AI_Deployment_Plan_Final_Ss.pdf](./docs/Group_AS_Id_178_Komplain_AI_Deployment_Plan_Final_Ss.pdf) |
+| Refined QATD | [docs/Team178_Team(as)_Refined_QATD_Final.pdf](./docs/Team178_Team(as)_Refined_QATD_Final.pdf) |
+| Pitch Deck PDF | [docs/Komplain_AI_Pitch_Deck.pdf](./docs/Komplain_AI_Pitch_Deck.pdf) |
+| Pitch Deck PPTX | [docs/Komplain_AI_Pitch_Deck.pptx](./docs/Komplain_AI_Pitch_Deck.pptx) |
+| Logo Assets | [docs/logos](./docs/logos) |
+| Canva Pitch Link | [https://canva.link/kwqw7albmm8g9ap](https://canva.link/kwqw7albmm8g9ap) |
+
+---
+
 <a id="quick-links"></a>
 
 ## Quick Links 🚀
 
+This table includes the full project links after the required document deliverables above.
+
 | Link | Purpose |
 |---|---|
+| [Final Submission Documents](#final-submission-documents) | Main PDFs, pitch deck, QATD, logos, and Canva pitch link from `docs/` |
 | [Live Frontend](https://komplain-test-xi2r.vercel.app) | Vercel-hosted dashboard for the judging demo |
 | [Backend Health](https://komplaintest.onrender.com/api/health) | Render-hosted FastAPI health check |
 | [GitHub Repository](https://github.com/Ph0enix19/Komplain.AI) | Source code and CI history |
+| [Canva Pitch Link](https://canva.link/kwqw7albmm8g9ap) | Online Canva version of the pitch deck |
 | [Finalist Deliverables](#finalist-deliverables) | Docs, Postman collections, and logo assets |
 | [Testing & CI](#testing-and-ci) | Local and GitHub Actions verification |
 | [Image Upload Test](#test-image-upload-and-damage-analysis) | Procedure for visual damage analysis |
@@ -54,13 +76,14 @@ The UMHackathon finalist handbook asks teams to keep the repository and delivera
 |---|---|
 | Code Repository | [GitHub repo](https://github.com/Ph0enix19/Komplain.AI) |
 | Live Demo | [Frontend](https://komplain-test-xi2r.vercel.app) and [backend health](https://komplaintest.onrender.com/api/health) |
+| Canva Pitch Link | [https://canva.link/kwqw7albmm8g9ap](https://canva.link/kwqw7albmm8g9ap) |
 | Core Postman API Collection | [postman_collection.json](./postman_collection.json) |
 | QATD Postman Evidence Collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
-| Business Proposal PDF | [docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission.pdf](./docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission.pdf) |
-| Development / Deployment Plan PDF | [docs/Group_AS_Id_178_Komplain_AI_Development_Plan_Final_Ss.pdf](./docs/Group_AS_Id_178_Komplain_AI_Development_Plan_Final_Ss.pdf) |
-| QATD PDF | [docs/qatd.pdf](./docs/qatd.pdf) - placeholder file currently present |
-| Pitch Deck PDF | [docs/pitch.pdf](./docs/pitch.pdf) - placeholder file currently present |
-| Pitch Deck PPTX | [docs/pitch.pptx](./docs/pitch.pptx) - placeholder file currently present |
+| Business Proposal PDF | [docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission-1.pdf](./docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission-1.pdf) |
+| Deployment Plan PDF | [docs/Group_AS_Id_178_Komplain_AI_Deployment_Plan_Final_Ss.pdf](./docs/Group_AS_Id_178_Komplain_AI_Deployment_Plan_Final_Ss.pdf) |
+| QATD PDF | [docs/Team178_Team(as)_Refined_QATD_Final.pdf](./docs/Team178_Team(as)_Refined_QATD_Final.pdf) |
+| Pitch Deck PDF | [docs/Komplain_AI_Pitch_Deck.pdf](./docs/Komplain_AI_Pitch_Deck.pdf) |
+| Pitch Deck PPTX | [docs/Komplain_AI_Pitch_Deck.pptx](./docs/Komplain_AI_Pitch_Deck.pptx) |
 | Logo Assets | [UMH.jpg](./docs/logos/UMH.jpg), [Z AI Logo](./docs/logos/Z%20AI%20Logo%20(Restricted%20Usage).png), [YTL AI Labs Logo](./docs/logos/YATL%20LOGO.png) |
 | Quality Assurance Notes | See [Testing and CI](#testing-and-ci) |
 | Deployment Plan Summary | See [Deployment](#deployment) |

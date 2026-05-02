@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import ValidationError
 
 from backend.agents import (
     build_event,
@@ -447,7 +448,10 @@ async def _read_complaint_request(
 @app.post("/api/complaints")
 async def create_complaint(request: Request) -> dict:
     complaint_id = str(uuid4())
-    payload, image_path, image_url = await _read_complaint_request(request, complaint_id)
+    try:
+        payload, image_path, image_url = await _read_complaint_request(request, complaint_id)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors()) from exc
     complaint_text = payload.complaint_text.strip()
     if payload.order_id and payload.order_id not in complaint_text:
         complaint_text = f"{complaint_text}\n\nOrder ID: {payload.order_id}"
