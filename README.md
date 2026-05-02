@@ -9,7 +9,7 @@
 
 ### Agentic Customer Complaint Resolution
 
-Komplain.ai turns raw customer complaints into structured, auditable, bilingual support resolutions through a five-agent workflow.
+Komplain.ai is a hackathon MVP that turns raw customer complaints into structured, auditable, bilingual support resolutions through a five-agent workflow.
 
 **Hackathon Track:** AI Systems & Agentic Workflow Automation
 
@@ -19,49 +19,79 @@ Komplain.ai turns raw customer complaints into structured, auditable, bilingual 
 
 ---
 
-## Live Links
+## Current Project Summary
 
-These links were verified against the current deployment:
+Use this section as handoff context when starting a new AI chat:
+
+Komplain.ai is a Python/FastAPI + static React 18 UMD dashboard for AI-assisted e-commerce complaint handling. The backend exposes `/api` endpoints, stores orders, complaints, and agent events in JSON files under `data/`, and runs a five-step complaint pipeline: intake, context, reasoning, response, and supervisor. The LLM client in `backend/llm.py` is OpenAI-compatible and environment-driven: `LLM_PROVIDER=zai` uses Z.ai / GLM first, with automatic Groq fallback; `LLM_PROVIDER=groq` and legacy `LLM_PROVIDER=ilmu` are also supported. Agents request structured JSON, normalize/validate outputs with Pydantic, record token/latency/provider telemetry, and fall back to deterministic logic when the LLM fails or returns invalid data. The frontend in `frontend/` is a no-build static React app served by `Komplain.ai Dashboard.html`; `frontend/index.html` redirects to it. The dashboard submits complaints, polls the backend until processing completes, renders live agent trace telemetry, shows resolution details and bilingual replies, supports editing/copying replies, and displays the latest five cases. Tests are in `tests/`, are mocked by default, and cover API routes, agent behavior, LLM parsing/fallbacks, storage, and telemetry.
+
+Important files:
+
+- `backend/main.py`: FastAPI app, routes, background pipeline orchestration, SSE event stream.
+- `backend/agents.py`: five agent prompts, LLM/fallback agent logic, validation, event creation.
+- `backend/llm.py`: OpenAI-compatible provider client, Z.ai/Groq/ILMU config, JSON parsing, fallback, token usage.
+- `backend/storage.py`: JSON-backed `DataManager`, latest-five complaint cap, event pruning.
+- `backend/models.py`: Pydantic request/response and agent result models.
+- `frontend/app.jsx`: dashboard state, backend API integration, polling, case mapping, edit/copy/approve flows.
+- `frontend/data.js`: demo scenarios, seed cases, mock order context, simulated traces.
+- `frontend/components/`: dashboard UI components.
+- `data/orders.json`: sample order lookup data.
+- `tests/`: pytest suite with mocked LLM clients.
+
+---
+
+## Live Links
 
 - **Live frontend:** <https://komplain-test-xi2r.vercel.app>
 - **Backend API health:** <https://komplaintest.onrender.com/api/health>
 - **GitHub repository:** <https://github.com/Ph0enix19/Komplain.AI>
+- **Pitch/demo video:** <https://drive.google.com/file/d/1IJ3Xe-SRWEcsv7_5ecS_KsFvllmv88rM/view?usp=sharing>
 
-> Render may cold-start after idle periods, so the first backend request can take longer than normal.
-
----
-
-## Pitch Video
-
-> **[Watch the recorded pitch and product demo](https://drive.google.com/file/d/1IJ3Xe-SRWEcsv7_5ecS_KsFvllmv88rM/view?usp=sharing)**
+Render may cold-start after idle periods, so the first backend request can take longer than normal.
 
 ---
 
 ## What Komplain.ai Does
 
-Komplain.ai is an AI copilot for e-commerce support teams. It accepts unstructured customer complaints, including English, Bahasa Malaysia, and Manglish, then produces a structured decision and bilingual customer response for human review.
+Komplain.ai is an AI copilot for e-commerce support teams. It accepts unstructured complaints in English, Bahasa Malaysia, or Manglish and produces a structured resolution for human review.
 
 A support operator can:
 
 - Submit a complaint with an optional order ID.
-- Run the five-agent pipeline from the dashboard.
-- View live agent trace telemetry with real timings.
-- Review the decision, rationale, confidence, bilingual output, tokens, and estimated RM cost.
-- Copy or edit the customer replies before approval.
-- Approve the case and reset the workspace for the next complaint.
-- Review recent stored cases and their agent events.
+- Run the five-agent workflow from the dashboard.
+- View agent trace telemetry with real backend timings.
+- Review decision, rationale, confidence, bilingual replies, latency, tokens, and estimated RM cost.
+- Edit and copy the generated English and Bahasa Malaysia replies.
+- Approve a case and reset the active workspace.
+- Search, filter, export, and inspect recent case history.
 
-The MVP stores only the latest five complaints and related agent events in JSON files.
+The MVP does not send customer messages automatically. Approval is represented inside the dashboard workflow.
 
 ---
 
 ## Architecture
 
-- **Backend:** FastAPI on Render.
-- **Frontend:** Static React 18 UMD app on Vercel.
-- **Storage:** JSON flat files for the MVP.
-- **Pipeline:** Intake -> Context -> Reasoning -> Response -> Supervisor.
-- **LLM:** Provider-agnostic OpenAI-compatible client. Z.ai / GLM is the primary provider, with Groq retained as fallback.
+```text
+Static React dashboard
+        |
+        v
+FastAPI backend (/api)
+        |
+        v
+Five-agent complaint pipeline
+        |
+        +--> JSON storage in data/
+        |
+        +--> OpenAI-compatible LLM provider
+             Z.ai / GLM primary, Groq fallback
+```
+
+- **Backend:** FastAPI, Uvicorn, Pydantic v2, HTTPX, Python 3.13.
+- **Frontend:** Static React 18 UMD, ReactDOM UMD, Babel Standalone, plain CSS.
+- **Storage:** JSON files for hackathon MVP persistence.
+- **LLM:** OpenAI-compatible chat completions client.
+- **Testing:** pytest and pytest-asyncio.
+- **Quality/security:** ruff, pip-audit, detect-secrets.
 
 ---
 
@@ -69,85 +99,138 @@ The MVP stores only the latest five complaints and related agent events in JSON 
 
 | Step | Agent | Responsibility |
 |---|---|---|
-| 1 | **Intake** | Extracts customer name, order ID, issue type, sentiment, and language from the raw complaint. |
-| 2 | **Context** | Looks up matching order data from JSON storage and summarizes available context. |
-| 3 | **Reasoning** | Chooses `REFUND`, `RESHIP`, `ESCALATE`, or `DISMISS`, with confidence and rationale. |
-| 4 | **Response** | Drafts concise English and Bahasa Malaysia replies aligned with the decision. |
-| 5 | **Supervisor** | Validates the outcome and flags whether human review or high priority handling is required. |
+| 1 | Intake | Extracts customer name, order ID, issue type, sentiment, and language. |
+| 2 | Context | Looks up matching order data from JSON storage and summarizes context. |
+| 3 | Reasoning | Chooses `REFUND`, `RESHIP`, `ESCALATE`, or `DISMISS` with confidence and rationale. |
+| 4 | Response | Drafts concise English and Bahasa Malaysia replies. |
+| 5 | Supervisor | Validates the outcome and flags review priority. |
 
-The backend records each agent step as an event. Response and supervisor processing are dispatched after reasoning, and the final complaint record is saved with agent metrics and pipeline totals.
+The backend records each agent step as an event. Intake, context, and reasoning run sequentially. Response and supervisor run in parallel after reasoning. The completed complaint record is saved with agent metrics and pipeline totals.
 
 ---
 
-## Observability / Telemetry
+## LLM Behavior
 
-Each complaint run captures operational telemetry:
+The provider is selected with `LLM_PROVIDER`:
 
-- Per-agent latency, rounded to two decimal places.
-- Per-agent input and output token counts.
-- Token usage from provider responses when available.
-- Token estimation fallback when providers omit usage data.
-- Total token count across all agents.
-- Estimated cost per complaint in RM.
+- `zai`: primary Z.ai / GLM provider using `ZAI_*` environment variables.
+- `groq`: Groq provider using `GROQ_*` environment variables.
+- `ilmu`: legacy ILMU-compatible provider using `ILMU_*` environment variables.
 
-Cost is calculated in `backend/llm.py` with:
+When Z.ai is selected, provider failures can fall back to Groq. Fallback reasons include timeout, rate limit, provider error, missing key, or invalid response.
+
+The client:
+
+- Calls OpenAI-compatible `/chat/completions` endpoints.
+- Requests JSON mode where supported.
+- Retries without JSON mode when needed.
+- Falls back to key-value parsing if structured JSON fails.
+- Estimates tokens when provider usage data is unavailable.
+- Adds provider and fallback metadata to agent metrics.
+
+Agents also have deterministic fallback logic, so local tests and demo flows can complete without real provider calls when mocked or when `USE_LLM_AGENTS=false`.
+
+---
+
+## Telemetry
+
+Each completed complaint stores:
+
+- Per-agent duration.
+- Per-agent input and output tokens.
+- Execution mode: `llm`, `fallback`, or `unknown`.
+- Provider metadata when available.
+- Total latency.
+- Total tokens.
+- Estimated cost in RM.
+
+Cost calculation lives in `backend/llm.py`:
 
 ```text
 COST_PER_1K_TOKENS_RM = 0.002
 estimated_cost_rm = (total_tokens / 1000) * COST_PER_1K_TOKENS_RM
 ```
 
-Telemetry appears in:
-
-- `/api/complaints`
-- `/api/complaints/{id}`
-- `/api/complaints/{id}/events`
-- `/api/complaints/{id}/stream`
-- the frontend agent trace, case detail modal, command center, and resolution card
+Telemetry appears through the API and in the frontend agent trace, command center, resolution card, and case detail modal.
 
 ---
 
-## Frontend Capabilities
+## API Overview
 
-The frontend is a static React 18 UMD dashboard with no build step. Current capabilities include:
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Returns backend status, UTC time, stored complaint count, active provider/model, and fallback provider. |
+| `POST` | `/api/test-llm` | Sends a prompt to the configured LLM client. |
+| `POST` | `/api/complaints` | Creates a `PROCESSING` placeholder and starts the pipeline in the background. |
+| `GET` | `/api/complaints` | Lists stored complaints, capped to the latest five records. |
+| `GET` | `/api/complaints/{id}` | Returns one complaint record. |
+| `GET` | `/api/complaints/{id}/events` | Returns agent events for one complaint. |
+| `GET` | `/api/complaints/{id}/stream` | Streams agent events with server-sent events. |
 
-- Complaint intake with optional order ID and quick-load scenarios.
-- Agent trace visualization with real backend timings.
-- Trace display modes: stepper, cards, and timeline.
-- Resolution card showing decision, confidence, rationale, bilingual replies, latency, tokens, and RM cost.
-- Copy buttons for English and Bahasa Malaysia replies with visible copied feedback.
-- Editable reply drafts before approval.
-- Approval flow that closes the active case and clears stale trace/resolution state.
-- Recent case log with search, status filters, CSV export, and detail modal.
+Example completed complaint telemetry:
 
-The MVP does not send messages to customers automatically; approval is represented inside the dashboard workflow.
+```json
+{
+  "status": "COMPLETED",
+  "agent_metrics": {
+    "intake": {
+      "agent": "intake",
+      "duration": 0.73,
+      "input_tokens": 184,
+      "output_tokens": 37,
+      "execution_mode": "llm"
+    }
+  },
+  "total_latency": 4.42,
+  "total_tokens": 891,
+  "estimated_cost_rm": 0.001782
+}
+```
 
 ---
 
-## LLM Architecture
+## Frontend
 
-The LLM client in `backend/llm.py` is provider-agnostic and OpenAI-compatible.
+The frontend is a static React app with no package install or build step.
 
-- `LLM_PROVIDER=zai` uses Z.ai / GLM with `ZAI_*` environment variables and reports the configured `ZAI_MODEL` to the frontend through `/api/health`.
-- `LLM_PROVIDER=groq` uses Groq with `GROQ_*` environment variables.
-- `LLM_PROVIDER=ilmu` remains available for the legacy GLM-oriented ILMU configuration with `ILMU_*` environment variables.
-- When Z.ai is selected, timeout, rate limit, provider, missing-key, or invalid-response failures fall back to Groq.
-- Structured output is requested with JSON mode where supported.
-- If JSON mode fails or returns unusable content, the client retries safer request shapes and can parse key-value fallback output.
-- Agents also include deterministic fallback logic for timeouts, invalid structured output, or provider failures.
+Current capabilities:
 
-This gives the MVP practical failover behavior at both the LLM request layer and the agent layer, while keeping provider selection environment-driven.
+- Complaint intake form with optional order ID.
+- Quick-load demo scenarios for delivery delay, damaged item, wrong item, and missing order ID.
+- Backend API fallback: local frontend tries `http://127.0.0.1:8000/api` first, then the hosted Render API.
+- Agent trace display modes: stepper, cards, and timeline.
+- Resolution card with decision, confidence, rationale, bilingual replies, latency, tokens, and RM cost.
+- Reply editing before approval.
+- Copy buttons for generated replies.
+- Approval flow that clears the active workspace.
+- Recent case log with search, status filters, CSV export, and case detail modal.
+- Optional tweak panel support for embedded edit-mode hosts.
+
+Main entry points:
+
+- `frontend/index.html`: redirects to the dashboard HTML file.
+- `frontend/Komplain.ai Dashboard.html`: loads React UMD, styles, data, components, and `app.jsx`.
+- `frontend/app.jsx`: application state and backend integration.
 
 ---
 
-## Tech Stack
+## Storage
 
-- **Backend:** FastAPI, Uvicorn, Pydantic v2, HTTPX, Python 3.13.
-- **Frontend:** React 18 UMD, ReactDOM UMD, Babel Standalone, plain CSS.
-- **LLM:** OpenAI-compatible chat completions client; Z.ai / GLM primary, Groq fallback.
-- **Storage:** JSON files in `data/`.
-- **Testing:** pytest, pytest-asyncio.
-- **Quality / security:** ruff, pip-audit, detect-secrets.
+Data is stored in JSON files under `data/`:
+
+- `orders.json`: sample order records used by the context agent.
+- `complaints.json`: latest complaint records.
+- `agent_events.json`: agent events linked to retained complaints.
+
+`DataManager.MAX_COMPLAINTS` is currently `5`. When a new complaint is added, old complaints beyond the cap are removed and events for removed complaints are pruned.
+
+Sample order IDs currently include:
+
+- `KM-1001`
+- `KM-1002`
+- `KM-1003`
+- `ORD-2041`
+- `ORD-1887`
 
 ---
 
@@ -156,9 +239,8 @@ This gives the MVP practical failover behavior at both the LLM request layer and
 ### Prerequisites
 
 - Python 3.13+
-- A Z.ai API key for the primary GLM provider
-- A Groq API key for fallback
 - A modern browser
+- Optional real-provider API keys for Z.ai and Groq
 
 ### 1. Clone the repository
 
@@ -188,31 +270,42 @@ Windows PowerShell:
 ### 3. Install dependencies
 
 ```bash
-pip install -r backend/requirements.txt
-pip install -r requirements-dev.txt
+python -m pip install -r requirements.txt -r requirements-dev.txt
 ```
+
+`backend/requirements.txt` is also present for Render and currently mirrors the runtime dependencies.
 
 ### 4. Configure environment variables
 
-Create a local `.env` file in the repository root:
+Create `.env` in the repository root. Use `.env.example` as the template:
 
 ```env
 LLM_PROVIDER=zai
-ZAI_API_KEY=your_zai_key_here
+
+ZAI_API_KEY=your_zai_api_key_here
 ZAI_BASE_URL=https://api.z.ai/api/paas/v4
 ZAI_MODEL=glm-5.1
 ZAI_TIMEOUT=60
 ZAI_THINKING_TYPE=disabled
 ZAI_TEMPERATURE=0.1
 
-GROQ_API_KEY=your_groq_key_here
+GROQ_API_KEY=your_groq_api_key_here
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=llama-3.1-8b-instant
 GROQ_TIMEOUT=180
+
 AGENT_LLM_TIMEOUT_SECONDS=180
 ```
 
-No provider API keys should be committed. Use `.env` locally and hosting environment variables in deployment.
+Useful local option:
+
+```env
+USE_LLM_AGENTS=false
+```
+
+That forces deterministic fallback agent logic instead of calling an LLM.
+
+Never commit `.env` or provider API keys.
 
 ### 5. Start the backend
 
@@ -220,84 +313,34 @@ No provider API keys should be committed. Use `.env` locally and hosting environ
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open the API docs at <http://127.0.0.1:8000/docs>.
+Open API docs at <http://127.0.0.1:8000/docs>.
 
 ### 6. Start the frontend
 
-From the `frontend/` directory:
+From the repository root:
 
 ```bash
-python -m http.server 3000 --bind 127.0.0.1
+python -m http.server 3000 --directory frontend --bind 127.0.0.1
 ```
 
 Open <http://127.0.0.1:3000/>.
 
-When served locally, the frontend tries `http://127.0.0.1:8000/api` first and then falls back to the hosted Render API.
-
 ---
 
-## API Overview
+## Testing and CI
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Returns backend status, UTC time, and stored complaint count. |
-| `POST` | `/api/test-llm` | Smoke-tests the configured LLM provider. |
-| `POST` | `/api/complaints` | Creates a `PROCESSING` complaint and starts the pipeline in the background. |
-| `GET` | `/api/complaints` | Lists stored complaints, capped to the latest five records. |
-| `GET` | `/api/complaints/{id}` | Returns one complaint record. |
-| `GET` | `/api/complaints/{id}/events` | Returns agent events for one complaint. |
-| `GET` | `/api/complaints/{id}/stream` | Streams agent events using server-sent events. |
-
-Completed complaint records include telemetry:
-
-```json
-{
-  "agent_metrics": {
-    "intake": {
-      "duration": 0.73,
-      "input_tokens": 184,
-      "output_tokens": 37,
-      "execution_mode": "llm"
-    }
-  },
-  "total_latency": 4.42,
-  "total_tokens": 891,
-  "estimated_cost_rm": 0.001782
-}
-```
-
----
-
-## Testing and CI/CD
-
-The current pytest suite is fully mocked by default and does not call external LLM APIs.
+Run the mocked test suite:
 
 ```bash
 python -m pytest -q
 ```
 
-Current local result:
+The default suite does not call real LLM providers. It covers:
 
-```text
-30 passed
-```
-
-Coverage areas:
-
-- **API:** health, LLM smoke endpoint, complaint creation, retrieval, and event traces.
-- **Agents:** intake extraction, language detection, context lookup, reasoning validation, bilingual response output, and supervisor flags.
-- **LLM parsing:** JSON mode, markdown JSON extraction, key-value fallback, provider switching, and token usage estimation.
-- **Storage:** JSON save/load, order lookup, FIFO complaint cap, and event pruning.
-
-GitHub Actions runs on pushes to `main`, pull requests to `main`, and manual `workflow_dispatch`.
-
-| Job | Purpose |
-|---|---|
-| `lint` | Runs `ruff check backend/ tests/` and `ruff format --check backend/ tests/`. |
-| `test` | Installs runtime/dev dependencies and runs `pytest tests/ -v --tb=short` on Python 3.13. |
-| `security` | Runs `pip-audit -r requirements.txt --strict` and `detect-secrets scan --baseline .secrets.baseline`. |
-
-The security job is marked `continue-on-error: true`, so advisories are visible without blocking demo iteration.
+- API health, LLM smoke route, complaint creation, retrieval, and events.
+- Agent extraction, language detection, context lookup, reasoning validation, bilingual response output, supervisor behavior, and fallback paths.
+- LLM JSON parsing, markdown JSON extraction, key-value fallback, provider switching, and token estimation.
+- JSON storage, order lookup, complaint FIFO cap, and event pruning.
 
 Optional real-provider smoke testing:
 
@@ -308,6 +351,16 @@ $env:GROQ_API_KEY = "your_real_groq_fallback_key"
 python -m pytest tests/ --llm -v
 ```
 
+GitHub Actions runs on pushes to `main`, pull requests to `main`, and manual `workflow_dispatch`.
+
+| Job | Purpose |
+|---|---|
+| `lint` | Runs `ruff check backend/ tests/` and `ruff format --check backend/ tests/`. |
+| `test` | Installs runtime/dev dependencies and runs `pytest tests/ -v --tb=short` on Python 3.13. |
+| `security` | Runs `pip-audit -r requirements.txt --strict` and `detect-secrets scan --baseline .secrets.baseline`. |
+
+The security job is `continue-on-error: true`, so advisories are visible without blocking demo iteration.
+
 ---
 
 ## Deployment
@@ -315,9 +368,9 @@ python -m pytest tests/ --llm -v
 ### Frontend - Vercel
 
 - Public URL: <https://komplain-test-xi2r.vercel.app>
-- Serves the static React app from `frontend/`.
+- Serves the static app from `frontend/`.
 - No frontend build step is required.
-- The deployed frontend points to the hosted Render API in `frontend/app.jsx`.
+- The deployed frontend uses the hosted Render API by default.
 
 ### Backend - Render
 
@@ -334,7 +387,7 @@ pip install -r backend/requirements.txt
 uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 ```
 
-Render environment variables:
+Typical Render environment variables:
 
 - `PYTHON_VERSION=3.13.2`
 - `LLM_PROVIDER=zai`
@@ -342,13 +395,15 @@ Render environment variables:
 - `ZAI_BASE_URL`
 - `ZAI_MODEL`
 - `ZAI_TIMEOUT`
+- `ZAI_THINKING_TYPE`
+- `ZAI_TEMPERATURE`
 - `GROQ_API_KEY`
 - `GROQ_BASE_URL`
 - `GROQ_MODEL`
 - `GROQ_TIMEOUT`
 - `AGENT_LLM_TIMEOUT_SECONDS`
 
-Never commit `.env` or provider API keys. Use the hosting platform's environment-variable settings.
+`app.py` exists as a root ASGI shim for platforms that scan the repository root.
 
 ---
 
@@ -356,46 +411,59 @@ Never commit `.env` or provider API keys. Use the hosting platform's environment
 
 ```text
 Komplain.ai/
-├── README.md
-├── requirements.txt
-├── requirements-dev.txt
-├── pytest.ini
-├── postman_collection.json
-├── .github/workflows/ci.yml
-├── backend/
-│   ├── main.py
-│   ├── agents.py
-│   ├── llm.py
-│   ├── models.py
-│   ├── storage.py
-│   └── requirements.txt
-├── frontend/
-│   ├── index.html
-│   ├── Komplain.ai Dashboard.html
-│   ├── app.jsx
-│   ├── data.js
-│   ├── styles.css
-│   ├── components.css
-│   └── components/
-├── data/
-│   ├── orders.json
-│   ├── complaints.json
-│   └── agent_events.json
-├── docs/
-│   ├── PRD.pdf
-│   ├── SAD.pdf
-│   ├── QATD.pdf
-│   ├── QATD.docx
-│   ├── PitchDeck.pdf
-│   ├── PitchDeck.pptx
-│   └── screenshots/dashboard.png
-└── tests/
-    ├── conftest.py
-    ├── test_api.py
-    ├── test_agents.py
-    ├── test_llm.py
-    ├── test_storage.py
-    └── smoke_test_glm.py
+|-- README.md
+|-- README_BACKEND.md
+|-- app.py
+|-- requirements.txt
+|-- requirements-dev.txt
+|-- pytest.ini
+|-- postman_collection.json
+|-- netlify.toml
+|-- .env.example
+|-- .github/
+|   `-- workflows/ci.yml
+|-- backend/
+|   |-- main.py
+|   |-- agents.py
+|   |-- llm.py
+|   |-- models.py
+|   |-- storage.py
+|   |-- requirements.txt
+|   `-- __init__.py
+|-- frontend/
+|   |-- index.html
+|   |-- Komplain.ai Dashboard.html
+|   |-- app.jsx
+|   |-- data.js
+|   |-- styles.css
+|   |-- components.css
+|   `-- components/
+|       |-- AgentTracePanel.jsx
+|       |-- CaseLog.jsx
+|       |-- CommandCenter.jsx
+|       |-- ComplaintForm.jsx
+|       |-- ResolutionCard.jsx
+|       |-- Topbar.jsx
+|       `-- TweaksPanel.jsx
+|-- data/
+|   |-- orders.json
+|   |-- complaints.json
+|   `-- agent_events.json
+|-- docs/
+|   |-- PRD.pdf
+|   |-- SAD.pdf
+|   |-- QATD.pdf
+|   |-- QATD.docx
+|   |-- PitchDeck.pdf
+|   |-- PitchDeck.pptx
+|   `-- screenshots/dashboard.png
+`-- tests/
+    |-- conftest.py
+    |-- test_api.py
+    |-- test_agents.py
+    |-- test_llm.py
+    |-- test_storage.py
+    `-- smoke_test_glm.py
 ```
 
 ---
@@ -410,19 +478,31 @@ Komplain.ai/
 | QATD editable source | [docs/QATD.docx](./docs/QATD.docx) |
 | Pitch deck | [docs/PitchDeck.pdf](./docs/PitchDeck.pdf) |
 | Pitch deck editable source | [docs/PitchDeck.pptx](./docs/PitchDeck.pptx) |
-| Source code | [GitHub repository](https://github.com/Ph0enix19/Komplain.AI) |
+| Dashboard screenshot | [docs/screenshots/dashboard.png](./docs/screenshots/dashboard.png) |
+| Postman collection | [postman_collection.json](./postman_collection.json) |
 
 ---
 
 ## Known Limitations and Roadmap
 
-These are intentional MVP tradeoffs and clear next steps:
+Current MVP tradeoffs:
 
-- **JSON storage is not scalable:** migrate complaints, orders, and events to PostgreSQL.
-- **No authentication:** add operator login, roles, and tenant isolation.
-- **No rate limiting:** add API-level request throttling and abuse protection.
-- **External LLM dependency:** add stronger provider failover, retries, and offline queue behavior.
-- **No frontend automated tests:** add component and end-to-end tests for the dashboard workflow.
+- JSON storage is not scalable or concurrent-write safe; migrate to PostgreSQL or another managed database.
+- There is no authentication, authorization, tenant isolation, or audit identity.
+- There is no API rate limiting.
+- The frontend has no automated component or end-to-end tests yet.
+- The dashboard approval flow does not persist an explicit `APPROVED` status to the backend.
+- Customer replies are drafted only; no messaging/email integration sends them.
+- LLM output quality depends on provider availability and structured-output reliability.
+
+Likely next steps:
+
+- Add operator login and role-based access.
+- Persist approval/review actions through API endpoints.
+- Move storage to PostgreSQL.
+- Add retry queues and stronger provider failover controls.
+- Add frontend tests and Playwright coverage for the main workflow.
+- Add deployment health checks that exercise a short mocked or deterministic pipeline.
 
 ---
 
