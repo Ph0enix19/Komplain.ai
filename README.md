@@ -291,7 +291,7 @@ ZAI_TEMPERATURE=0.1
 
 GROQ_API_KEY=your_groq_api_key_here
 GROQ_BASE_URL=https://api.groq.com/openai/v1
-GROQ_MODEL=llama-3.1-8b-instant
+GROQ_MODEL=llama-3.3-70b-versatile
 GROQ_TIMEOUT=180
 
 AGENT_LLM_TIMEOUT_SECONDS=180
