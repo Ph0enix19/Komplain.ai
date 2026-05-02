@@ -119,18 +119,13 @@ def make_client(tmp_path, monkeypatch) -> TestClient:
     return TestClient(main.app)
 
 
-def test_health_returns_200(tmp_path, monkeypatch) -> None:
+def test_health_returns_200_with_operational_fields(tmp_path, monkeypatch) -> None:
     with make_client(tmp_path, monkeypatch) as client:
         response = client.get("/api/health")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
-
-
-def test_health_response_contains_operational_fields(tmp_path, monkeypatch) -> None:
-    with make_client(tmp_path, monkeypatch) as client:
-        payload = client.get("/api/health").json()
-
+    payload = response.json()
+    assert payload["status"] == "ok"
     assert "time" in payload
     assert payload["complaints_count"] == 0
 

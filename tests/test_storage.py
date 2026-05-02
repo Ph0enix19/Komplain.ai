@@ -17,17 +17,13 @@ def test_complaint_save_and_load_works(tmp_path) -> None:
     }
 
 
-def test_order_save_and_load_defaults_to_empty_list(tmp_path) -> None:
+def test_order_defaults_and_lookup_work(tmp_path) -> None:
     manager = DataManager(data_dir=str(tmp_path))
     manager.load_all()
 
     assert manager.orders == []
     assert manager.get_order("missing") is None
 
-
-def test_get_order_returns_matching_order(tmp_path) -> None:
-    manager = DataManager(data_dir=str(tmp_path))
-    manager.load_all()
     manager.orders = [{"order_id": "KM-1001", "customer_name": "Aisyah"}]
 
     assert manager.get_order("KM-1001") == {"order_id": "KM-1001", "customer_name": "Aisyah"}

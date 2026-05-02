@@ -205,7 +205,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"complaint_text\": \"My Bluetooth speaker arrived with a broken screen and I want help with this order.\",\n  \"order_id\": \"KM-1001\"\n}",
+          "raw": "{\n  \"complaint_text\": \"My denim jacket order ORD-26 arrived with a torn sleeve and I want help with this order.\",\n  \"order_id\": \"ORD-26\"\n}",
           "options": {
             "raw": {
               "language": "json"

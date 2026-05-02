@@ -2,6 +2,14 @@
 
 # Komplain.ai
 
+<p>
+  <img src="./docs/logos/UMH.jpg" alt="UMHackathon 2026 logo" height="52">
+  &nbsp;&nbsp;
+  <img src="./docs/logos/Z%20AI%20Logo%20(Restricted%20Usage).png" alt="Z AI logo" height="52">
+  &nbsp;&nbsp;
+  <img src="./docs/logos/YATL%20LOGO.png" alt="YTL AI Labs logo" height="52">
+</p>
+
 [![CI](https://github.com/Ph0enix19/Komplain.AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Ph0enix19/Komplain.AI/actions/workflows/ci.yml)
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![FastAPI 0.136](https://img.shields.io/badge/FastAPI-0.136-009688?logo=fastapi&logoColor=white)
@@ -27,6 +35,7 @@ Komplain.ai turns messy customer complaints into structured decisions, bilingual
 | [Live Frontend](https://komplain-test-xi2r.vercel.app) | Vercel-hosted dashboard for the judging demo |
 | [Backend Health](https://komplaintest.onrender.com/api/health) | Render-hosted FastAPI health check |
 | [GitHub Repository](https://github.com/Ph0enix19/Komplain.AI) | Source code and CI history |
+| [Finalist Deliverables](#finalist-deliverables) | Docs, Postman collections, and logo assets |
 | [Testing & CI](#testing-and-ci) | Local and GitHub Actions verification |
 | [Image Upload Test](#test-image-upload-and-damage-analysis) | Procedure for visual damage analysis |
 | [Judging Criteria Map](#judging-criteria-map) | How this project addresses UMHackathon scoring areas |
@@ -47,6 +56,12 @@ The UMHackathon finalist handbook asks teams to keep the repository and delivera
 | Live Demo | [Frontend](https://komplain-test-xi2r.vercel.app) and [backend health](https://komplaintest.onrender.com/api/health) |
 | Core Postman API Collection | [postman_collection.json](./postman_collection.json) |
 | QATD Postman Evidence Collection | [postman_qatd_collection.json](./postman_qatd_collection.json) |
+| Business Proposal PDF | [docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission.pdf](./docs/Group_AS_ID_178_Komplain_ai_Business_Proposal_Final_Submission.pdf) |
+| Development / Deployment Plan PDF | [docs/Group_AS_Id_178_Komplain_AI_Development_Plan_Final_Ss.pdf](./docs/Group_AS_Id_178_Komplain_AI_Development_Plan_Final_Ss.pdf) |
+| QATD PDF | [docs/qatd.pdf](./docs/qatd.pdf) - placeholder file currently present |
+| Pitch Deck PDF | [docs/pitch.pdf](./docs/pitch.pdf) - placeholder file currently present |
+| Pitch Deck PPTX | [docs/pitch.pptx](./docs/pitch.pptx) - placeholder file currently present |
+| Logo Assets | [UMH.jpg](./docs/logos/UMH.jpg), [Z AI Logo](./docs/logos/Z%20AI%20Logo%20(Restricted%20Usage).png), [YTL AI Labs Logo](./docs/logos/YATL%20LOGO.png) |
 | Quality Assurance Notes | See [Testing and CI](#testing-and-ci) |
 | Deployment Plan Summary | See [Deployment](#deployment) |
 | Architecture Summary | See [Architecture](#architecture) |
@@ -83,11 +98,13 @@ Useful demo order IDs from [data/orders.json](./data/orders.json):
 
 | Order ID | Demo angle |
 |---|---|
-| `KM-1001` | Damaged or refund-oriented cases |
-| `KM-1002` | Delivery delay / reship flow |
-| `KM-1003` | Missing or unclear order context |
-| `ORD-2041` | Additional order lookup scenario |
-| `ORD-1887` | Additional order lookup scenario |
+| `ORD-15` | Wrong-size apparel case; good for `RESHIP` with clear delivered order context. |
+| `ORD-26` | Damaged denim jacket scenario; good for Manglish text plus image evidence. |
+| `ORD-37` | Delivered kids boots case; useful for missing-item or clarification demos. |
+| `ORD-48` | In-transit Bluetooth speaker; good for delivery delay / follow-up reasoning. |
+| `ORD-59` | Ceramic plate set delivered recently; good for damaged fragile-item refund demos. |
+| `ORD-70` | Older delivered running shoes with reship disabled; useful for policy-bound review. |
+| `ORD-104` | White sport shoes delivered order; useful as a lightweight lookup scenario. |
 
 ---
 
@@ -295,7 +312,7 @@ Use the dashboard form or call the API:
 ```bash
 curl -X POST http://127.0.0.1:8000/api/complaints \
   -H "Content-Type: application/json" \
-  -d "{\"complaint_text\":\"Hi, saya punya order KM-1001 arrived damaged. Can refund?\"}"
+  -d "{\"complaint_text\":\"Hi, saya punya order ORD-26 arrived damaged. Can refund?\"}"
 ```
 
 The API returns a `PROCESSING` placeholder immediately, then the background pipeline updates the stored complaint and event trace.
@@ -329,8 +346,8 @@ The dashboard shows each agent step with:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/complaints \
-  -F "complaint_text=Order KM-1001 arrived with a torn box and cracked item. Please help refund." \
-  -F "order_id=KM-1001" \
+  -F "complaint_text=Order ORD-26 arrived with a torn sleeve and damaged packaging. Please help review." \
+  -F "order_id=ORD-26" \
   -F "image=@data/images/damaged-box.jpg;type=image/jpeg"
 ```
 
@@ -396,12 +413,23 @@ Run the mocked test suite:
 python -m pytest -q
 ```
 
+Current pytest collection count: **55 tests**.
+
 Run lint and format checks:
 
 ```bash
 ruff check backend/ tests/
 ruff format --check backend/ tests/
 ```
+
+### Postman Collections
+
+| Collection | Purpose | Requests | `pm.test(...)` assertions |
+|---|---|---:|---:|
+| [postman_collection.json](./postman_collection.json) | Core API smoke test for the happy path: health, LLM smoke, create complaint, fetch complaint. | 4 | 9 |
+| [postman_qatd_collection.json](./postman_qatd_collection.json) | QATD evidence suite covering smoke paths, validation failures, missing records, agent events, latest-five list cap, and SSE stream smoke. | 10 | 22 |
+
+Both collections use the current `ORD-26` demo order from [data/orders.json](./data/orders.json).
 
 The tests cover:
 
