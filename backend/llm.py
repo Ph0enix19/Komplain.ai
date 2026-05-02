@@ -43,7 +43,7 @@ class ILMUClient:
         if self.provider == "groq":
             default_base_url = "https://api.groq.com/openai/v1"
             self.base_url = (base_url or os.getenv("GROQ_BASE_URL", default_base_url)).rstrip("/")
-            self.model = model or os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+            self.model = model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
             self.api_key = os.getenv("GROQ_API_KEY")
             self.api_key_env_var = "GROQ_API_KEY"
             self.reasoning_effort = None

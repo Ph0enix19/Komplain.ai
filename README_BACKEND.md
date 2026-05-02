@@ -33,7 +33,7 @@ backend/requirements.txt
    ZAI_MODEL=glm-5.1
    ZAI_TEMPERATURE=0.1
    GROQ_API_KEY=your_groq_api_key_here
-   GROQ_MODEL=llama-3.1-8b-instant
+   GROQ_MODEL=llama-3.3-70b-versatile
    ```
    Z.ai / GLM is the primary provider. Groq remains the fallback when Z.ai times out, rate-limits, returns invalid output, or is missing configuration.
 3. Run API:
