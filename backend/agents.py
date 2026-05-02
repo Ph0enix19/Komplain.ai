@@ -329,12 +329,16 @@ async def reasoning_agent(
         payload["requires_human_review"] = False
         payload["confidence"] = max(payload["confidence"], 0.82)
         if not payload.get("rationale") or "manual" in str(payload.get("rationale")).lower():
-            payload["rationale"] = "Wrong item reported for an order found in the system; replacement is the preferred policy path."
+            payload["rationale"] = (
+                "Wrong item reported for an order found in the system; replacement is the preferred policy path."
+            )
     if _should_dismiss_refund_request(complaint_text, intake, context):
         payload["decision"] = "DISMISS"
         payload["requires_human_review"] = False
         payload["confidence"] = max(payload["confidence"], 0.9)
-        payload["rationale"] = "Change-of-mind refund request is outside the seller refund window and no damage or fulfillment issue is claimed."
+        payload["rationale"] = (
+            "Change-of-mind refund request is outside the seller refund window and no damage or fulfillment issue is claimed."
+        )
     if isinstance(payload.get("rationale"), str):
         payload["rationale"] = payload["rationale"].strip()
     try:

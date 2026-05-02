@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import time
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 from uuid import uuid4
@@ -35,7 +36,17 @@ from backend.storage import DataManager
 
 load_dotenv(override=True)
 
-app = FastAPI(title="Komplain.ai Backend", version="0.1.0")
+data_manager = DataManager(data_dir="data")
+ilmu_client = ILMUClient()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    data_manager.load_all()
+    yield
+
+
+app = FastAPI(title="Komplain.ai Backend", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,9 +55,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-data_manager = DataManager(data_dir="data")
-ilmu_client = ILMUClient()
 
 
 async def run_intake_agent(complaint_text: str, metrics: dict | None = None) -> dict:
@@ -245,11 +253,6 @@ async def _run_pipeline_in_background(complaint_id: str, complaint_text: str, cr
                 "error": str(exc),
             }
         )
-
-
-@app.on_event("startup")
-def startup() -> None:
-    data_manager.load_all()
 
 
 @app.get("/api/health")

@@ -558,7 +558,9 @@ class ILMUClient:
             result = await operation(self)
         except Exception as exc:
             if not self.fallback_client:
-                self._set_provider_metadata(self.provider, fallback_used=False, fallback_reason=self._fallback_reason(exc))
+                self._set_provider_metadata(
+                    self.provider, fallback_used=False, fallback_reason=self._fallback_reason(exc)
+                )
                 raise
 
             fallback_reason = self._fallback_reason(exc)
